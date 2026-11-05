@@ -12,6 +12,7 @@ jobs:
       - run: corepack pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm gen:crud-schema:check
       - run: pnpm test
       - run: pnpm format:check
       - run: pnpm build

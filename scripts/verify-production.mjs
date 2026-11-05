@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 export function assertProduction(text) {
   if (
-    /vite-plugin-fake-server|vitePluginFakeServer|enableProd\s*:\s*true|admin123|fake-user|\/mock\//i.test(
+    /vite-plugin-fake-server|vitePluginFakeServer|enableProd\s*:\s*true|admin123|fake-user|\/mock\/|synthetic-browser-only|组件验收台|test\/crud-browser/i.test(
       text
     )
   )

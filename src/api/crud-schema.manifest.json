@@ -1,0 +1,9 @@
+{
+  "generator": "openapi-typescript",
+  "revision": "651af0615ac995653f8624692a40ed22baa2d71b",
+  "source": "T03 framework schema subset (test/fixtures/t03-openapi.json)",
+  "schemaSha256": "ba5d6b788deafd9a5991bb82fd544e2cbbd725fec361c15be8021e9bfb266db7",
+  "operationCount": 0,
+  "permissionsProvided": false,
+  "files": ["crud-schema.d.ts", "crud-schema.manifest.json"]
+}

@@ -1,0 +1,178 @@
+{
+  "resource": "test/demo-user",
+  "label": "演示用户",
+  "permPrefix": "test:demo-user",
+  "api": [
+    "page",
+    "info",
+    "add",
+    "update",
+    "delete"
+  ],
+  "deleteMode": "soft",
+  "columns": [
+    {
+      "field": "id",
+      "label": "编号",
+      "sortable": true
+    },
+    {
+      "field": "version",
+      "label": "版本号",
+      "sortable": false
+    },
+    {
+      "field": "createdBy",
+      "label": "创建人",
+      "sortable": false
+    },
+    {
+      "field": "updatedBy",
+      "label": "修改人",
+      "sortable": false
+    },
+    {
+      "field": "createdAt",
+      "label": "创建时间",
+      "sortable": true
+    },
+    {
+      "field": "updatedAt",
+      "label": "修改时间",
+      "sortable": true
+    },
+    {
+      "field": "username",
+      "label": "账号",
+      "width": 140,
+      "sortable": true
+    },
+    {
+      "field": "nickname",
+      "label": "姓名",
+      "sortable": true
+    },
+    {
+      "field": "status",
+      "label": "状态",
+      "sortable": false,
+      "dict": "status"
+    }
+  ],
+  "form": [
+    {
+      "field": "username",
+      "label": "账号",
+      "component": "input",
+      "required": true,
+      "edit": "add"
+    },
+    {
+      "field": "nickname",
+      "label": "姓名",
+      "component": "input",
+      "required": true,
+      "edit": "both"
+    },
+    {
+      "field": "status",
+      "label": "状态",
+      "component": "select",
+      "required": false,
+      "edit": "both",
+      "dict": "status"
+    },
+    {
+      "field": "remark",
+      "label": "备注",
+      "component": "textarea",
+      "required": false,
+      "edit": "both"
+    }
+  ],
+  "query": [
+    {
+      "field": "status",
+      "label": "状态",
+      "operators": [
+        "eq"
+      ]
+    },
+    {
+      "field": "orgId",
+      "label": "所属组织",
+      "operators": [
+        "eq"
+      ]
+    }
+  ],
+  "dictionaries": {
+    "status": [
+      {
+        "value": "enabled",
+        "label": "正常"
+      },
+      {
+        "value": "disabled",
+        "label": "停用"
+      }
+    ]
+  },
+  "actions": {
+    "page": {
+      "readable": [
+        "id",
+        "version",
+        "createdBy",
+        "updatedBy",
+        "createdAt",
+        "updatedAt",
+        "username",
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ],
+      "sortable": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "username",
+        "nickname"
+      ],
+      "filterable": [
+        "status",
+        "orgId"
+      ],
+      "keyWords": [
+        "username",
+        "nickname"
+      ]
+    },
+    "add": {
+      "writable": [
+        "username",
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ]
+    },
+    "update": {
+      "writable": [
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ]
+    }
+  },
+  "defaultSort": [
+    {
+      "field": "id",
+      "order": "desc"
+    }
+  ],
+  "maxSize": 100,
+  "children": []
+}

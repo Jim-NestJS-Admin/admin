@@ -106,3 +106,34 @@ admin:
   retry: Retry
   accountPlaceholder: Enter your account
   passwordPlaceholder: Enter your password
+crud:
+  title: Records
+  add: Add
+  edit: Edit
+  remove: Delete
+  batchRemove: Delete selected
+  confirmRemove: Delete the {count} selected records?
+  confirm: Confirm
+  cancel: Cancel
+  save: Save
+  apply: Apply
+  filter: Categories
+  search: Search
+  columns: Columns
+  actions: Actions
+  density: Table density
+  small: Compact
+  default: Standard
+  large: Spacious
+  width: Column width
+  fixed: Pin column
+  unfixed: Unpinned
+  left: Left
+  right: Right
+  up: Move up
+  down: Move down
+  reset: Restore defaults
+  reload: Reload
+  required: This field is required
+  invalidData: Invalid record ID or version. Refresh the list
+  requestFailed: Operation failed. Please try again later

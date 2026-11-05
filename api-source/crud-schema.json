@@ -1,0 +1,267 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "contact": {},
+    "description": "后台、APP、网站、开放接口。统一响应格式：{ code, data, message }，code 为 1000 表示成功。",
+    "title": "jim-nestjs-admin 接口",
+    "version": "0.0.1"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "CrudSchema": {
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/CrudSchemaActions"
+          },
+          "api": {
+            "items": {
+              "enum": ["page", "info", "add", "update", "delete"],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaColumn"
+            },
+            "type": "array"
+          },
+          "defaultSort": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaSort"
+            },
+            "type": "array"
+          },
+          "deleteMode": {
+            "enum": ["soft", "hard"],
+            "type": "string"
+          },
+          "dictionaries": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/CrudSchemaDictItem"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          },
+          "form": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaFormItem"
+            },
+            "type": "array"
+          },
+          "label": {
+            "type": "string"
+          },
+          "maxSize": {
+            "type": "number"
+          },
+          "permPrefix": {
+            "description": "权限码前缀",
+            "example": "system:user",
+            "type": "string"
+          },
+          "query": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaQueryItem"
+            },
+            "type": "array"
+          },
+          "resource": {
+            "example": "system/user",
+            "type": "string"
+          }
+        },
+        "required": [
+          "resource",
+          "label",
+          "permPrefix",
+          "api",
+          "deleteMode",
+          "columns",
+          "form",
+          "query",
+          "dictionaries",
+          "actions",
+          "defaultSort",
+          "maxSize"
+        ],
+        "type": "object"
+      },
+      "CrudSchemaActions": {
+        "properties": {
+          "add": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          },
+          "page": {
+            "$ref": "#/components/schemas/CrudSchemaPageAction"
+          },
+          "update": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          }
+        },
+        "type": "object"
+      },
+      "CrudSchemaColumn": {
+        "properties": {
+          "dict": {
+            "description": "字典名，对应 dictionaries 里的键",
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sortable": {
+            "type": "boolean"
+          },
+          "width": {
+            "type": "number"
+          }
+        },
+        "required": ["field", "label", "sortable"],
+        "type": "object"
+      },
+      "CrudSchemaDictItem": {
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "required": ["value", "label"],
+        "type": "object"
+      },
+      "CrudSchemaFormItem": {
+        "properties": {
+          "component": {
+            "enum": [
+              "input",
+              "textarea",
+              "number",
+              "select",
+              "switch",
+              "date",
+              "datetime"
+            ],
+            "type": "string"
+          },
+          "dict": {
+            "type": "string"
+          },
+          "edit": {
+            "description": "both：新增和修改都能写；add：只在新增时写；none：只读",
+            "enum": ["both", "add", "none"],
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": ["field", "label", "component", "required", "edit"],
+        "type": "object"
+      },
+      "CrudSchemaPageAction": {
+        "properties": {
+          "filterable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "keyWords": {
+            "description": "搜索框匹配的字段",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "readable": {
+            "description": "最多能看哪些列；每一行实际状态以接口逐行返回为准",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sortable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["readable", "sortable", "filterable", "keyWords"],
+        "type": "object"
+      },
+      "CrudSchemaQueryItem": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "operators": {
+            "description": "可用的运算符；高级查询在 T18 扩展",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["field", "label", "operators"],
+        "type": "object"
+      },
+      "CrudSchemaSort": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "order": {
+            "enum": ["asc", "desc"],
+            "type": "string"
+          }
+        },
+        "required": ["field", "order"],
+        "type": "object"
+      },
+      "CrudSchemaWriteAction": {
+        "properties": {
+          "writable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["writable"],
+        "type": "object"
+      }
+    }
+  }
+}

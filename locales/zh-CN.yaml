@@ -106,3 +106,34 @@ admin:
   retry: 重试
   accountPlaceholder: 请输入账号
   passwordPlaceholder: 请输入密码
+crud:
+  title: 数据列表
+  add: 新增
+  edit: 编辑
+  remove: 删除
+  batchRemove: 批量删除
+  confirmRemove: 确定删除选中的 {count} 条记录吗？
+  confirm: 确定
+  cancel: 取消
+  save: 保存
+  apply: 应用
+  filter: 分类筛选
+  search: 搜索
+  columns: 列设置
+  actions: 操作
+  density: 表格密度
+  small: 紧凑
+  default: 标准
+  large: 宽松
+  width: 列宽
+  fixed: 固定列
+  unfixed: 不固定
+  left: 左侧
+  right: 右侧
+  up: 上移
+  down: 下移
+  reset: 恢复默认
+  reload: 重新加载
+  required: 此项必填
+  invalidData: 数据标识或版本无效，请刷新
+  requestFailed: 操作未完成，请稍后重试
