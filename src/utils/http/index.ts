@@ -32,12 +32,19 @@ export class PureHttp {
       typeof window === "undefined"
         ? "http://localhost"
         : window.location.origin;
-    const target = new URL(url, origin);
+    let target: URL;
+    let pathname: string;
+    try {
+      target = new URL(url, origin);
+      pathname = decodeURIComponent(target.pathname);
+    } catch {
+      throw new RequestFailure(normalizeFailure(null));
+    }
     if (
       !url.startsWith("/admin/") ||
       target.origin !== origin ||
       !target.pathname.startsWith("/admin/") ||
-      /[\\]/.test(decodeURIComponent(target.pathname)) ||
+      /[\\]/.test(pathname) ||
       params.baseURL ||
       config.baseURL
     )

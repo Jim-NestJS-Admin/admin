@@ -48,3 +48,23 @@ ALTCHA 3.5.0 是本次新增依赖，用于规则指定的人机验证；账号�
 24 项测试包括真实 HTTP 服务的非 2xx/重放/取消、权限指令的动态撤销、跨标签页消息丢失/退出竞态。另以 test/session-browser.html 在两个真实浏览器标签页验证并发只执行一次和在途旧结果作废（shots/session-coordination.png），测试页面不进入生产入口或产物。它只传递合成数字，不构造可登录的假会话。
 
 真实 Cookie/ALTCHA/菜单权限与组织认证联调仍等 T05/T06 + T12。正式手机尺寸尚未确认，浏览器的视口覆盖接口仍未实际生效；保留为后续可验证事项，不冒称本轮手机验收通过。T11 整体保持进行中，本次收尾可先交审。
+
+## T12 接口生成
+
+新增开发依赖 openapi-typescript 7.13.0，按官方 Node API 将 OpenAPI 引用、组合类型和枚举转换为类型，再生成接入既有 HTTP 层的操作函数；不自行实现 schema 类型解析。参考：https://openapi-ts.dev/node 。
+
+```sh
+pnpm gen:api
+pnpm gen:api:check
+pnpm gen:api --input https://example.com/admin.json --source-revision <后端提交号>
+```
+
+默认读 ../server/openapi/admin.json，生成 src/api/schema.d.ts、client.ts、constants.ts、manifest.json，禁止手改。manifest 记录后端提交号、输入 SHA256 和操作数；api-source/admin.json 是同次输入快照，使只有 admin 仓库的 CI 仍可验证全部生成文件一致。若没有相邻后端仓库，默认使用已提交快照及 manifest 中的来源信息。远程地址必须显式给后端提交号，禁止 URL 携带凭据/查询参数，禁止重定向和外部引用。
+
+当前正式 admin.json 没有业务路径，正式客户端故意为空；权限扩展缺失时生成空集合并提示，不从路由猜权限。T06 可在根或操作上给 x-permissions 字符串数组，在根给 x-scopes 字符串数组；标准 OAuth2 flow 的 scopes 也会收集。ENUMS 按完整 schema 属性路径生成，保留原始枚举值。后端采用其他扩展结构时需共同对齐，不能静默猜测。
+
+使用示例：业务页从 src/api/client 导入 api，调用由 operationId 命名的函数；请求参数分 body/path/query/headers，统一返回值类型直接来自 OpenAPI 成功响应信封。原始出题响应在认证适配层显式传 responseMode: raw、authPolicy: none，不能把它误判为统一信封；实际认证适配仍待 T05/T06 导出。multipart 按契约构造 FormData，binary 类型生成 Blob。
+
+测试源 test/fixtures/t03-openapi.json 来自已经审查的 server 651af06 的真实测试实体和控制器，10 个操作；来源见 t03-provenance.json。导出工具 scripts/export-t03-openapi.mjs 只编译测试资源并创建没有数据库模块的 Nest 应用，未连接数据库。复现时在 Codex 独立 server worktree 核实对应提交后运行 pnpm gen:api:fixture；该工具会更新测试快照，不会把测试端点写入正式 src/api。
+
+测试覆盖可重复生成、真实 T03 DTO 的正反类型断言、请求版本与幂等键转发、引用/重复 operationId 拒绝、路径参数编码、multipart、正式产物与输入快照一致。生成器只写固定目录与自己拥有的文件，不覆盖手写文件或符号链接。当前分支基于 T11 8e5d1de，尚未自动合并。

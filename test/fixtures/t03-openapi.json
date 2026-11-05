@@ -1,0 +1,1329 @@
+{
+  "components": {
+    "schemas": {
+      "ApiErrorBody": {
+        "properties": {
+          "code": {
+            "description": "业务码，非 1000 都是失败",
+            "example": 4000,
+            "type": "number"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiErrorData"
+              }
+            ],
+            "nullable": true,
+            "type": "object"
+          },
+          "message": {
+            "example": "请求参数有误",
+            "type": "string"
+          }
+        },
+        "required": ["code", "data", "message"],
+        "type": "object"
+      },
+      "ApiErrorData": {
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ApiFieldError"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ApiFieldError": {
+        "properties": {
+          "clientId": {
+            "description": "新增子行的客户端标识",
+            "type": "string"
+          },
+          "field": {
+            "example": "username",
+            "type": "string"
+          },
+          "id": {
+            "description": "已有子行的编号",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "resource": {
+            "description": "子表资源名（主子表保存时）",
+            "type": "string"
+          }
+        },
+        "required": ["field", "messages"],
+        "type": "object"
+      },
+      "CrudSchema": {
+        "properties": {
+          "actions": {
+            "$ref": "#/components/schemas/CrudSchemaActions"
+          },
+          "api": {
+            "items": {
+              "enum": ["page", "info", "add", "update", "delete"],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaColumn"
+            },
+            "type": "array"
+          },
+          "defaultSort": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaSort"
+            },
+            "type": "array"
+          },
+          "deleteMode": {
+            "enum": ["soft", "hard"],
+            "type": "string"
+          },
+          "dictionaries": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/CrudSchemaDictItem"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          },
+          "form": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaFormItem"
+            },
+            "type": "array"
+          },
+          "label": {
+            "type": "string"
+          },
+          "maxSize": {
+            "type": "number"
+          },
+          "permPrefix": {
+            "description": "权限码前缀",
+            "example": "system:user",
+            "type": "string"
+          },
+          "query": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaQueryItem"
+            },
+            "type": "array"
+          },
+          "resource": {
+            "example": "system/user",
+            "type": "string"
+          }
+        },
+        "required": [
+          "resource",
+          "label",
+          "permPrefix",
+          "api",
+          "deleteMode",
+          "columns",
+          "form",
+          "query",
+          "dictionaries",
+          "actions",
+          "defaultSort",
+          "maxSize"
+        ],
+        "type": "object"
+      },
+      "CrudSchemaActions": {
+        "properties": {
+          "add": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          },
+          "page": {
+            "$ref": "#/components/schemas/CrudSchemaPageAction"
+          },
+          "update": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          }
+        },
+        "type": "object"
+      },
+      "CrudSchemaColumn": {
+        "properties": {
+          "dict": {
+            "description": "字典名，对应 dictionaries 里的键",
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sortable": {
+            "type": "boolean"
+          },
+          "width": {
+            "type": "number"
+          }
+        },
+        "required": ["field", "label", "sortable"],
+        "type": "object"
+      },
+      "CrudSchemaDictItem": {
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        "required": ["value", "label"],
+        "type": "object"
+      },
+      "CrudSchemaFormItem": {
+        "properties": {
+          "component": {
+            "enum": [
+              "input",
+              "textarea",
+              "number",
+              "select",
+              "switch",
+              "date",
+              "datetime"
+            ],
+            "type": "string"
+          },
+          "dict": {
+            "type": "string"
+          },
+          "edit": {
+            "description": "both：新增和修改都能写；add：只在新增时写；none：只读",
+            "enum": ["both", "add", "none"],
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": ["field", "label", "component", "required", "edit"],
+        "type": "object"
+      },
+      "CrudSchemaPageAction": {
+        "properties": {
+          "filterable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "keyWords": {
+            "description": "搜索框匹配的字段",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "readable": {
+            "description": "最多能看哪些列；每一行实际状态以接口逐行返回为准",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sortable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["readable", "sortable", "filterable", "keyWords"],
+        "type": "object"
+      },
+      "CrudSchemaQueryItem": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "operators": {
+            "description": "可用的运算符；高级查询在 T18 扩展",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["field", "label", "operators"],
+        "type": "object"
+      },
+      "CrudSchemaSort": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "order": {
+            "enum": ["asc", "desc"],
+            "type": "string"
+          }
+        },
+        "required": ["field", "order"],
+        "type": "object"
+      },
+      "CrudSchemaWriteAction": {
+        "properties": {
+          "writable": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["writable"],
+        "type": "object"
+      },
+      "TestDemoLogAddBody": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TestDemoLogAddData"
+          }
+        },
+        "required": ["data"],
+        "type": "object"
+      },
+      "TestDemoLogAddData": {
+        "properties": {
+          "message": {
+            "description": "内容",
+            "type": "string"
+          }
+        },
+        "required": ["message"],
+        "type": "object"
+      },
+      "TestDemoLogDeleteBody": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": ["ids"],
+        "type": "object"
+      },
+      "TestDemoLogDeleteResult": {
+        "properties": {
+          "count": {
+            "description": "删除的行数",
+            "type": "number"
+          }
+        },
+        "required": ["count"],
+        "type": "object"
+      },
+      "TestDemoLogPageBody": {
+        "properties": {
+          "eq": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TestDemoLogPageEq"
+              }
+            ],
+            "description": "按等于筛选"
+          },
+          "keyword": {
+            "description": "这个资源没有配置搜索字段，传了也不生效",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "page": {
+            "default": 1,
+            "minimum": 1,
+            "type": "number"
+          },
+          "size": {
+            "default": 20,
+            "maximum": 500,
+            "minimum": 1,
+            "type": "number"
+          },
+          "sort": {
+            "items": {
+              "$ref": "#/components/schemas/TestDemoLogPageSort"
+            },
+            "maxItems": 5,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TestDemoLogPageEq": {
+        "properties": {},
+        "type": "object"
+      },
+      "TestDemoLogPageResult": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/TestDemoLogRow"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "number"
+          },
+          "size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": ["list", "total", "page", "size"],
+        "type": "object"
+      },
+      "TestDemoLogPageSort": {
+        "properties": {
+          "field": {
+            "description": "排序字段",
+            "enum": ["id", "createdAt", "updatedAt"],
+            "type": "string"
+          },
+          "order": {
+            "enum": ["asc", "desc"],
+            "type": "string"
+          }
+        },
+        "required": ["field", "order"],
+        "type": "object"
+      },
+      "TestDemoLogRow": {
+        "properties": {
+          "createdAt": {
+            "description": "创建时间",
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "description": "创建人",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "编号",
+            "example": "1",
+            "type": "string"
+          },
+          "message": {
+            "description": "内容",
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "修改时间",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "修改人",
+            "nullable": true,
+            "type": "string"
+          },
+          "version": {
+            "description": "版本号，修改时原样带回",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "createdBy",
+          "updatedBy",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "message"
+        ],
+        "type": "object"
+      },
+      "TestDemoUserAddBody": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TestDemoUserAddData"
+          }
+        },
+        "required": ["data"],
+        "type": "object"
+      },
+      "TestDemoUserAddData": {
+        "properties": {
+          "nickname": {
+            "description": "姓名",
+            "type": "string"
+          },
+          "orgId": {
+            "description": "所属组织",
+            "nullable": true,
+            "type": "object"
+          },
+          "remark": {
+            "description": "备注",
+            "nullable": true,
+            "type": "object"
+          },
+          "status": {
+            "description": "状态",
+            "enum": ["enabled", "disabled"],
+            "type": "string"
+          },
+          "username": {
+            "description": "账号",
+            "type": "string"
+          }
+        },
+        "required": ["username", "nickname"],
+        "type": "object"
+      },
+      "TestDemoUserDeleteBody": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": ["ids"],
+        "type": "object"
+      },
+      "TestDemoUserDeleteResult": {
+        "properties": {
+          "count": {
+            "description": "删除的行数",
+            "type": "number"
+          }
+        },
+        "required": ["count"],
+        "type": "object"
+      },
+      "TestDemoUserInfoBody": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          }
+        },
+        "required": ["id"],
+        "type": "object"
+      },
+      "TestDemoUserPageBody": {
+        "properties": {
+          "eq": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TestDemoUserPageEq"
+              }
+            ],
+            "description": "按等于筛选"
+          },
+          "keyword": {
+            "description": "搜索框，模糊匹配：username、nickname",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "page": {
+            "default": 1,
+            "minimum": 1,
+            "type": "number"
+          },
+          "size": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "number"
+          },
+          "sort": {
+            "items": {
+              "$ref": "#/components/schemas/TestDemoUserPageSort"
+            },
+            "maxItems": 5,
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TestDemoUserPageEq": {
+        "properties": {
+          "orgId": {
+            "description": "所属组织",
+            "nullable": true,
+            "type": "object"
+          },
+          "status": {
+            "description": "状态",
+            "enum": ["enabled", "disabled"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TestDemoUserPageResult": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/TestDemoUserRow"
+            },
+            "type": "array"
+          },
+          "page": {
+            "type": "number"
+          },
+          "size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": ["list", "total", "page", "size"],
+        "type": "object"
+      },
+      "TestDemoUserPageSort": {
+        "properties": {
+          "field": {
+            "description": "排序字段",
+            "enum": ["id", "createdAt", "updatedAt", "username", "nickname"],
+            "type": "string"
+          },
+          "order": {
+            "enum": ["asc", "desc"],
+            "type": "string"
+          }
+        },
+        "required": ["field", "order"],
+        "type": "object"
+      },
+      "TestDemoUserRow": {
+        "properties": {
+          "createdAt": {
+            "description": "创建时间",
+            "format": "date-time",
+            "type": "string"
+          },
+          "createdBy": {
+            "description": "创建人",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "description": "编号",
+            "example": "1",
+            "type": "string"
+          },
+          "nickname": {
+            "description": "姓名",
+            "type": "string"
+          },
+          "orgId": {
+            "description": "所属组织",
+            "nullable": true,
+            "type": "object"
+          },
+          "remark": {
+            "description": "备注",
+            "nullable": true,
+            "type": "object"
+          },
+          "status": {
+            "description": "状态",
+            "enum": ["enabled", "disabled"],
+            "type": "string"
+          },
+          "updatedAt": {
+            "description": "修改时间",
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "修改人",
+            "nullable": true,
+            "type": "string"
+          },
+          "username": {
+            "description": "账号",
+            "type": "string"
+          },
+          "version": {
+            "description": "版本号，修改时原样带回",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "createdBy",
+          "updatedBy",
+          "createdAt",
+          "updatedAt",
+          "version",
+          "username",
+          "nickname"
+        ],
+        "type": "object"
+      },
+      "TestDemoUserUpdateBody": {
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TestDemoUserUpdateData"
+              }
+            ],
+            "description": "只传要改的字段"
+          },
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "version": {
+            "description": "读到的版本号，原样带回",
+            "minimum": 1,
+            "type": "number"
+          }
+        },
+        "required": ["id", "version", "data"],
+        "type": "object"
+      },
+      "TestDemoUserUpdateData": {
+        "properties": {
+          "nickname": {
+            "description": "姓名",
+            "type": "string"
+          },
+          "orgId": {
+            "description": "所属组织",
+            "nullable": true,
+            "type": "object"
+          },
+          "remark": {
+            "description": "备注",
+            "nullable": true,
+            "type": "object"
+          },
+          "status": {
+            "description": "状态",
+            "enum": ["enabled", "disabled"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "bearerFormat": "JWT",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "contact": {},
+    "description": "后台、APP、网站、开放接口。统一响应格式：{ code, data, message }，code 为 1000 表示成功。",
+    "title": "jim-nestjs-admin 接口",
+    "version": "0.0.1"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/admin/test/demo-log/add": {
+      "post": {
+        "operationId": "testDemoLogAdd",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoLogAddBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoLogRow"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          }
+        },
+        "summary": "新增演示日志",
+        "tags": ["test/demo-log 演示日志"]
+      }
+    },
+    "/admin/test/demo-log/delete": {
+      "post": {
+        "operationId": "testDemoLogDelete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoLogDeleteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoLogDeleteResult"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4004：数据不存在或无权访问"
+          }
+        },
+        "summary": "删除演示日志（整批成败）",
+        "tags": ["test/demo-log 演示日志"]
+      }
+    },
+    "/admin/test/demo-log/page": {
+      "post": {
+        "operationId": "testDemoLogPage",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoLogPageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoLogPageResult"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          }
+        },
+        "summary": "演示日志分页列表",
+        "tags": ["test/demo-log 演示日志"]
+      }
+    },
+    "/admin/test/demo-log/schema": {
+      "get": {
+        "operationId": "testDemoLogSchema",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CrudSchema"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "演示日志页面描述",
+        "tags": ["test/demo-log 演示日志"]
+      }
+    },
+    "/admin/test/demo-user/add": {
+      "post": {
+        "operationId": "testDemoUserAdd",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoUserAddBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoUserRow"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          }
+        },
+        "summary": "新增演示用户",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    },
+    "/admin/test/demo-user/delete": {
+      "post": {
+        "operationId": "testDemoUserDelete",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoUserDeleteBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoUserDeleteResult"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4004：数据不存在或无权访问"
+          }
+        },
+        "summary": "删除演示用户（整批成败）",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    },
+    "/admin/test/demo-user/info": {
+      "post": {
+        "operationId": "testDemoUserInfo",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoUserInfoBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoUserRow"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4004：数据不存在或无权访问"
+          }
+        },
+        "summary": "演示用户详情",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    },
+    "/admin/test/demo-user/page": {
+      "post": {
+        "operationId": "testDemoUserPage",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoUserPageBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoUserPageResult"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          }
+        },
+        "summary": "演示用户分页列表",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    },
+    "/admin/test/demo-user/schema": {
+      "get": {
+        "operationId": "testDemoUserSchema",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/CrudSchema"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "summary": "演示用户页面描述",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    },
+    "/admin/test/demo-user/update": {
+      "post": {
+        "operationId": "testDemoUserUpdate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestDemoUserUpdateBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "enum": [1000],
+                      "type": "integer"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/TestDemoUserRow"
+                    },
+                    "message": {
+                      "example": "ok",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code", "data", "message"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4000：参数有误、唯一冲突等，字段错误在 data.errors"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4004：数据不存在或无权访问"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorBody"
+                }
+              }
+            },
+            "description": "4009：数据已被他人修改，请刷新后重试"
+          }
+        },
+        "summary": "修改演示用户",
+        "tags": ["test/demo-user 演示用户"]
+      }
+    }
+  },
+  "servers": [],
+  "tags": []
+}

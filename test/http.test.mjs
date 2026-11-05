@@ -155,6 +155,10 @@ test("真实 HTTP 响应下的刷新、错误、取消与重放边界", async t 
       reset();
       await assert.rejects(client.get("https://example.invalid/admin/data"));
       await assert.rejects(client.get("/admin/../public"));
+      await assert.rejects(
+        client.get("/admin/%E0"),
+        error => error.failure.message === "admin.serviceUnavailable"
+      );
       assert.equal(requests.length, 0);
     });
   } finally {
