@@ -65,6 +65,7 @@ export const usePermissionStore = defineStore("pure-permission", {
     /** 清空缓存页面 */
     clearAllCachePage() {
       this.wholeMenus = [];
+      this.flatteningRoutes = [];
       this.cachePageList = [];
     }
   }

@@ -11,6 +11,7 @@ export const perm: Directive<HTMLElement, string | string[]> = {
       priority = el.style.getPropertyPriority("display");
     const hidden = el.hidden,
       inert = el.inert;
+    const ariaHidden = el.getAttribute("aria-hidden");
     const stop = watchEffect(() => {
       const allowed = hasPerms(value.value);
       el.hidden = hidden || !allowed;
@@ -21,7 +22,8 @@ export const perm: Directive<HTMLElement, string | string[]> = {
       } else {
         if (display) el.style.setProperty("display", display, priority);
         else el.style.removeProperty("display");
-        el.removeAttribute("aria-hidden");
+        if (ariaHidden === null) el.removeAttribute("aria-hidden");
+        else el.setAttribute("aria-hidden", ariaHidden);
       }
     });
     bindings.set(el, { value, stop });

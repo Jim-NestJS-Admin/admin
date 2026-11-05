@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { gatewayReady } from "@/platform/gateway";
 import { useUserStoreHook } from "@/store/modules/user";
 import Verification from "./verification.vue";
+import { RequestFailure } from "@/utils/http";
+import { failureView } from "@/platform/failure-view.mjs";
 const { t, locale } = useI18n();
 const router = useRouter();
 const account = ref("");
@@ -13,13 +15,22 @@ const proof = ref("");
 const revision = ref(0);
 const busy = ref(false);
 const error = ref("");
+const fields = ref<string[]>([]);
+const retry = ref(0);
+const timer = setInterval(() => {
+  if (retry.value > 0) retry.value--;
+}, 1000);
+onBeforeUnmount(() => clearInterval(timer));
 watch([account, locale], () => {
   proof.value = "";
   revision.value++;
   error.value = "";
+  fields.value = [];
 });
 async function signIn() {
+  if (busy.value || retry.value > 0) return;
   error.value = "";
+  fields.value = [];
   if (!gatewayReady()) {
     error.value = t("admin.serviceUnavailable");
     return;
@@ -36,8 +47,15 @@ async function signIn() {
       proof: proof.value
     });
     await router.replace("/welcome");
-  } catch {
-    error.value = t("admin.serviceUnavailable");
+  } catch (reason) {
+    const view = failureView(
+      reason instanceof RequestFailure ? reason.failure : null
+    );
+    error.value = view.message.startsWith("admin.")
+      ? t(view.message)
+      : view.message;
+    fields.value = view.fields;
+    retry.value = view.retrySeconds;
   } finally {
     busy.value = false;
     password.value = "";
@@ -89,12 +107,24 @@ async function signIn() {
           :language="locale"
           @proof="proof = $event"
         />
-        <p v-if="error" role="alert">{{ error }}</p>
+        <div v-if="error" role="alert">
+          <p>{{ error }}</p>
+          <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
+        </div>
+        <p v-if="retry > 0" role="status">
+          {{ t("admin.retryAfter", { seconds: retry }) }}
+        </p>
         <el-button
           native-type="submit"
           type="primary"
           :loading="busy"
-          :disabled="!gatewayReady() || !proof || !account.trim() || !password"
+          :disabled="
+            !gatewayReady() ||
+            !proof ||
+            !account.trim() ||
+            !password ||
+            retry > 0
+          "
           >{{ t("admin.signIn") }}</el-button
         >
       </form>

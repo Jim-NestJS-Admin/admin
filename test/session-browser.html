@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>会话协调测试</title>
+  <body>
+    <h1>会话协调测试</h1>
+    <p>只传递合成数字，不安装认证适配器。</p>
+    <button id="refresh">请求刷新</button
+    ><button id="reset">使旧结果失效</button
+    ><output id="result">等待操作</output><output id="calls">0</output>
+    <script type="module">
+      import { createSessionCoordinator } from "/src/platform/session-coordinator.mjs";
+      const channel = new BroadcastChannel("jim-admin-test-session");
+      const result = document.querySelector("#result"),
+        calls = document.querySelector("#calls");
+      const coordinator = createSessionCoordinator({
+        randomId: () => crypto.randomUUID(),
+        readVersion: () => localStorage.getItem("jim-admin-test-version") ?? "",
+        writeVersion: value =>
+          localStorage.setItem("jim-admin-test-version", value),
+        lock: run => navigator.locks.request("jim-admin-test-lock", run),
+        send: message => channel.postMessage(message),
+        subscribe: receive => {
+          channel.onmessage = event => receive(event.data);
+          return () => channel.close();
+        },
+        onInvalidate: () => {
+          result.textContent = "已失效";
+        }
+      });
+      const count = () => {
+        calls.textContent = localStorage.getItem("jim-admin-test-count") ?? "0";
+      };
+      window.addEventListener("storage", count);
+      count();
+      document.querySelector("#refresh").onclick = async () => {
+        result.textContent = "正在刷新";
+        try {
+          const value = await coordinator.refresh(async () => {
+            localStorage.setItem(
+              "jim-admin-test-count",
+              String(
+                Number(localStorage.getItem("jim-admin-test-count") ?? 0) + 1
+              )
+            );
+            count();
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            return 42;
+          });
+          result.textContent = "结果：" + value;
+        } catch {
+          result.textContent = "已拒绝旧结果";
+        }
+      };
+      document.querySelector("#reset").onclick = () => {
+        coordinator.invalidate();
+        result.textContent = "已失效";
+      };
+    </script>
+  </body>
+</html>

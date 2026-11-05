@@ -7,6 +7,26 @@ import {
   singleFlight
 } from "../src/platform/policy.mjs";
 import { assertProduction } from "../scripts/verify-production.mjs";
+import { failureView } from "../src/platform/failure-view.mjs";
+test("字段错误与限流等待提示来自公开响应，异常数值不启动无限计时", () => {
+  assert.deepEqual(
+    failureView({
+      status: 429,
+      message: "稍后重试",
+      data: {
+        retryAfterSeconds: 12.2,
+        errors: [{ messages: ["字段有误", 42] }]
+      }
+    }),
+    { message: "稍后重试", fields: ["字段有误"], retrySeconds: 13 }
+  );
+  assert.equal(
+    failureView({ status: 429, data: { retryAfterSeconds: Infinity } })
+      .retrySeconds,
+    0
+  );
+  assert.equal(failureView(null).message, "admin.serviceUnavailable");
+});
 test("权限必须逐项明确授予，空列表与通配符不能放行", () => {
   assert.equal(allows(["*:*:*"], "system:user:page"), false);
   assert.equal(allows(["*:*:*"], "*:*:*"), false);

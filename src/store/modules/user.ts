@@ -2,6 +2,12 @@ import { defineStore } from "pinia";
 import { store } from "@/store";
 import { getAdminGateway, gatewayReady } from "@/platform/gateway";
 import { resetSessionViews } from "@/platform/lifecycle";
+import {
+  coordinatedRefresh,
+  coordinatedMutation,
+  invalidateOtherSessions,
+  onRemoteSessionReset
+} from "@/platform/session-browser";
 import type {
   SessionSnapshot,
   SignInInput,
@@ -36,10 +42,18 @@ export const useUserStore = defineStore("admin-user", {
         !Number.isFinite(session.expiresAt) ||
         session.expiresAt <= Date.now() ||
         !session.user?.id ||
+        !session.organizationId ||
+        typeof session.user.username !== "string" ||
         !Array.isArray(session.permissions) ||
         !Array.isArray(session.menus)
       )
         throw new Error("admin.serviceUnavailable");
+      const changed =
+        this.accessToken &&
+        (this.organizationId !== session.organizationId ||
+          JSON.stringify(this.permissions) !==
+            JSON.stringify(session.permissions) ||
+          JSON.stringify(this.menus) !== JSON.stringify(session.menus));
       this.accessToken = session.accessToken;
       this.expiresAt = session.expiresAt;
       this.username = session.user.username;
@@ -49,8 +63,12 @@ export const useUserStore = defineStore("admin-user", {
         value => typeof value === "string" && value !== "*:*:*"
       );
       this.menus = session.menus;
+      if (changed && !this.transitioning) {
+        this.epoch++;
+        resetSessionViews();
+      }
     },
-    clearSession() {
+    clearSession(notify = true) {
       this.epoch++;
       this.accessToken = "";
       this.expiresAt = 0;
@@ -62,11 +80,20 @@ export const useUserStore = defineStore("admin-user", {
       this.organizationId = "";
       this.transitioning = false;
       resetSessionViews();
+      if (notify) {
+        try {
+          invalidateOtherSessions();
+        } catch {
+          /* 不支持协调能力时，本地清理仍须完成。 */
+        }
+      }
     },
     async loginByUsername(input: SignInInput) {
       this.clearSession();
       const epoch = this.epoch;
-      const session = await getAdminGateway().signIn(input);
+      const session = await coordinatedMutation(() =>
+        getAdminGateway().signIn(input)
+      );
       if (epoch !== this.epoch) throw new Error("admin.requestCanceled");
       this.applySession(session);
     },
@@ -74,19 +101,20 @@ export const useUserStore = defineStore("admin-user", {
       if (!gatewayReady()) return;
       const epoch = this.epoch;
       try {
-        const session = await getAdminGateway().resume();
+        const session = await coordinatedRefresh(() =>
+          getAdminGateway().resume()
+        );
         if (session && epoch === this.epoch) this.applySession(session);
       } catch {
         if (epoch === this.epoch) this.clearSession();
       }
     },
-    async ensureFreshSession() {
+    async ensureFreshSession(force = false) {
       if (!this.accessToken) return;
-      if (this.expiresAt - Date.now() > 30000) return;
+      if (!force && this.expiresAt - Date.now() > 30000) return;
       if (!refreshPromise) {
         const epoch = this.epoch;
-        refreshPromise = getAdminGateway()
-          .refresh()
+        refreshPromise = coordinatedRefresh(() => getAdminGateway().refresh())
           .then(session => {
             if (epoch !== this.epoch) throw new Error("admin.requestCanceled");
             this.applySession(session);
@@ -111,7 +139,9 @@ export const useUserStore = defineStore("admin-user", {
       this.menus = [];
       resetSessionViews();
       try {
-        const session = await getAdminGateway().switchOrganization(id);
+        const session = await coordinatedMutation(() =>
+          getAdminGateway().switchOrganization(id)
+        );
         if (epoch !== this.epoch) throw new Error("admin.requestCanceled");
         this.applySession(session);
       } catch (error) {
@@ -123,7 +153,11 @@ export const useUserStore = defineStore("admin-user", {
     },
     async logOut() {
       const gateway = gatewayReady() ? getAdminGateway() : null;
-      const pending = Promise.resolve().then(() => gateway?.signOut());
+      const pending = Promise.resolve().then(() =>
+        coordinatedMutation(async () => {
+          await gateway?.signOut();
+        })
+      );
       this.clearSession();
       try {
         await pending;
@@ -134,3 +168,4 @@ export const useUserStore = defineStore("admin-user", {
   }
 });
 export const useUserStoreHook = () => useUserStore(store);
+onRemoteSessionReset(() => useUserStoreHook().clearSession(false));

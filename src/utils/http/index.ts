@@ -1,4 +1,4 @@
-import Axios, { type AxiosRequestConfig } from "axios";
+import Axios, { type AxiosInstance, type AxiosRequestConfig } from "axios";
 import { normalizeFailure } from "@/platform/policy.mjs";
 import { onSessionReset } from "@/platform/lifecycle";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -17,7 +17,9 @@ export class RequestFailure extends Error {
     super(failure.message);
   }
 }
-class PureHttp {
+const canceled = () => Object.assign(new Error(), { code: "ERR_CANCELED" });
+export class PureHttp {
+  constructor(private readonly client: AxiosInstance = instance) {}
   async request<T>(
     method: RequestMethods,
     url: string,
@@ -26,24 +28,44 @@ class PureHttp {
   ): Promise<T> {
     const user = useUserStoreHook();
     const epoch = user.epoch;
-    if (!url.startsWith("/admin/") || url.includes("..") || url.includes("\\"))
-      throw new Error("admin.serviceUnavailable");
+    const origin =
+      typeof window === "undefined"
+        ? "http://localhost"
+        : window.location.origin;
+    const target = new URL(url, origin);
+    if (
+      !url.startsWith("/admin/") ||
+      target.origin !== origin ||
+      !target.pathname.startsWith("/admin/") ||
+      /[\\]/.test(decodeURIComponent(target.pathname)) ||
+      params.baseURL ||
+      config.baseURL
+    )
+      throw new RequestFailure(normalizeFailure(null));
     const controller = new AbortController();
     active.add(controller);
-    const canceled = () => controller.abort();
     const signal = config.signal ?? params.signal;
-    if (signal?.aborted) controller.abort();
-    else signal?.addEventListener?.("abort", canceled);
-    try {
-      if (!config.skipSessionRefresh) {
-        if (user.transitioning)
-          throw Object.assign(new Error(), { code: "ERR_CANCELED" });
-        await user.ensureFreshSession();
-      }
-      const headers = Axios.AxiosHeaders.from(config.headers ?? params.headers);
-      if (user.accessToken)
+    const abort = () => controller.abort();
+    if (signal?.aborted) abort();
+    else signal?.addEventListener?.("abort", abort);
+    const session = config.authPolicy !== "none";
+    const check = () => {
+      if (
+        epoch !== user.epoch ||
+        controller.signal.aborted ||
+        (session && user.transitioning)
+      )
+        throw canceled();
+    };
+    let sentToken = "";
+    const send = () => {
+      check();
+      const headers = new Axios.AxiosHeaders(config.headers ?? params.headers);
+      sentToken = user.accessToken;
+      if (session && user.accessToken)
         headers.set("Authorization", "Bearer " + user.accessToken);
-      const response = await instance.request({
+      else headers.delete("Authorization");
+      return this.client.request({
         ...params,
         ...config,
         method,
@@ -51,16 +73,45 @@ class PureHttp {
         headers,
         signal: controller.signal
       });
-      if (epoch !== user.epoch)
-        throw Object.assign(new Error(), { code: "ERR_CANCELED" });
-      if (response.data?.code !== 1000) throw { response };
+    };
+    try {
+      if (session && !config.skipSessionRefresh)
+        await user.ensureFreshSession();
+      let response;
+      try {
+        response = await send();
+      } catch (error) {
+        check();
+        const failure = normalizeFailure(error);
+        if (
+          !(
+            session &&
+            !config.skipSessionRefresh &&
+            user.accessToken &&
+            failure.status === 401 &&
+            failure.code === 4001
+          )
+        )
+          throw error;
+        // 较晚到达的旧令牌 401 可复用同批已经刷新的令牌，避免连续轮换。
+        if (user.accessToken === sentToken) await user.ensureFreshSession(true);
+        check();
+        response = await send(); // 只有明确的认证失败可以重放一次，保持原请求体和幂等键。
+      }
+      check();
+      if (config.responseMode !== "raw" && response.data?.code !== 1000)
+        throw { response };
       return response.data as T;
     } catch (error) {
-      const failure = normalizeFailure(error);
-      if (failure.status === 401 && epoch === user.epoch) user.clearSession();
+      const failure =
+        error instanceof RequestFailure
+          ? error.failure
+          : normalizeFailure(error);
+      if (failure.status === 401 && session && epoch === user.epoch)
+        user.clearSession();
       throw new RequestFailure(failure);
     } finally {
-      signal?.removeEventListener?.("abort", canceled);
+      signal?.removeEventListener?.("abort", abort);
       active.delete(controller);
     }
   }

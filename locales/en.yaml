@@ -90,6 +90,7 @@ login:
   purePassWordReg: Please enter password
   purePassWordRuleReg: The password format should be any combination of 8-18 digits
 admin:
+  retryAfter: Try again in {seconds} seconds
   title: Administration
   account: Account
   password: Password
