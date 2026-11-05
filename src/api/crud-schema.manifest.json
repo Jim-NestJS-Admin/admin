@@ -1,8 +1,8 @@
 {
   "generator": "openapi-typescript",
-  "revision": "651af0615ac995653f8624692a40ed22baa2d71b",
+  "revision": "4915aca93b5dc30b7aeec569a23bc6f01f1b6c4a",
   "source": "T03 framework schema subset (test/fixtures/t03-openapi.json)",
-  "schemaSha256": "ba5d6b788deafd9a5991bb82fd544e2cbbd725fec361c15be8021e9bfb266db7",
+  "schemaSha256": "a82996368b2daa99c91fbd0a6d9d7e66a8f6fbd1c05c8711dde85b42efb66464",
   "operationCount": 0,
   "permissionsProvided": false,
   "files": ["crud-schema.d.ts", "crud-schema.manifest.json"]

@@ -1,15 +1,64 @@
 {
-  "resource": "test/demo-user",
-  "label": "演示用户",
-  "permPrefix": "test:demo-user",
+  "actions": {
+    "add": {
+      "writable": [
+        "username",
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ]
+    },
+    "page": {
+      "filterable": [
+        "status",
+        "orgId"
+      ],
+      "keyWords": [
+        "username",
+        "nickname"
+      ],
+      "readable": [
+        "id",
+        "version",
+        "createdBy",
+        "updatedBy",
+        "createdAt",
+        "updatedAt",
+        "username",
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ],
+      "sortable": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "username",
+        "nickname"
+      ]
+    },
+    "update": {
+      "writable": [
+        "nickname",
+        "status",
+        "orgId",
+        "remark"
+      ]
+    }
+  },
   "api": [
     "page",
     "info",
     "add",
     "update",
-    "delete"
+    "delete",
+    "recycle",
+    "restore",
+    "purge"
   ],
-  "deleteMode": "soft",
+  "children": [],
   "columns": [
     {
       "field": "id",
@@ -44,8 +93,8 @@
     {
       "field": "username",
       "label": "账号",
-      "width": 140,
-      "sortable": true
+      "sortable": true,
+      "width": 140
     },
     {
       "field": "nickname",
@@ -53,43 +102,65 @@
       "sortable": true
     },
     {
+      "dict": "status",
       "field": "status",
       "label": "状态",
-      "sortable": false,
-      "dict": "status"
+      "sortable": false
     }
   ],
+  "defaultSort": [
+    {
+      "field": "id",
+      "order": "desc"
+    }
+  ],
+  "deleteMode": "soft",
+  "dictionaries": {
+    "status": [
+      {
+        "label": "正常",
+        "value": "enabled"
+      },
+      {
+        "label": "停用",
+        "value": "disabled"
+      }
+    ]
+  },
   "form": [
     {
+      "component": "input",
+      "edit": "add",
       "field": "username",
       "label": "账号",
-      "component": "input",
-      "required": true,
-      "edit": "add"
+      "required": true
     },
     {
+      "component": "input",
+      "edit": "both",
       "field": "nickname",
       "label": "姓名",
-      "component": "input",
-      "required": true,
-      "edit": "both"
+      "required": true
     },
     {
+      "component": "select",
+      "dict": "status",
+      "edit": "both",
       "field": "status",
       "label": "状态",
-      "component": "select",
-      "required": false,
-      "edit": "both",
-      "dict": "status"
+      "required": false
     },
     {
+      "component": "textarea",
+      "edit": "both",
       "field": "remark",
       "label": "备注",
-      "component": "textarea",
-      "required": false,
-      "edit": "both"
+      "required": false
     }
   ],
+  "label": "演示用户",
+  "maxSize": 100,
+  "permPrefix": "test:demo-user",
   "query": [
     {
       "field": "status",
@@ -106,73 +177,5 @@
       ]
     }
   ],
-  "dictionaries": {
-    "status": [
-      {
-        "value": "enabled",
-        "label": "正常"
-      },
-      {
-        "value": "disabled",
-        "label": "停用"
-      }
-    ]
-  },
-  "actions": {
-    "page": {
-      "readable": [
-        "id",
-        "version",
-        "createdBy",
-        "updatedBy",
-        "createdAt",
-        "updatedAt",
-        "username",
-        "nickname",
-        "status",
-        "orgId",
-        "remark"
-      ],
-      "sortable": [
-        "id",
-        "createdAt",
-        "updatedAt",
-        "username",
-        "nickname"
-      ],
-      "filterable": [
-        "status",
-        "orgId"
-      ],
-      "keyWords": [
-        "username",
-        "nickname"
-      ]
-    },
-    "add": {
-      "writable": [
-        "username",
-        "nickname",
-        "status",
-        "orgId",
-        "remark"
-      ]
-    },
-    "update": {
-      "writable": [
-        "nickname",
-        "status",
-        "orgId",
-        "remark"
-      ]
-    }
-  },
-  "defaultSort": [
-    {
-      "field": "id",
-      "order": "desc"
-    }
-  ],
-  "maxSize": 100,
-  "children": []
+  "resource": "test/demo-user"
 }

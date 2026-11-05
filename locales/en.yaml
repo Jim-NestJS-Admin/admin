@@ -137,3 +137,19 @@ crud:
   required: This field is required
   invalidData: Invalid record ID or version. Refresh the list
   requestFailed: Operation failed. Please try again later
+  addRow: Add row
+  copyRow: Copy
+  rowCount: '{count} rows loaded; allowed {min}–{max}'
+  rowLimit: Row count is outside the allowed range
+  childrenNotLoaded: These rows have not been loaded
+  rowOrder: Order
+  dragRow: Drag to reorder
+  recycle: Recycle bin
+  activeList: Back to list
+  restore: Restore
+  purge: Delete permanently
+  deletedAt: Deleted at
+  confirmRestore: Restore the {count} selected records?
+  confirmPurge: Permanently delete the {count} selected records and all their details? This cannot be undone.
+  duplicateRow: Unique fields cannot repeat within these rows
+  info: Details

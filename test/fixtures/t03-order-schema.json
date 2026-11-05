@@ -1,0 +1,375 @@
+{
+  "actions": {
+    "add": {
+      "writable": [
+        "orderNo",
+        "title"
+      ]
+    },
+    "page": {
+      "filterable": [],
+      "keyWords": [],
+      "readable": [
+        "id",
+        "version",
+        "createdBy",
+        "updatedBy",
+        "createdAt",
+        "updatedAt",
+        "orderNo",
+        "title"
+      ],
+      "sortable": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "orderNo"
+      ]
+    },
+    "update": {
+      "writable": [
+        "title"
+      ]
+    }
+  },
+  "api": [
+    "page",
+    "info",
+    "add",
+    "update",
+    "delete",
+    "recycle",
+    "restore",
+    "purge"
+  ],
+  "children": [
+    {
+      "add": {
+        "writable": [
+          "productCode",
+          "qty",
+          "sort",
+          "remark"
+        ]
+      },
+      "columns": [
+        {
+          "field": "id",
+          "label": "编号",
+          "sortable": false
+        },
+        {
+          "field": "createdBy",
+          "label": "创建人",
+          "sortable": false
+        },
+        {
+          "field": "updatedBy",
+          "label": "修改人",
+          "sortable": false
+        },
+        {
+          "field": "createdAt",
+          "label": "创建时间",
+          "sortable": false
+        },
+        {
+          "field": "updatedAt",
+          "label": "修改时间",
+          "sortable": false
+        },
+        {
+          "field": "productCode",
+          "label": "商品",
+          "sortable": false
+        },
+        {
+          "field": "qty",
+          "label": "数量",
+          "sortable": false
+        },
+        {
+          "field": "sort",
+          "label": "排序",
+          "sortable": false
+        },
+        {
+          "field": "remark",
+          "label": "备注",
+          "sortable": false
+        }
+      ],
+      "form": [
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "productCode",
+          "label": "商品",
+          "required": true
+        },
+        {
+          "component": "number",
+          "edit": "both",
+          "field": "qty",
+          "label": "数量",
+          "required": true
+        },
+        {
+          "component": "number",
+          "edit": "both",
+          "field": "sort",
+          "label": "排序",
+          "required": false
+        },
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "remark",
+          "label": "备注",
+          "required": false
+        }
+      ],
+      "label": "订单明细",
+      "max": 5,
+      "min": 1,
+      "resource": "items",
+      "sortField": "sort",
+      "unique": [
+        [
+          "productCode"
+        ]
+      ],
+      "update": {
+        "writable": [
+          "productCode",
+          "qty",
+          "sort",
+          "remark"
+        ]
+      }
+    },
+    {
+      "add": {
+        "writable": [
+          "content"
+        ]
+      },
+      "columns": [
+        {
+          "field": "id",
+          "label": "编号",
+          "sortable": false
+        },
+        {
+          "field": "createdBy",
+          "label": "创建人",
+          "sortable": false
+        },
+        {
+          "field": "updatedBy",
+          "label": "修改人",
+          "sortable": false
+        },
+        {
+          "field": "createdAt",
+          "label": "创建时间",
+          "sortable": false
+        },
+        {
+          "field": "updatedAt",
+          "label": "修改时间",
+          "sortable": false
+        },
+        {
+          "field": "content",
+          "label": "内容",
+          "sortable": false
+        }
+      ],
+      "form": [
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "content",
+          "label": "内容",
+          "required": true
+        }
+      ],
+      "label": "订单备注",
+      "max": 500,
+      "min": 0,
+      "resource": "notes",
+      "unique": [],
+      "update": {
+        "writable": [
+          "content"
+        ]
+      }
+    },
+    {
+      "add": {
+        "writable": [
+          "label",
+          "level",
+          "code"
+        ]
+      },
+      "columns": [
+        {
+          "field": "id",
+          "label": "编号",
+          "sortable": false
+        },
+        {
+          "field": "createdBy",
+          "label": "创建人",
+          "sortable": false
+        },
+        {
+          "field": "updatedBy",
+          "label": "修改人",
+          "sortable": false
+        },
+        {
+          "field": "createdAt",
+          "label": "创建时间",
+          "sortable": false
+        },
+        {
+          "field": "updatedAt",
+          "label": "修改时间",
+          "sortable": false
+        },
+        {
+          "field": "label",
+          "label": "名称",
+          "sortable": false
+        },
+        {
+          "field": "level",
+          "label": "级别",
+          "sortable": false
+        },
+        {
+          "field": "code",
+          "label": "代码",
+          "sortable": false
+        }
+      ],
+      "form": [
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "label",
+          "label": "名称",
+          "required": true
+        },
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "level",
+          "label": "级别",
+          "required": false
+        },
+        {
+          "component": "input",
+          "edit": "both",
+          "field": "code",
+          "label": "代码",
+          "required": false
+        }
+      ],
+      "label": "订单标签",
+      "max": 500,
+      "min": 0,
+      "resource": "tags",
+      "unique": [
+        [
+          "level"
+        ],
+        [
+          "code",
+          "label"
+        ]
+      ],
+      "update": {
+        "writable": [
+          "label",
+          "level",
+          "code"
+        ]
+      }
+    }
+  ],
+  "columns": [
+    {
+      "field": "id",
+      "label": "编号",
+      "sortable": true
+    },
+    {
+      "field": "version",
+      "label": "版本号",
+      "sortable": false
+    },
+    {
+      "field": "createdBy",
+      "label": "创建人",
+      "sortable": false
+    },
+    {
+      "field": "updatedBy",
+      "label": "修改人",
+      "sortable": false
+    },
+    {
+      "field": "createdAt",
+      "label": "创建时间",
+      "sortable": true
+    },
+    {
+      "field": "updatedAt",
+      "label": "修改时间",
+      "sortable": true
+    },
+    {
+      "field": "orderNo",
+      "label": "单号",
+      "sortable": true
+    },
+    {
+      "field": "title",
+      "label": "标题",
+      "sortable": false
+    }
+  ],
+  "defaultSort": [
+    {
+      "field": "id",
+      "order": "desc"
+    }
+  ],
+  "deleteMode": "soft",
+  "dictionaries": {},
+  "form": [
+    {
+      "component": "input",
+      "edit": "add",
+      "field": "orderNo",
+      "label": "单号",
+      "required": true
+    },
+    {
+      "component": "input",
+      "edit": "both",
+      "field": "title",
+      "label": "标题",
+      "required": true
+    }
+  ],
+  "label": "演示订单",
+  "maxSize": 500,
+  "permPrefix": "test:demo-order",
+  "query": [],
+  "resource": "test/demo-order"
+}

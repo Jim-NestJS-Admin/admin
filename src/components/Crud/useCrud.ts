@@ -1,6 +1,7 @@
 import { computed, onBeforeUnmount, reactive, ref, shallowRef } from "vue";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
+import { childDraft, childIssues, relatedChanges } from "./children.mjs";
 import {
   columnChoices,
   defaultCell,
@@ -21,7 +22,12 @@ import type {
 export function useCrud(
   port: CrudPort,
   pageKey: string,
-  cell: (row: CrudRecord, field: string) => CrudCell = defaultCell
+  cell: (row: CrudRecord, field: string) => CrudCell = defaultCell,
+  relatedCell: (
+    resource: string,
+    row: CrudRecord,
+    field: string
+  ) => CrudCell = (_resource, row, field) => defaultCell(row, field)
 ) {
   const schema = shallowRef<CrudSchema>();
   const rows = shallowRef<CrudRecord[]>([]),
@@ -31,6 +37,12 @@ export function useCrud(
     saving = ref(false),
     error = ref("");
   const fields = ref<Record<string, string[]>>({});
+  const rowIssues = ref<
+    { group: string; key: string; field: string; message: string }[]
+  >([]);
+  const recycledView = ref(false);
+  const groupCell = (resource: string) => (row: CrudRecord, field: string) =>
+    relatedCell(resource, row, field);
   const retryUntil = ref(0);
   const choices = ref<CrudChoices>({ columns: [], density: "default" });
   const query = reactive<CrudQuery>({
@@ -42,9 +54,11 @@ export function useCrud(
   });
   const editor = reactive({
     open: false,
+    readOnly: false,
     mode: "add" as "add" | "update",
     values: {} as CrudRecord,
-    record: undefined as CrudRecord | undefined
+    record: undefined as CrudRecord | undefined,
+    related: [] as ReturnType<typeof childDraft>[]
   });
   let generation = 0,
     listSequence = 0,
@@ -70,6 +84,9 @@ export function useCrud(
     editor.open = false;
     editor.values = {};
     editor.record = undefined;
+    editor.related = [];
+    rowIssues.value = [];
+    recycledView.value = false;
     query.search = "";
     query.equality = {};
     query.sorting = [];
@@ -92,19 +109,57 @@ export function useCrud(
     const data =
       reason instanceof RequestFailure
         ? (reason.failure.data as {
-            errors?: { field: string; messages: string[] }[];
+            errors?: {
+              field: string;
+              messages: string[];
+              resource?: string;
+              id?: string;
+              clientId?: string;
+              index?: number;
+            }[];
           })
         : undefined;
     fields.value = Object.fromEntries(
       (Array.isArray(data?.errors) ? data.errors : [])
         .filter(
           item =>
-            typeof item?.field === "string" && Array.isArray(item.messages)
+            !item?.resource &&
+            typeof item?.field === "string" &&
+            Array.isArray(item.messages)
         )
         .map(item => [
           item.field.replace(/^data\./, ""),
           item.messages.filter(message => typeof message === "string")
         ])
+    );
+    rowIssues.value = (Array.isArray(data?.errors) ? data.errors : []).flatMap(
+      item => {
+        if (
+          typeof item?.resource !== "string" ||
+          typeof item.field !== "string" ||
+          !Array.isArray(item.messages)
+        )
+          return [];
+        const changes = relatedChanges(
+          schema.value?.children ?? [],
+          editor.related,
+          groupCell
+        ).find(group => group.resource === item.resource);
+        const key =
+          item.id ??
+          item.clientId ??
+          (Number.isInteger(item.index)
+            ? changes?.inserted[item.index]?.localKey
+            : "");
+        return item.messages
+          .filter(message => typeof message === "string")
+          .map(message => ({
+            group: item.resource,
+            key: typeof key === "string" ? key : "",
+            field: item.field,
+            message
+          }));
+      }
     );
     if (reason instanceof RequestFailure && reason.failure.status === 429) {
       const seconds = Number(
@@ -128,7 +183,10 @@ export function useCrud(
     error.value = "";
     selected.value = [];
     try {
-      const result = await port.list(
+      const list = recycledView.value ? port.recycled : port.list;
+      if (!list) throw Error("crud.requestFailed");
+      const result = await list.call(
+        port,
         JSON.parse(JSON.stringify(query)),
         request.signal
       );
@@ -200,22 +258,28 @@ export function useCrud(
     return search();
   }
   function sort(field: string, order: "ascending" | "descending" | null) {
+    if (recycledView.value) return;
     if (order && !schema.value?.actions.page?.sortable.includes(field)) return;
     query.sorting = order
       ? [{ field, direction: order === "ascending" ? "asc" : "desc" }]
       : [];
     return search();
   }
-  async function edit(row?: CrudRecord) {
-    if (saving.value || !schema.value) return;
+  async function edit(row?: CrudRecord, readOnly = false) {
+    if (saving.value || !schema.value || recycledView.value) return;
     error.value = "";
     fields.value = {};
+    rowIssues.value = [];
     intent = undefined;
+    editor.readOnly = readOnly;
     const sequence = ++detailSequence;
     if (!row) {
       editor.mode = "add";
       editor.record = undefined;
       editor.values = {};
+      editor.related = (schema.value.children ?? []).map(child =>
+        childDraft(child, [], true)
+      );
       editor.open = true;
       return;
     }
@@ -234,6 +298,16 @@ export function useCrud(
         result,
         cell
       );
+      const groups = result.children as
+        | Record<string, CrudRecord[]>
+        | undefined;
+      editor.related = (schema.value.children ?? []).map(child =>
+        childDraft(
+          child,
+          groups?.[child.resource],
+          port.relatedComplete?.(child.resource, result) === true
+        )
+      );
       editor.open = true;
     } catch (reason) {
       if (context === generation && sequence === detailSequence)
@@ -248,6 +322,8 @@ export function useCrud(
       editor.open = false;
       editor.values = {};
       editor.record = undefined;
+      editor.related = [];
+      rowIssues.value = [];
       intent = undefined;
     }
   }
@@ -264,6 +340,7 @@ export function useCrud(
       !editor.open
     )
       return;
+    if (recycledView.value || editor.readOnly) return;
     const method = editor.mode === "add" ? port.create : port.update;
     if (!method) return;
     const missing = requiredFields(
@@ -276,7 +353,17 @@ export function useCrud(
     fields.value = Object.fromEntries(
       missing.map(field => [field, ["crud.required"]])
     );
-    if (missing.length) return;
+    rowIssues.value = childIssues(
+      schema.value.children ?? [],
+      editor.related,
+      groupCell
+    );
+    if (missing.length || rowIssues.value.length) return;
+    const changes = JSON.parse(
+      JSON.stringify(
+        relatedChanges(schema.value.children ?? [], editor.related, groupCell)
+      )
+    );
     const values = editableValues(
       schema.value,
       editor.mode,
@@ -286,13 +373,19 @@ export function useCrud(
     );
     const current =
       editor.mode === "update" ? identity(editor.record) : undefined;
-    const key = mutationKey(JSON.stringify([editor.mode, current, values]));
+    const key = mutationKey(
+      JSON.stringify([editor.mode, current, values, changes])
+    );
     const context = generation,
       request = start();
     saving.value = true;
     error.value = "";
     try {
-      const options = { signal: request.signal, idempotencyKey: key };
+      const options = {
+        signal: request.signal,
+        idempotencyKey: key,
+        relatedChanges: changes
+      };
       if (current) await port.update(current, values, options);
       else await port.create(values, options);
       if (context !== generation) return;
@@ -300,6 +393,8 @@ export function useCrud(
       editor.open = false;
       editor.values = {};
       editor.record = undefined;
+      editor.related = [];
+      rowIssues.value = [];
       await load();
     } catch (reason) {
       if (context === generation) failure(reason);
@@ -309,6 +404,7 @@ export function useCrud(
     }
   }
   async function remove(ids: string[]) {
+    if (recycledView.value) return;
     if (
       !port.remove ||
       saving.value ||
@@ -323,6 +419,60 @@ export function useCrud(
     error.value = "";
     try {
       await port.remove(ids, { signal: request.signal, idempotencyKey: key });
+      if (context !== generation) return;
+      intent = undefined;
+      await load();
+    } catch (reason) {
+      if (context === generation) failure(reason);
+    } finally {
+      pending.delete(request);
+      if (context === generation) saving.value = false;
+    }
+  }
+  async function showRecycled(value: boolean) {
+    if (
+      saving.value ||
+      !schema.value ||
+      (value && (!port.recycled || !schema.value.api.includes("recycle")))
+    )
+      return;
+    closeEditor();
+    recycledView.value = value;
+    query.pageNumber = 1;
+    query.equality = {};
+    query.sorting = [];
+    query.search = "";
+    await load();
+  }
+  async function recycleAction(
+    action: "restore" | "purge",
+    records: CrudRecord[]
+  ) {
+    if (
+      !recycledView.value ||
+      saving.value ||
+      Date.now() < retryUntil.value ||
+      !schema.value?.api.includes(action) ||
+      !port[action] ||
+      !records.length
+    )
+      return;
+    const items = records.map(record => identity(record));
+    const key = mutationKey(
+      JSON.stringify([
+        action,
+        [...items].sort((a, b) => a.id.localeCompare(b.id))
+      ])
+    );
+    const context = generation,
+      request = start();
+    saving.value = true;
+    error.value = "";
+    try {
+      await port[action](items, {
+        signal: request.signal,
+        idempotencyKey: key
+      });
       if (context !== generation) return;
       intent = undefined;
       await load();
@@ -368,6 +518,8 @@ export function useCrud(
     saving,
     error,
     fields,
+    rowIssues,
+    recycledView,
     retryUntil,
     choices,
     query,
@@ -382,6 +534,8 @@ export function useCrud(
     closeEditor,
     save,
     remove,
+    showRecycled,
+    recycleAction,
     saveChoices
   };
 }

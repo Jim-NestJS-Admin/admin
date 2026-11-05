@@ -24,7 +24,11 @@ writeFileSync(
   config,
   JSON.stringify({
     extends: "./tsconfig.json",
-    include: ["src/**/*.ts", "test/fixtures/demo-resources.ts"],
+    include: [
+      "src/**/*.ts",
+      "test/fixtures/demo-resources.ts",
+      "test/fixtures/demo-order.ts"
+    ],
     exclude: ["dist", "node_modules"],
     compilerOptions: {
       outDir: "./dist/t12-contract",
@@ -51,12 +55,19 @@ const { Test } = backendRequire("@nestjs/testing");
 const source = relative =>
   import(pathToFileURL(join(serverRoot, "dist/t12-contract", relative)).href);
 const fixtures = await source("test/fixtures/demo-resources.js");
+const orders = await source("test/fixtures/demo-order.js");
+const { CRUD_RESOURCE } = await source("src/core/crud/base.controller.js");
+const { buildCrudSchema } = await source("src/core/crud/crud-schema.js");
 const { CrudRuntime } = await source("src/core/crud/crud.runtime.js");
 const { buildOpenApiDocument, stableStringify } = await source(
   "src/core/swagger/swagger.js"
 );
 const module = await Test.createTestingModule({
-  controllers: [fixtures.DemoUserController, fixtures.DemoLogController],
+  controllers: [
+    fixtures.DemoUserController,
+    fixtures.DemoLogController,
+    orders.DemoOrderController
+  ],
   providers: [
     fixtures.DemoUserService,
     {
@@ -79,13 +90,36 @@ try {
     JSON.stringify(
       {
         serverCommit: commit,
-        source: "test/fixtures/demo-resources.ts",
+        source: "test/fixtures/demo-resources.ts + test/fixtures/demo-order.ts",
         databaseConnected: false
       },
       null,
       2
     ) + "\n"
   );
+  for (const [name, controller] of [
+    ["user", fixtures.DemoUserController],
+    ["order", orders.DemoOrderController]
+  ]) {
+    const { meta } = Reflect.getMetadata(CRUD_RESOURCE, controller);
+    writeFileSync(
+      `test/fixtures/t03-${name}-schema.json`,
+      stableStringify(buildCrudSchema(meta))
+    );
+  }
+  const common = {
+    openapi: document.openapi,
+    info: document.info,
+    paths: {},
+    components: {
+      schemas: Object.fromEntries(
+        Object.entries(document.components.schemas).filter(([name]) =>
+          name.startsWith("CrudSchema")
+        )
+      )
+    }
+  };
+  writeFileSync("api-source/crud-schema.json", stableStringify(common));
   console.log(`已导出 T03 测试资源，后端 ${commit.slice(0, 7)}，未连接数据库`);
 } finally {
   await app.close();

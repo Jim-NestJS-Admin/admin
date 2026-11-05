@@ -1,12 +1,4 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "contact": {},
-    "description": "后台、APP、网站、开放接口。统一响应格式：{ code, data, message }，code 为 1000 表示成功。",
-    "title": "jim-nestjs-admin 接口",
-    "version": "0.0.1"
-  },
-  "paths": {},
   "components": {
     "schemas": {
       "CrudSchema": {
@@ -16,8 +8,24 @@
           },
           "api": {
             "items": {
-              "enum": ["page", "info", "add", "update", "delete"],
+              "enum": [
+                "page",
+                "info",
+                "add",
+                "update",
+                "delete",
+                "recycle",
+                "restore",
+                "purge"
+              ],
               "type": "string"
+            },
+            "type": "array"
+          },
+          "children": {
+            "description": "子表；没有子表时为空数组",
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaChild"
             },
             "type": "array"
           },
@@ -34,7 +42,10 @@
             "type": "array"
           },
           "deleteMode": {
-            "enum": ["soft", "hard"],
+            "enum": [
+              "soft",
+              "hard"
+            ],
             "type": "string"
           },
           "dictionaries": {
@@ -86,7 +97,8 @@
           "dictionaries",
           "actions",
           "defaultSort",
-          "maxSize"
+          "maxSize",
+          "children"
         ],
         "type": "object"
       },
@@ -102,6 +114,66 @@
             "$ref": "#/components/schemas/CrudSchemaWriteAction"
           }
         },
+        "type": "object"
+      },
+      "CrudSchemaChild": {
+        "properties": {
+          "add": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaColumn"
+            },
+            "type": "array"
+          },
+          "form": {
+            "items": {
+              "$ref": "#/components/schemas/CrudSchemaFormItem"
+            },
+            "type": "array"
+          },
+          "label": {
+            "type": "string"
+          },
+          "max": {
+            "type": "number"
+          },
+          "min": {
+            "type": "number"
+          },
+          "resource": {
+            "example": "items",
+            "type": "string"
+          },
+          "sortField": {
+            "type": "string"
+          },
+          "unique": {
+            "description": "同一张单据里不能重复的字段组",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "update": {
+            "$ref": "#/components/schemas/CrudSchemaWriteAction"
+          }
+        },
+        "required": [
+          "resource",
+          "label",
+          "min",
+          "max",
+          "unique",
+          "columns",
+          "form",
+          "add",
+          "update"
+        ],
         "type": "object"
       },
       "CrudSchemaColumn": {
@@ -123,7 +195,11 @@
             "type": "number"
           }
         },
-        "required": ["field", "label", "sortable"],
+        "required": [
+          "field",
+          "label",
+          "sortable"
+        ],
         "type": "object"
       },
       "CrudSchemaDictItem": {
@@ -145,7 +221,10 @@
             ]
           }
         },
-        "required": ["value", "label"],
+        "required": [
+          "value",
+          "label"
+        ],
         "type": "object"
       },
       "CrudSchemaFormItem": {
@@ -167,7 +246,11 @@
           },
           "edit": {
             "description": "both：新增和修改都能写；add：只在新增时写；none：只读",
-            "enum": ["both", "add", "none"],
+            "enum": [
+              "both",
+              "add",
+              "none"
+            ],
             "type": "string"
           },
           "field": {
@@ -183,7 +266,13 @@
             "type": "boolean"
           }
         },
-        "required": ["field", "label", "component", "required", "edit"],
+        "required": [
+          "field",
+          "label",
+          "component",
+          "required",
+          "edit"
+        ],
         "type": "object"
       },
       "CrudSchemaPageAction": {
@@ -215,7 +304,12 @@
             "type": "array"
           }
         },
-        "required": ["readable", "sortable", "filterable", "keyWords"],
+        "required": [
+          "readable",
+          "sortable",
+          "filterable",
+          "keyWords"
+        ],
         "type": "object"
       },
       "CrudSchemaQueryItem": {
@@ -234,7 +328,11 @@
             "type": "array"
           }
         },
-        "required": ["field", "label", "operators"],
+        "required": [
+          "field",
+          "label",
+          "operators"
+        ],
         "type": "object"
       },
       "CrudSchemaSort": {
@@ -243,11 +341,17 @@
             "type": "string"
           },
           "order": {
-            "enum": ["asc", "desc"],
+            "enum": [
+              "asc",
+              "desc"
+            ],
             "type": "string"
           }
         },
-        "required": ["field", "order"],
+        "required": [
+          "field",
+          "order"
+        ],
         "type": "object"
       },
       "CrudSchemaWriteAction": {
@@ -259,9 +363,19 @@
             "type": "array"
           }
         },
-        "required": ["writable"],
+        "required": [
+          "writable"
+        ],
         "type": "object"
       }
     }
-  }
+  },
+  "info": {
+    "contact": {},
+    "description": "后台、APP、网站、开放接口。统一响应格式：{ code, data, message }，code 为 1000 表示成功。",
+    "title": "jim-nestjs-admin 接口",
+    "version": "0.0.1"
+  },
+  "openapi": "3.0.0",
+  "paths": {}
 }

@@ -18,7 +18,8 @@
     "gen:api:check": "node scripts/gen-api.mjs --check",
     "gen:api:fixture": "node scripts/export-t03-openapi.mjs",
     "gen:crud-schema": "node scripts/gen-crud-schema.mjs",
-    "gen:crud-schema:check": "node scripts/gen-crud-schema.mjs --check"
+    "gen:crud-schema:check": "node scripts/gen-crud-schema.mjs --check",
+    "test:crud-contract": "node scripts/verify-t03-aggregate.mjs"
   },
   "keywords": [
     "pure-admin-thin",

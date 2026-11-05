@@ -137,3 +137,19 @@ crud:
   required: 此项必填
   invalidData: 数据标识或版本无效，请刷新
   requestFailed: 操作未完成，请稍后重试
+  addRow: 增行
+  copyRow: 复制
+  rowCount: '已加载 {count} 行；行数范围 {min}～{max}'
+  rowLimit: 明细行数不在允许范围内
+  childrenNotLoaded: 尚未加载此组明细
+  rowOrder: 顺序
+  dragRow: 拖动调整顺序
+  recycle: 回收站
+  activeList: 返回列表
+  restore: 恢复
+  purge: 彻底删除
+  deletedAt: 删除时间
+  confirmRestore: 确定恢复选中的 {count} 条记录吗？
+  confirmPurge: 确定彻底删除选中的 {count} 条记录及其全部明细吗？此操作无法撤销。
+  duplicateRow: 同组明细的唯一字段不能重复
+  info: 详情

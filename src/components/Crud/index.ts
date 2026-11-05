@@ -5,5 +5,7 @@ export type {
   CrudCell,
   CrudQuery,
   CrudRecord,
-  CrudChoices
+  CrudChoices,
+  CrudChild,
+  CrudRelatedChange
 } from "./types";

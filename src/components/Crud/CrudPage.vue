@@ -1,17 +1,34 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useSlots,
+  watch
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
 import { ElMessageBox } from "element-plus";
+import ChildEditor from "./ChildEditor.vue";
 import { cellText, columnChoices, defaultCell } from "./model.mjs";
 import { useCrud } from "./useCrud";
 import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
 const props = defineProps<{
   port: CrudPort;
   pageKey: string;
-  permissions?: { create?: string; update?: string; remove?: string };
+  permissions?: {
+    create?: string;
+    info?: string;
+    update?: string;
+    remove?: string;
+    recycle?: string;
+    restore?: string;
+    purge?: string;
+  };
   cell?: (row: CrudRecord, field: string) => CrudCell;
+  childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
 }>();
 const { t } = useI18n();
 const slots = useSlots();
@@ -19,14 +36,21 @@ const mobile = useMediaQuery("(max-width: 760px)");
 const treeOpen = ref(false),
   settingsOpen = ref(false);
 const draft = ref<CrudChoices>({ columns: [], density: "default" });
+const activeChild = ref("");
 const stopReset = onSessionReset(() => {
   treeOpen.value = false;
   settingsOpen.value = false;
   draft.value = { columns: [], density: "default" };
 });
 onBeforeUnmount(stopReset);
-const view = useCrud(props.port, props.pageKey, (row, field) =>
-  (props.cell ?? defaultCell)(row, field)
+const view = useCrud(
+  props.port,
+  props.pageKey,
+  (row, field) => (props.cell ?? defaultCell)(row, field),
+  (resource, row, field) =>
+    props.childCell
+      ? props.childCell(resource, row, field)
+      : defaultCell(row, field)
 );
 const {
   schema,
@@ -37,12 +61,28 @@ const {
   saving,
   error,
   fields,
+  rowIssues,
+  recycledView,
   choices,
   query,
   editor,
   visibleColumns,
   retryUntil
 } = view;
+watch(
+  () => editor.open,
+  open => {
+    activeChild.value = open
+      ? (schema.value?.children?.[0]?.resource ?? "")
+      : "";
+  }
+);
+watch(rowIssues, issues => {
+  const group = issues.find(issue =>
+    schema.value?.children?.some(child => child.resource === issue.group)
+  )?.group;
+  if (group) activeChild.value = group;
+});
 const now = useNow({ interval: 1000 });
 const retrySeconds = computed(() =>
   Math.max(0, Math.ceil((retryUntil.value - now.value.getTime()) / 1000))
@@ -61,6 +101,7 @@ function readCell(row: CrudRecord, field: string) {
 }
 function writable(item) {
   return (
+    !editor.readOnly &&
     schema.value?.actions[editor.mode]?.writable.includes(item.field) &&
     (item.edit === "both" || (item.edit === "add" && editor.mode === "add")) &&
     (!editor.record || readCell(editor.record, item.field).state === "visible")
@@ -112,6 +153,39 @@ async function confirmRemove(ids: string[]) {
   await view.remove(ids);
 }
 onMounted(view.initialize);
+async function confirmRecycle(action: "restore" | "purge") {
+  const description = schema.value;
+  const records = rows.value
+    .filter(row => selected.value.includes(String(row.id)))
+    .map(row => ({ id: row.id, version: row.version }));
+  if (!records.length) return;
+  try {
+    await ElMessageBox.confirm(
+      t(action === "purge" ? "crud.confirmPurge" : "crud.confirmRestore", {
+        count: records.length
+      }),
+      t(`crud.${action}`),
+      {
+        type: "warning",
+        confirmButtonText: t("crud.confirm"),
+        cancelButtonText: t("crud.cancel")
+      }
+    );
+  } catch {
+    return;
+  }
+  if (
+    schema.value !== description ||
+    !recycledView.value ||
+    !records.every(record =>
+      rows.value.some(
+        row => row.id === record.id && row.version === record.version
+      )
+    )
+  )
+    return;
+  await view.recycleAction(action, records);
+}
 defineExpose({ reload: view.initialize });
 </script>
 
@@ -119,7 +193,7 @@ defineExpose({ reload: view.initialize });
   <section class="crud-page" :aria-label="schema?.label ?? t('crud.title')">
     <el-splitter v-if="schema" class="crud-splitter">
       <el-splitter-panel
-        v-if="slots.tree && !mobile"
+        v-if="slots.tree && !mobile && !recycledView"
         size="220px"
         min="160px"
         max="360px"
@@ -133,11 +207,15 @@ defineExpose({ reload: view.initialize });
         <div class="crud-main">
           <header class="crud-toolbar">
             <div class="crud-actions">
-              <el-button v-if="slots.tree && mobile" @click="treeOpen = true">{{
-                t("crud.filter")
-              }}</el-button>
               <el-button
-                v-if="port.create && schema.api.includes('add')"
+                v-if="slots.tree && mobile && !recycledView"
+                @click="treeOpen = true"
+                >{{ t("crud.filter") }}</el-button
+              >
+              <el-button
+                v-if="
+                  port.create && schema.api.includes('add') && !recycledView
+                "
                 v-perm="permissions?.create ?? []"
                 type="primary"
                 :disabled="saving"
@@ -145,13 +223,47 @@ defineExpose({ reload: view.initialize });
                 >{{ t("crud.add") }}</el-button
               >
               <el-button
-                v-if="port.remove && schema.api.includes('delete')"
+                v-if="
+                  port.remove && schema.api.includes('delete') && !recycledView
+                "
                 v-perm="permissions?.remove ?? []"
                 :disabled="saving || !selected.length"
                 @click="confirmRemove([...selected])"
                 >{{ t("crud.batchRemove") }}</el-button
               >
               <slot name="toolbar" :query="query" :reload="view.load" />
+              <el-button
+                v-if="
+                  port.recycled &&
+                  schema.deleteMode === 'soft' &&
+                  schema.api.includes('recycle')
+                "
+                v-perm="permissions?.recycle ?? []"
+                :disabled="saving"
+                @click="view.showRecycled(!recycledView)"
+                >{{
+                  t(recycledView ? "crud.activeList" : "crud.recycle")
+                }}</el-button
+              >
+              <el-button
+                v-if="
+                  recycledView && port.restore && schema.api.includes('restore')
+                "
+                v-perm="permissions?.restore ?? []"
+                :disabled="saving || !selected.length || retrySeconds > 0"
+                @click="confirmRecycle('restore')"
+                >{{ t("crud.restore") }}</el-button
+              >
+              <el-button
+                v-if="
+                  recycledView && port.purge && schema.api.includes('purge')
+                "
+                v-perm="permissions?.purge ?? []"
+                type="danger"
+                :disabled="saving || !selected.length || retrySeconds > 0"
+                @click="confirmRecycle('purge')"
+                >{{ t("crud.purge") }}</el-button
+              >
             </div>
             <form class="crud-search" @submit.prevent="view.search">
               <el-input
@@ -167,6 +279,7 @@ defineExpose({ reload: view.initialize });
                 >{{ t("crud.search") }}</el-button
               >
               <slot
+                v-if="!recycledView"
                 name="advanced"
                 :apply="
                   (value: unknown) => {
@@ -192,13 +305,22 @@ defineExpose({ reload: view.initialize });
               v-loading="loading"
               :data="rows"
               row-key="id"
+              :tree-props="{
+                children: '__crudTreeChildren',
+                hasChildren: '__crudTreeHasChildren'
+              }"
               height="100%"
               :size="choices.density"
               @selection-change="selected = $event.map(row => String(row.id))"
               @sort-change="view.sort($event.prop, $event.order)"
             >
               <el-table-column
-                v-if="port.remove && permissions?.remove"
+                v-if="
+                  recycledView
+                    ? (port.restore && permissions?.restore) ||
+                      (port.purge && permissions?.purge)
+                    : port.remove && permissions?.remove
+                "
                 type="selection"
                 width="48"
               />
@@ -210,6 +332,7 @@ defineExpose({ reload: view.initialize });
                 :width="column.width"
                 :fixed="column.fixed"
                 :sortable="
+                  !recycledView &&
                   column.sortable &&
                   schema.actions.page?.sortable.includes(column.field)
                     ? 'custom'
@@ -228,13 +351,21 @@ defineExpose({ reload: view.initialize });
                 </template>
               </el-table-column>
               <el-table-column
-                v-if="port.update && schema.api.includes('update')"
+                v-if="(port.update || permissions?.info) && !recycledView"
                 :label="t('crud.actions')"
                 fixed="right"
-                width="100"
+                width="160"
               >
                 <template #default="{ row }"
                   ><el-button
+                    v-if="permissions?.info && schema.api.includes('info')"
+                    v-perm="permissions.info"
+                    link
+                    :disabled="saving"
+                    @click="view.edit(row, true)"
+                    >{{ t("crud.info") }}</el-button
+                  ><el-button
+                    v-if="port.update && schema.api.includes('update')"
                     v-perm="permissions?.update ?? []"
                     link
                     type="primary"
@@ -244,6 +375,12 @@ defineExpose({ reload: view.initialize });
                   ></template
                 >
               </el-table-column>
+              <el-table-column
+                v-if="recycledView"
+                prop="deletedAt"
+                :label="t('crud.deletedAt')"
+                width="190"
+              />
             </el-table>
           </div>
           <footer class="crud-pagination">
@@ -342,8 +479,22 @@ defineExpose({ reload: view.initialize });
     </el-drawer>
     <el-drawer
       :model-value="editor.open"
-      :title="t(editor.mode === 'add' ? 'crud.add' : 'crud.edit')"
-      :size="mobile ? '100%' : '560px'"
+      :title="
+        t(
+          editor.readOnly
+            ? 'crud.info'
+            : editor.mode === 'add'
+              ? 'crud.add'
+              : 'crud.edit'
+        )
+      "
+      :size="
+        mobile
+          ? '100%'
+          : schema?.children?.length
+            ? 'min(1080px, 92vw)'
+            : '560px'
+      "
       :close-on-click-modal="!saving"
       :close-on-press-escape="!saving"
       :show-close="!saving"
@@ -437,11 +588,43 @@ defineExpose({ reload: view.initialize });
           </slot>
         </el-form-item>
       </el-form>
+      <el-tabs
+        v-if="schema?.children?.length"
+        v-model="activeChild"
+        class="crud-children-tabs"
+      >
+        <el-tab-pane
+          v-for="child in schema.children"
+          :key="child.resource"
+          :label="child.label"
+          :name="child.resource"
+        >
+          <ChildEditor
+            v-if="
+              editor.related.find(group => group.resource === child.resource)
+            "
+            :child="child"
+            :draft="
+              editor.related.find(group => group.resource === child.resource)
+            "
+            :dictionaries="schema.dictionaries"
+            :disabled="saving || editor.readOnly"
+            :issues="rowIssues"
+            :cell="
+              (row, field) =>
+                childCell
+                  ? childCell(child.resource, row, field)
+                  : defaultCell(row, field)
+            "
+          />
+        </el-tab-pane>
+      </el-tabs>
       <template #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
           t("crud.cancel")
         }}</el-button
         ><el-button
+          v-if="!editor.readOnly"
           type="primary"
           :loading="saving"
           :disabled="retrySeconds > 0"

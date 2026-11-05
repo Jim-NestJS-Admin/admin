@@ -47,7 +47,17 @@ test("正式生成文件与版本化输入快照完全一致，CI 无需克隆�
 });
 test("T03 实际测试资源生成可编译类型，并调用现有请求接口", async () => {
   const files = await generateApi(schema, source);
-  assert.equal(JSON.parse(files.get("manifest.json")).operationCount, 10);
+  assert.equal(
+    JSON.parse(files.get("manifest.json")).operationCount,
+    Object.values(schema.paths).reduce(
+      (sum, path) =>
+        sum +
+        Object.keys(path).filter(method =>
+          ["get", "post", "put", "patch", "delete"].includes(method)
+        ).length,
+      0
+    )
+  );
   assert.deepEqual(files, await generateApi(schema, source));
   const folder = fileURLToPath(
     new URL("./generated-contract", import.meta.url)

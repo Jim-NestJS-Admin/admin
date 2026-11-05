@@ -1,5 +1,5 @@
 {
-  "serverCommit": "651af0615ac995653f8624692a40ed22baa2d71b",
-  "source": "test/fixtures/demo-resources.ts",
+  "serverCommit": "4915aca93b5dc30b7aeec569a23bc6f01f1b6c4a",
+  "source": "test/fixtures/demo-resources.ts + test/fixtures/demo-order.ts",
   "databaseConnected": false
 }

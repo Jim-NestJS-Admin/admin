@@ -5,7 +5,18 @@ export type components = {
   schemas: {
     CrudSchema: {
       actions: components["schemas"]["CrudSchemaActions"];
-      api: ("page" | "info" | "add" | "update" | "delete")[];
+      api: (
+        | "page"
+        | "info"
+        | "add"
+        | "update"
+        | "delete"
+        | "recycle"
+        | "restore"
+        | "purge"
+      )[];
+      /** @description 子表；没有子表时为空数组 */
+      children: components["schemas"]["CrudSchemaChild"][];
       columns: components["schemas"]["CrudSchemaColumn"][];
       defaultSort: components["schemas"]["CrudSchemaSort"][];
       /** @enum {string} */
@@ -29,6 +40,20 @@ export type components = {
       add?: components["schemas"]["CrudSchemaWriteAction"];
       page?: components["schemas"]["CrudSchemaPageAction"];
       update?: components["schemas"]["CrudSchemaWriteAction"];
+    };
+    CrudSchemaChild: {
+      add: components["schemas"]["CrudSchemaWriteAction"];
+      columns: components["schemas"]["CrudSchemaColumn"][];
+      form: components["schemas"]["CrudSchemaFormItem"][];
+      label: string;
+      max: number;
+      min: number;
+      /** @example items */
+      resource: string;
+      sortField?: string;
+      /** @description 同一张单据里不能重复的字段组 */
+      unique: string[][];
+      update: components["schemas"]["CrudSchemaWriteAction"];
     };
     CrudSchemaColumn: {
       /** @description 字典名，对应 dictionaries 里的键 */
