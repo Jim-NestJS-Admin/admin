@@ -25,6 +25,7 @@ export const useUserStore = defineStore("admin-user", {
     accessToken: "",
     expiresAt: 0,
     organizationId: "",
+    authVersion: undefined as number | undefined,
     menus: [] as NavigationItem[],
     epoch: 0,
     transitioning: false,
@@ -42,7 +43,7 @@ export const useUserStore = defineStore("admin-user", {
         !Number.isFinite(session.expiresAt) ||
         session.expiresAt <= Date.now() ||
         !session.user?.id ||
-        !session.organizationId ||
+        typeof session.organizationId !== "string" ||
         typeof session.user.username !== "string" ||
         !Array.isArray(session.permissions) ||
         !Array.isArray(session.menus)
@@ -51,6 +52,7 @@ export const useUserStore = defineStore("admin-user", {
       const changed =
         this.accessToken &&
         (this.organizationId !== session.organizationId ||
+          this.authVersion !== session.authVersion ||
           JSON.stringify(this.permissions) !==
             JSON.stringify(session.permissions) ||
           JSON.stringify(this.menus) !== JSON.stringify(session.menus));
@@ -59,6 +61,7 @@ export const useUserStore = defineStore("admin-user", {
       this.username = session.user.username;
       this.nickname = session.user.nickname ?? "";
       this.organizationId = session.organizationId;
+      this.authVersion = session.authVersion;
       this.permissions = session.permissions.filter(
         value => typeof value === "string" && value !== "*:*:*"
       );
@@ -78,6 +81,7 @@ export const useUserStore = defineStore("admin-user", {
       this.permissions = [];
       this.menus = [];
       this.organizationId = "";
+      this.authVersion = undefined;
       this.transitioning = false;
       resetSessionViews();
       if (notify) {

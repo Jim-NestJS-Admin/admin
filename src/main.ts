@@ -1,6 +1,9 @@
 import App from "./App.vue";
 import router from "./router";
 import { setupStore } from "@/store";
+import { useUserStoreHook } from "@/store/modules/user";
+import { configureAdminGateway } from "@/platform/gateway";
+import { createBackendGateway } from "@/platform/backend-gateway";
 import { useI18n } from "@/plugins/i18n";
 import { getPlatformConfig } from "./config";
 import { MotionPlugin } from "@vueuse/motion";
@@ -58,6 +61,9 @@ app.use(VueTippy);
 
 getPlatformConfig(app).then(async config => {
   setupStore(app);
+  configureAdminGateway(
+    createBackendGateway(() => useUserStoreHook().accessToken)
+  );
   app.use(router);
   await router.isReady();
   injectResponsiveStorage(app, config);

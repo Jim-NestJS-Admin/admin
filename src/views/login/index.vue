@@ -90,7 +90,7 @@ async function signIn() {
           v-model="account"
           autocomplete="username"
           :disabled="busy"
-          maxlength="128"
+          maxlength="64"
         />
         <label for="password">{{ t("admin.password") }}</label>
         <el-input

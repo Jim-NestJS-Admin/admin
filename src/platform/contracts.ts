@@ -14,6 +14,7 @@ export interface SessionSnapshot {
   expiresAt: number;
   user: { id: string; username: string; nickname?: string };
   organizationId: string;
+  authVersion?: number;
   permissions: string[];
   menus: NavigationItem[];
 }

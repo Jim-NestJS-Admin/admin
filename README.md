@@ -25,9 +25,11 @@ pnpm preview
 
 T11 仍在进行中：布局底座、双语登录入口、内存会话、单标签页刷新单飞、退出与切组织的旧响应隔离、动态菜单本地白名单、响应式 v-perm、统一错误解析、生产插件及真实产物检查已具备。24 项测试覆盖权限拒绝、菜单容错、非 2xx 错误、刷新失败与退出竞态等。
 
-目前没有安装正式 AdminGateway 适配器，登录显示服务暂不可用并保持禁用；无默认账号、假登录或生产 mock。src/platform/contracts.ts 是前端内部状态与适配口，不是后端 DTO。src/api 只允许 T12 从正式 OpenAPI 生成，当前留空，不照草案手写请求类型。
+已在 codex/T11-auth-integration 安装正式 AdminGateway 适配器，使用生成客户端接入验证码、登录、刷新、退出、用户资料、菜单和切组织七个操作。无默认账号、假登录或生产 mock。src/platform/contracts.ts 是前端内部状态与适配口，不是后端 DTO；src/api 由 T12 从后端 OpenAPI 生成。
 
-认证草案见 ../docs/contracts/auth-session.md。待 T05/T06 导出正式契约后完成：T12 生成客户端与适配器、刷新 Cookie 同源代理、真实 ALTCHA 出题登录、权限变化及组织切换端到端验证。上述部分未验收，不能把本次基础提交视为完整 T11 完成。
+认证契约见 ../docs/contracts/auth-session.md。本批固定使用 server 6475933edc7e4e7d636ed9917038dd9c570ded9d 的正式 OpenAPI 生成，T05 已审，T06 仍在复审。认证请求不走业务刷新拦截器，资料/菜单使用刚签发的内存令牌；资料失败不建立部分会话，授权版本变化清理旧页面，无当前组织也可以建立合法会话。Cookie 由浏览器传输，访问令牌不落盘。
+
+本地联调运行 `pnpm exec vite --host localhost --port 8848 --strictPort`，访问 http://localhost:8848 。开发代理默认关闭；确认真实 Nest 后端地址后在本地公开配置里设置 VITE_ADMIN_PROXY_TARGET（见 .env.example），/admin 才会转发到该地址并保留 Origin。后端需要允许当前前端 Origin。生产部署仍需配置同源反向代理。实际账号来源待 T07，T06 复审及真实 Cookie/ALTCHA 登录、菜单与组织切换全链路验收尚未完成，T11 整体保持进行中。动态视图白名单只接收实际实现的页面，不用演示菜单填充正式系统。
 
 ALTCHA 3.5.0 是本次新增依赖，用于规则指定的人机验证；账号或语言变化、每次提交后重建组件，异步旧题作废，判定交给库与后端。正式适配器必须返回原始题目对象，不能走统一成功信封解析。
 
@@ -47,7 +49,7 @@ ALTCHA 3.5.0 是本次新增依赖，用于规则指定的人机验证；账号�
 
 24 项测试包括真实 HTTP 服务的非 2xx/重放/取消、权限指令的动态撤销、跨标签页消息丢失/退出竞态。另以 test/session-browser.html 在两个真实浏览器标签页验证并发只执行一次和在途旧结果作废（shots/session-coordination.png），测试页面不进入生产入口或产物。它只传递合成数字，不构造可登录的假会话。
 
-真实 Cookie/ALTCHA/菜单权限与组织认证联调仍等 T05/T06 + T12。正式手机尺寸尚未确认，浏览器的视口覆盖接口仍未实际生效；保留为后续可验证事项，不冒称本轮手机验收通过。T11 整体保持进行中，本次收尾可先交审。
+此段为基础收尾记录；本批已接入生成客户端，真实账号全链路验证仍待 T06 审查及 T07 账号来源。正式手机尺寸尚未确认，浏览器的视口覆盖接口仍未实际生效；保留为后续可验证事项，不冒称本轮手机验收通过。T11 整体保持进行中，本次收尾可先交审。
 
 ## T12 接口生成
 
@@ -61,9 +63,9 @@ pnpm gen:api --input https://example.com/admin.json --source-revision <后端提
 
 默认读 ../server/openapi/admin.json，生成 src/api/schema.d.ts、client.ts、constants.ts、manifest.json，禁止手改。manifest 记录后端提交号、输入 SHA256 和操作数；api-source/admin.json 是同次输入快照，使只有 admin 仓库的 CI 仍可验证全部生成文件一致。若没有相邻后端仓库，默认使用已提交快照及 manifest 中的来源信息。远程地址必须显式给后端提交号，禁止 URL 携带凭据/查询参数，禁止重定向和外部引用。
 
-当前版本化输入快照的正式 admin.json 没有业务路径，正式客户端故意为空；权限扩展缺失时生成空集合并提示，不从路由猜权限。生成器已兼容 T06 正式的 `x-permission: { code, risk }`，并继续读取根或操作上的 `x-permissions` 字符串数组，合并去重后生成权限常量；非法对象扩展拒绝生成，不能静默猜测。根的 x-scopes 字符串数组与标准 OAuth2 flow 的 scopes 也会收集。ENUMS 按完整 schema 属性路径生成，保留原始枚举值。T05/T06 正式客户端快照更新与真实前端联调仍单独推进，本批没有混入测试接口。
+当前版本化输入快照包含七个正式认证/会话操作，没有业务资源路径；权限扩展缺失时生成空集合并提示，不从路由猜权限。生成器已兼容 T06 正式的 `x-permission: { code, risk }`，并继续读取根或操作上的 `x-permissions` 字符串数组，合并去重后生成权限常量；非法对象扩展拒绝生成，不能静默猜测。根的 x-scopes 字符串数组与标准 OAuth2 flow 的 scopes 也会收集。ENUMS 按完整 schema 属性路径生成，保留原始枚举值。本批已更新 T05/T06 正式客户端快照，T06 复审和真实账号全链路联调仍未完成，没有混入测试接口。
 
-使用示例：业务页从 src/api/client 导入 api，调用由 operationId 命名的函数；请求参数分 body/path/query/headers，统一返回值类型直接来自 OpenAPI 成功响应信封。原始出题响应在认证适配层显式传 responseMode: raw、authPolicy: none，不能把它误判为统一信封；实际认证适配仍待 T05/T06 导出。multipart 按契约构造 FormData，binary 类型生成 Blob。
+使用示例：业务页从 src/api/client 导入 api，调用由 operationId 命名的函数；请求参数分 body/path/query/headers，统一返回值类型直接来自 OpenAPI 成功响应信封。原始出题响应在认证适配层显式传 responseMode: raw、authPolicy: none，不能把它误判为统一信封；认证适配已由 backend-gateway.ts 接入。multipart 按契约构造 FormData，binary 类型生成 Blob。
 
 测试源 test/fixtures/t03-openapi.json 来自已经审查的 server 651af06 的真实测试实体和控制器，10 个操作；来源见 t03-provenance.json。导出工具 scripts/export-t03-openapi.mjs 只编译测试资源并创建没有数据库模块的 Nest 应用，未连接数据库。复现时在 Codex 独立 server worktree 核实对应提交后运行 pnpm gen:api:fixture；该工具会更新测试快照，不会把测试端点写入正式 src/api。
 

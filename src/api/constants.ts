@@ -2,4 +2,7 @@
 export const PERMISSIONS = [] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const SCOPES = [] as const;
-export const ENUMS = {} as const;
+export const ENUMS = {
+  "components.schemas.MenuItemDto.properties.type": ["directory", "page"],
+  "components.schemas.TokenResult.properties.tokenType": ["Bearer"]
+} as const;
