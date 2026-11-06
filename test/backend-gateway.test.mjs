@@ -37,7 +37,16 @@ test("正式生成客户端的认证适配与会话边界", async t => {
           };
         let data = token;
         if (config.url.endsWith("/captcha"))
-          return { data: { challenge: "测试库出题响应" } };
+          return {
+            data: {
+              code: 1000,
+              data: {
+                captchaId: "image-id",
+                image: "data:image/svg+xml;base64,PHN2Zy8+"
+              },
+              message: "成功"
+            }
+          };
         if (config.url.endsWith("/profile")) {
           if (profileFails)
             throw {
@@ -77,12 +86,14 @@ test("正式生成客户端的认证适配与会话边界", async t => {
         const snapshot = await gateway.signIn({
           account: "tester",
           password: "仅测试输入",
-          proof: "库生成证明"
+          captchaId: "image-id",
+          captchaCode: "aB12"
         });
         assert.deepEqual(calls[0].data, {
           username: "tester",
           password: "仅测试输入",
-          altcha: "库生成证明"
+          captchaId: "image-id",
+          captchaCode: "aB12"
         });
         assert.equal(calls[0].headers.get("Authorization"), undefined);
         assert.equal(
@@ -100,14 +111,14 @@ test("正式生成客户端的认证适配与会话边界", async t => {
         user.clearSession(false);
       }
     );
-    await t.test("验证码返回原始对象、绑定账号并支持取消", async () => {
+    await t.test("图形验证码解包成功信封、绑定账号并支持取消", async () => {
       assert.deepEqual(
         await gateway.challenge(
           "tester",
           "zh-CN",
           new AbortController().signal
         ),
-        { challenge: "测试库出题响应" }
+        { id: "image-id", image: "data:image/svg+xml;base64,PHN2Zy8+" }
       );
       assert.deepEqual(calls.at(-1).params, {
         purpose: "login",
@@ -121,7 +132,7 @@ test("正式生成客户端的认证适配与会话边界", async t => {
       );
     });
     await t.test(
-      "刷新失效仅请求一次，恢复返回空会话；退出不带访问令牌",
+      "刷新失效只请求一次；退出携带现有令牌或明确使用Cookie",
       async () => {
         unauthorized = true;
         const count = calls.length;
@@ -130,6 +141,11 @@ test("正式生成客户端的认证适配与会话边界", async t => {
         unauthorized = false;
         await gateway.signOut();
         assert.equal(calls.at(-1).url, "/admin/auth/logout");
+        assert.equal(
+          calls.at(-1).headers.get("Authorization"),
+          "Bearer 切组织前凭据"
+        );
+        await gateway.signOut("");
         assert.equal(calls.at(-1).headers.get("Authorization"), undefined);
       }
     );

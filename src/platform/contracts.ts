@@ -23,18 +23,19 @@ export interface SessionSnapshot {
 export interface SignInInput {
   account: string;
   password: string;
-  proof: string;
+  captchaId: string;
+  captchaCode: string;
 }
 
 export interface AdminGateway {
   signIn(input: SignInInput): Promise<SessionSnapshot>;
   resume(): Promise<SessionSnapshot | null>;
   refresh(): Promise<SessionSnapshot>;
-  signOut(): Promise<void>;
+  signOut(accessToken?: string): Promise<void>;
   switchOrganization(id: string): Promise<SessionSnapshot>;
   challenge(
     account: string,
     language: string,
     signal: AbortSignal
-  ): Promise<unknown>;
+  ): Promise<{ id: string; image: string }>;
 }

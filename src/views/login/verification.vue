@@ -1,59 +1,123 @@
 <script setup lang="ts">
-import "altcha";
-import "altcha/i18n";
 import { ref, watch, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import { gatewayReady, getAdminGateway } from "@/platform/gateway";
 const props = defineProps<{ account: string; language: string }>();
-const emit = defineEmits<{ proof: [value: string] }>();
+const emit = defineEmits<{ proof: [value: string]; challenge: [id: string] }>();
 const { t } = useI18n();
-const challenge = ref("");
+const image = ref("");
+const code = ref("");
 const failed = ref(false);
+const loading = ref(false);
 let controller: AbortController | undefined;
 let generation = 0;
+let timer: ReturnType<typeof setTimeout> | undefined;
+async function reload() {
+  clearTimeout(timer);
+  const current = ++generation;
+  controller?.abort();
+  controller = new AbortController();
+  code.value = "";
+  image.value = "";
+  emit("proof", "");
+  emit("challenge", "");
+  failed.value = false;
+  loading.value = false;
+  if (!gatewayReady() || !props.account) return;
+  loading.value = true;
+  try {
+    const value = await getAdminGateway().challenge(
+      props.account,
+      props.language,
+      controller.signal
+    );
+    if (current !== generation) return;
+    image.value = value.image;
+    emit("challenge", value.id);
+  } catch {
+    if (current === generation) failed.value = true;
+  } finally {
+    if (current === generation) loading.value = false;
+  }
+}
 watch(
   () => [props.account, props.language],
-  async () => {
-    const current = ++generation;
+  () => {
+    clearTimeout(timer);
+    generation++;
     controller?.abort();
-    controller = new AbortController();
+    image.value = "";
+    code.value = "";
     emit("proof", "");
-    challenge.value = "";
-    failed.value = false;
-    if (!gatewayReady() || !props.account) return;
-    try {
-      const value = await getAdminGateway().challenge(
-        props.account,
-        props.language,
-        controller.signal
-      );
-      if (current === generation) challenge.value = JSON.stringify(value);
-    } catch {
-      if (current === generation) failed.value = true;
-    }
+    emit("challenge", "");
+    timer = setTimeout(reload, 250);
   },
   { immediate: true }
 );
 onBeforeUnmount(() => {
+  clearTimeout(timer);
   generation++;
   controller?.abort();
 });
-function stateChanged(event: CustomEvent<{ state: string; payload?: string }>) {
-  emit(
-    "proof",
-    event.detail.state === "verified" ? (event.detail.payload ?? "") : ""
-  );
-}
 </script>
 <template>
-  <altcha-widget
-    v-if="challenge"
-    :key="challenge"
-    :challenge="challenge"
-    :language="language === 'zh' ? 'zh-cn' : 'en'"
-    @statechange="stateChanged"
-  />
-  <p v-else-if="failed" role="alert">
+  <div class="captcha-row">
+    <el-input
+      v-model="code"
+      :aria-label="t('admin.captcha')"
+      :placeholder="t('admin.captcha')"
+      size="large"
+      maxlength="6"
+      autocomplete="off"
+      :disabled="!image || loading"
+      @input="emit('proof', code)"
+    />
+    <button
+      type="button"
+      class="captcha-image"
+      :aria-label="t('admin.refreshCaptcha')"
+      :title="t('admin.refreshCaptcha')"
+      :disabled="!account || loading"
+      @click="reload"
+    >
+      <img v-if="image" :src="image" :alt="t('admin.captcha')" />
+      <span v-else>{{
+        t(loading ? "admin.captchaLoading" : "admin.refreshCaptcha")
+      }}</span>
+    </button>
+  </div>
+  <p v-if="failed" class="captcha-error" role="alert">
     {{ t("admin.verificationUnavailable") }}
   </p>
 </template>
+<style scoped lang="scss">
+.captcha-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 12px;
+}
+
+.captcha-image {
+  height: 40px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--el-fill-color-light);
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.captcha-error {
+  color: var(--el-color-danger);
+}
+</style>

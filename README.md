@@ -1,4 +1,5 @@
 # jim-nestjs-admin 前端
+当前进度（2026-11-06）：T07新增用户、角色、菜单、组织、角色分配、多上级管理契约已生成；本轮按Jimmy要求先写代码，测试保留到统一阶段。登录已改为后端svg-captcha图形验证码，统一响应解包为图片与题目编号，账号变化、点击刷新、登录失败均作废旧题；保留Pure原版布局和资产。altcha依赖已移除。退出会把清理前的访问令牌交给网关，有令牌就携带，Cookie退出仍支持。后文ALTCHA和旧测试数为历史阶段记录，不代表当前测试已执行。
 
 正式项目独立仓库，当前分支 codex/T11-admin-init。基于 Pure Admin 国际化精简版 6.2.0，保留 LICENSE（MIT）。来源：https://github.com/pure-admin/pure-admin-thin/tree/i18n ，快照 2395bb11b51b45c3e9ae78ee23f88e3f3510b606；底座来自已审查 T19（文档仓库提交 6777d1a）。
 

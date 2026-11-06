@@ -100,7 +100,10 @@ admin:
   serviceUnavailable: 服务暂不可用，请稍后再试
   requestCanceled: 请求已取消
   verificationUnavailable: 暂时无法加载验证，请稍后再试
-  verificationRequired: 请先完成人机验证
+  verificationRequired: 请填写验证码
+  captcha: 验证码
+  refreshCaptcha: 点击刷新验证码
+  captchaLoading: 加载中
   requiredAccount: 请输入账号
   requiredPassword: 请输入密码
   retry: 重试
@@ -139,7 +142,7 @@ crud:
   requestFailed: 操作未完成，请稍后重试
   addRow: 增行
   copyRow: 复制
-  rowCount: '已加载 {count} 行；行数范围 {min}～{max}'
+  rowCount: "已加载 {count} 行；行数范围 {min}～{max}"
   rowLimit: 明细行数不在允许范围内
   childrenNotLoaded: 尚未加载此组明细
   rowOrder: 顺序

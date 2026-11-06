@@ -17,6 +17,7 @@ const router = useRouter();
 const account = ref("");
 const password = ref("");
 const proof = ref("");
+const captchaId = ref("");
 const revision = ref(0);
 const busy = ref(false);
 const error = ref("");
@@ -28,6 +29,7 @@ const timer = setInterval(() => {
 onBeforeUnmount(() => clearInterval(timer));
 watch([account, locale], () => {
   proof.value = "";
+  captchaId.value = "";
   revision.value++;
   error.value = "";
   fields.value = [];
@@ -40,7 +42,12 @@ async function signIn() {
     error.value = t("admin.serviceUnavailable");
     return;
   }
-  if (!account.value.trim() || !password.value || !proof.value) {
+  if (
+    !account.value.trim() ||
+    !password.value ||
+    !proof.value ||
+    !captchaId.value
+  ) {
     error.value = t("admin.verificationRequired");
     return;
   }
@@ -49,7 +56,8 @@ async function signIn() {
     await useUserStoreHook().loginByUsername({
       account: account.value.trim(),
       password: password.value,
-      proof: proof.value
+      captchaId: captchaId.value,
+      captchaCode: proof.value
     });
     await router.replace("/welcome");
   } catch (reason) {
@@ -65,6 +73,7 @@ async function signIn() {
     busy.value = false;
     password.value = "";
     proof.value = "";
+    captchaId.value = "";
     revision.value++;
   }
 }
@@ -123,6 +132,7 @@ async function signIn() {
               :account="account.trim()"
               :language="locale"
               @proof="proof = $event"
+              @challenge="captchaId = $event"
             />
             <div v-if="error" class="login-error" role="alert">
               <p>{{ error }}</p>
@@ -139,6 +149,7 @@ async function signIn() {
               :disabled="
                 !gatewayReady() ||
                 !proof ||
+                !captchaId ||
                 !account.trim() ||
                 !password ||
                 retry > 0

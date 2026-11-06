@@ -140,6 +140,499 @@ export function createApiClient(
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
+    },
+    systemMenuAdd(
+      input: OperationInput<"systemMenuAdd"> & {
+        body: OperationBody<"systemMenuAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuAdd">>(
+        "post",
+        interpolate("/admin/system/menu/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemMenuDelete(
+      input: OperationInput<"systemMenuDelete"> & {
+        body: OperationBody<"systemMenuDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuDelete">>(
+        "post",
+        interpolate("/admin/system/menu/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemMenuInfo(
+      input: OperationInput<"systemMenuInfo"> & {
+        body: OperationBody<"systemMenuInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuInfo">>(
+        "post",
+        interpolate("/admin/system/menu/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemMenuPage(
+      input: OperationInput<"systemMenuPage"> & {
+        body: OperationBody<"systemMenuPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuPage">>(
+        "post",
+        interpolate("/admin/system/menu/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemMenuSchema(
+      input: OperationInput<"systemMenuSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuSchema">>(
+        "get",
+        interpolate("/admin/system/menu/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemMenuUpdate(
+      input: OperationInput<"systemMenuUpdate"> & {
+        body: OperationBody<"systemMenuUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuUpdate">>(
+        "post",
+        interpolate("/admin/system/menu/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgAdd(
+      input: OperationInput<"systemOrgAdd"> & {
+        body: OperationBody<"systemOrgAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgAdd">>(
+        "post",
+        interpolate("/admin/system/org/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgDelete(
+      input: OperationInput<"systemOrgDelete"> & {
+        body: OperationBody<"systemOrgDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgDelete">>(
+        "post",
+        interpolate("/admin/system/org/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgInfo(
+      input: OperationInput<"systemOrgInfo"> & {
+        body: OperationBody<"systemOrgInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgInfo">>(
+        "post",
+        interpolate("/admin/system/org/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgPage(
+      input: OperationInput<"systemOrgPage"> & {
+        body: OperationBody<"systemOrgPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgPage">>(
+        "post",
+        interpolate("/admin/system/org/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgSchema(
+      input: OperationInput<"systemOrgSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgSchema">>(
+        "get",
+        interpolate("/admin/system/org/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgUpdate(
+      input: OperationInput<"systemOrgUpdate"> & {
+        body: OperationBody<"systemOrgUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgUpdate">>(
+        "post",
+        interpolate("/admin/system/org/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPermissionList(
+      input: OperationInput<"systemPermissionList"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPermissionList">>(
+        "get",
+        interpolate("/admin/system/permission/list", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleAdd(
+      input: OperationInput<"systemRoleAdd"> & {
+        body: OperationBody<"systemRoleAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleAdd">>(
+        "post",
+        interpolate("/admin/system/role/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleDelete(
+      input: OperationInput<"systemRoleDelete"> & {
+        body: OperationBody<"systemRoleDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleDelete">>(
+        "post",
+        interpolate("/admin/system/role/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleInfo(
+      input: OperationInput<"systemRoleInfo"> & {
+        body: OperationBody<"systemRoleInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleInfo">>(
+        "post",
+        interpolate("/admin/system/role/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRolePage(
+      input: OperationInput<"systemRolePage"> & {
+        body: OperationBody<"systemRolePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRolePage">>(
+        "post",
+        interpolate("/admin/system/role/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleSchema(
+      input: OperationInput<"systemRoleSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleSchema">>(
+        "get",
+        interpolate("/admin/system/role/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleUpdate(
+      input: OperationInput<"systemRoleUpdate"> & {
+        body: OperationBody<"systemRoleUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleUpdate">>(
+        "post",
+        interpolate("/admin/system/role/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRoleAdd(
+      input: OperationInput<"systemUserRoleAdd"> & {
+        body: OperationBody<"systemUserRoleAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleAdd">>(
+        "post",
+        interpolate("/admin/system/user-role/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRoleDelete(
+      input: OperationInput<"systemUserRoleDelete"> & {
+        body: OperationBody<"systemUserRoleDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleDelete">>(
+        "post",
+        interpolate("/admin/system/user-role/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRoleInfo(
+      input: OperationInput<"systemUserRoleInfo"> & {
+        body: OperationBody<"systemUserRoleInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleInfo">>(
+        "post",
+        interpolate("/admin/system/user-role/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRolePage(
+      input: OperationInput<"systemUserRolePage"> & {
+        body: OperationBody<"systemUserRolePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRolePage">>(
+        "post",
+        interpolate("/admin/system/user-role/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRoleSchema(
+      input: OperationInput<"systemUserRoleSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleSchema">>(
+        "get",
+        interpolate("/admin/system/user-role/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserRoleUpdate(
+      input: OperationInput<"systemUserRoleUpdate"> & {
+        body: OperationBody<"systemUserRoleUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleUpdate">>(
+        "post",
+        interpolate("/admin/system/user-role/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorAdd(
+      input: OperationInput<"systemUserSupervisorAdd"> & {
+        body: OperationBody<"systemUserSupervisorAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorAdd">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorDelete(
+      input: OperationInput<"systemUserSupervisorDelete"> & {
+        body: OperationBody<"systemUserSupervisorDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorDelete">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorInfo(
+      input: OperationInput<"systemUserSupervisorInfo"> & {
+        body: OperationBody<"systemUserSupervisorInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorInfo">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorPage(
+      input: OperationInput<"systemUserSupervisorPage"> & {
+        body: OperationBody<"systemUserSupervisorPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorPage">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorSchema(
+      input: OperationInput<"systemUserSupervisorSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorSchema">>(
+        "get",
+        interpolate("/admin/system/user-supervisor/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorUpdate(
+      input: OperationInput<"systemUserSupervisorUpdate"> & {
+        body: OperationBody<"systemUserSupervisorUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorUpdate">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserChangePassword(
+      input: OperationInput<"systemUserChangePassword"> & {
+        body: OperationBody<"systemUserChangePassword">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserChangePassword">>(
+        "post",
+        interpolate("/admin/system/user/change-password", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserCreate(
+      input: OperationInput<"systemUserCreate"> & {
+        body: OperationBody<"systemUserCreate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserCreate">>(
+        "post",
+        interpolate("/admin/system/user/create", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserDelete(
+      input: OperationInput<"systemUserDelete"> & {
+        body: OperationBody<"systemUserDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserDelete">>(
+        "post",
+        interpolate("/admin/system/user/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserInfo(
+      input: OperationInput<"systemUserInfo"> & {
+        body: OperationBody<"systemUserInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserInfo">>(
+        "post",
+        interpolate("/admin/system/user/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserPage(
+      input: OperationInput<"systemUserPage"> & {
+        body: OperationBody<"systemUserPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserPage">>(
+        "post",
+        interpolate("/admin/system/user/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserResetPassword(
+      input: OperationInput<"systemUserResetPassword"> & {
+        body: OperationBody<"systemUserResetPassword">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserResetPassword">>(
+        "post",
+        interpolate("/admin/system/user/reset-password", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSchema(
+      input: OperationInput<"systemUserSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSchema">>(
+        "get",
+        interpolate("/admin/system/user/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserUpdate(
+      input: OperationInput<"systemUserUpdate"> & {
+        body: OperationBody<"systemUserUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserUpdate">>(
+        "post",
+        interpolate("/admin/system/user/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
     }
   };
 }

@@ -157,9 +157,10 @@ export const useUserStore = defineStore("admin-user", {
     },
     async logOut() {
       const gateway = gatewayReady() ? getAdminGateway() : null;
+      const token = this.accessToken;
       const pending = Promise.resolve().then(() =>
         coordinatedMutation(async () => {
-          await gateway?.signOut();
+          await gateway?.signOut(token);
         })
       );
       this.clearSession();

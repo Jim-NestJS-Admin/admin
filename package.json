@@ -53,7 +53,6 @@
     "@pureadmin/utils": "^2.6.4",
     "@vueuse/core": "^14.4.0",
     "@vueuse/motion": "^3.0.3",
-    "altcha": "3.5.0",
     "animate.css": "^4.1.1",
     "axios": "^1.21.0",
     "dayjs": "^1.11.23",

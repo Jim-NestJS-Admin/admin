@@ -103,7 +103,8 @@ export function createBackendGateway(
         body: {
           username: input.account,
           password: input.password,
-          altcha: input.proof
+          captchaId: input.captchaId,
+          captchaCode: input.captchaCode
         }
       });
       return hydrate(result.data);
@@ -122,8 +123,8 @@ export function createBackendGateway(
         throw error;
       }
     },
-    async signOut() {
-      await client().authLogout();
+    async signOut(accessToken = currentToken()) {
+      await client(accessToken).authLogout();
     },
     async switchOrganization(id) {
       const token = currentToken();
@@ -132,11 +133,21 @@ export function createBackendGateway(
         (await client(token).sessionSwitchOrg({ body: { orgId: id } })).data
       );
     },
-    challenge(account, _language, signal) {
-      return client().authCaptcha(
+    async challenge(account, _language, signal) {
+      const result = await client().authCaptcha(
         { query: { purpose: "login", account } },
-        { responseMode: "raw", signal }
+        { signal }
       );
+      if (
+        !result.data?.captchaId ||
+        typeof result.data.image !== "string" ||
+        !/^data:image\/svg\+xml;base64,[A-Za-z0-9+/]+=*$/.test(
+          result.data.image
+        ) ||
+        result.data.image.length > 128000
+      )
+        throw new RequestFailure(normalizeFailure(null));
+      return { id: result.data.captchaId, image: result.data.image };
     }
   };
 }
