@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useNav } from "@/layout/hooks/useNav";
 import LaySearch from "../lay-search/index.vue";
+import OrganizationSwitch from "@/views/system/OrganizationSwitch.vue";
+import PasswordDialog from "@/views/system/PasswordDialog.vue";
+import { ref } from "vue";
+const passwordDialogOpen = ref(false);
 import LayNotice from "../lay-notice/index.vue";
 import LayNavMix from "../lay-sidebar/NavMix.vue";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
@@ -47,6 +51,7 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
     <LayNavMix v-if="layout === 'mix'" />
 
     <div v-if="layout === 'vertical'" class="vertical-header-right">
+      <OrganizationSwitch />
       <!-- 菜单搜索 -->
       <LaySearch id="header-search" />
       <!-- 国际化 -->
@@ -93,6 +98,9 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">
+            <el-dropdown-item @click="passwordDialogOpen = true">{{
+              t("system.changePassword")
+            }}</el-dropdown-item>
             <el-dropdown-item @click="logout">
               <IconifyIconOffline
                 :icon="LogoutCircleRLine"
@@ -112,6 +120,7 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
       </span>
     </div>
   </div>
+  <PasswordDialog v-model="passwordDialogOpen" />
 </template>
 
 <style lang="scss" scoped>

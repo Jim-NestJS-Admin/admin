@@ -25,6 +25,7 @@ export const useUserStore = defineStore("admin-user", {
     accessToken: "",
     expiresAt: 0,
     organizationId: "",
+    organizations: [] as { id: string; name: string; path: string[] }[],
     authVersion: undefined as number | undefined,
     menus: [] as NavigationItem[],
     epoch: 0,
@@ -61,6 +62,7 @@ export const useUserStore = defineStore("admin-user", {
       this.username = session.user.username;
       this.nickname = session.user.nickname ?? "";
       this.organizationId = session.organizationId;
+      this.organizations = session.organizations ?? [];
       this.authVersion = session.authVersion;
       this.permissions = session.permissions.filter(
         value => typeof value === "string" && value !== "*:*:*"
@@ -81,6 +83,7 @@ export const useUserStore = defineStore("admin-user", {
       this.permissions = [];
       this.menus = [];
       this.organizationId = "";
+      this.organizations = [];
       this.authVersion = undefined;
       this.transitioning = false;
       resetSessionViews();

@@ -156,3 +156,39 @@ crud:
   confirmPurge: 确定彻底删除选中的 {count} 条记录及其全部明细吗？此操作无法撤销。
   duplicateRow: 同组明细的唯一字段不能重复
   info: 详情
+
+system:
+  createUser: 新增用户
+  resetPassword: 重置密码
+  chooseUser: 选择用户
+  name: 姓名
+  saved: 保存成功
+  lookupFailed: 关联选项加载失败，请检查权限后重试
+  permissions: 权限码
+  organizations: 组织
+  globalScope: 全局作用范围
+  dataScope: 数据范围
+  menuType: 菜单类型
+  enabled: 启用
+  currentOrganization: 当前组织
+  noOrganization: 暂无组织
+  switchFailed: 组织切换失败，请重新登录
+  scopes:
+    all: 全部
+    org: 本组织
+    org_and_children: 本组织及下级
+    self: 仅本人
+    custom: 自定义组织
+  menuTypes:
+    directory: 目录
+    page: 页面
+    button: 按钮
+
+  changePassword: 修改密码
+  oldPassword: 原密码
+  newPassword: 新密码
+  filterDefaultOrg: 按默认组织筛选
+  filterScope: 按角色作用组织筛选
+  filterDictionary: 按字典类型筛选
+  filterChildren: 查看直属下级
+  showAll: 显示全部

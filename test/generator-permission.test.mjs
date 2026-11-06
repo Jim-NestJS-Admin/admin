@@ -24,7 +24,17 @@ test("T06对象权限扩展与已有数组扩展合并去重，产物有明确�
   const text = files.get("constants.ts");
   assert.match(text, /file:asset:download/);
   assert.match(text, /file:asset:read/);
-  assert.equal((text.match(/file:asset:read/g) ?? []).length, 1);
+  const constants = await import(
+    `data:text/javascript,${encodeURIComponent(text.replace(/ as const/g, "").replace(/export type PermissionCode[^;]+;/g, ""))}`
+  );
+  assert.deepEqual(constants.PERMISSIONS, [
+    "file:asset:download",
+    "file:asset:read"
+  ]);
+  assert.deepEqual(constants.OPERATION_PERMISSIONS.downloadFile, [
+    "file:asset:read",
+    "file:asset:download"
+  ]);
   assert.equal(
     JSON.parse(files.get("manifest.json")).permissionsProvided,
     true

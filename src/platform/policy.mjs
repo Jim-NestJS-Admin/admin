@@ -83,7 +83,13 @@ export function adaptNavigation(
           path: item.path,
           name: `Resource_${item.key}`,
           ...(item.kind === "page" ? { component: item.view } : {}),
-          meta: { title: item.title, rank: 10 },
+          meta: {
+            title: item.title,
+            rank: Number.isFinite(item.rank) ? item.rank : 10,
+            showLink: !item.hidden,
+            keepAlive: !!item.keepAlive,
+            icon: item.icon ?? undefined
+          },
           ...(children ? { children } : {})
         }
       ];

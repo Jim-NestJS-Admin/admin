@@ -71,3 +71,11 @@ pnpm gen:api --input https://example.com/admin.json --source-revision <后端提
 测试源 test/fixtures/t03-openapi.json 来自已经审查的 server 651af06 的真实测试实体和控制器，10 个操作；来源见 t03-provenance.json。导出工具 scripts/export-t03-openapi.mjs 只编译测试资源并创建没有数据库模块的 Nest 应用，未连接数据库。复现时在 Codex 独立 server worktree 核实对应提交后运行 pnpm gen:api:fixture；该工具会更新测试快照，不会把测试端点写入正式 src/api。
 
 测试覆盖可重复生成、真实 T03 DTO 的正反类型断言、请求版本与幂等键转发、引用/重复 operationId 拒绝、路径参数编码、multipart、正式产物与输入快照一致。生成器只写固定目录与自己拥有的文件，不覆盖手写文件或符号链接。当前分支基于 T11 8e5d1de，尚未自动合并。
+
+## T14 系统管理页面（代码阶段）
+
+系统用户、角色、组织、菜单、组织角色分配、多上级、字典类型/项、参数、操作日志、登录日志共11个实际页面，组件键为 `system/<资源名>`（例如 `system/user`、`system/user-role`）。只开放本地白名单，菜单由后端提供；部署时需T10初始化菜单，不能靠前端假数据补菜单。
+
+接口快照来自server-t08的931e49f。所有按钮权限从生成的OPERATION_PERMISSIONS读取。用户创建/重置密码走专用接口；导航顶部支持当前组织切换及本人改密。组织、菜单、字典和作用范围有左树筛选，关联选择器按权限加载，不把编号当可授权范围。
+
+本轮类型检查、lint、生产构建通过。按Jimmy要求，新增/更新测试先写入，统一验收阶段再执行；未做浏览器联调。字段权限配置和逐行状态等待T16契约补齐，查询偏好和高级查询等待T18。

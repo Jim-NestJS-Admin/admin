@@ -141,6 +141,208 @@ export function createApiClient(
         config
       );
     },
+    systemDictItemAdd(
+      input: OperationInput<"systemDictItemAdd"> & {
+        body: OperationBody<"systemDictItemAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemAdd">>(
+        "post",
+        interpolate("/admin/system/dict-item/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemDelete(
+      input: OperationInput<"systemDictItemDelete"> & {
+        body: OperationBody<"systemDictItemDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemDelete">>(
+        "post",
+        interpolate("/admin/system/dict-item/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemInfo(
+      input: OperationInput<"systemDictItemInfo"> & {
+        body: OperationBody<"systemDictItemInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemInfo">>(
+        "post",
+        interpolate("/admin/system/dict-item/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemPage(
+      input: OperationInput<"systemDictItemPage"> & {
+        body: OperationBody<"systemDictItemPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemPage">>(
+        "post",
+        interpolate("/admin/system/dict-item/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemSchema(
+      input: OperationInput<"systemDictItemSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemSchema">>(
+        "get",
+        interpolate("/admin/system/dict-item/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemUpdate(
+      input: OperationInput<"systemDictItemUpdate"> & {
+        body: OperationBody<"systemDictItemUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemUpdate">>(
+        "post",
+        interpolate("/admin/system/dict-item/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeAdd(
+      input: OperationInput<"systemDictTypeAdd"> & {
+        body: OperationBody<"systemDictTypeAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeAdd">>(
+        "post",
+        interpolate("/admin/system/dict-type/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictionaryOptions(
+      input: OperationInput<"systemDictionaryOptions"> & {
+        query: OperationParameter<"systemDictionaryOptions", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictionaryOptions">>(
+        "get",
+        interpolate("/admin/system/dict-type/data", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeDelete(
+      input: OperationInput<"systemDictTypeDelete"> & {
+        body: OperationBody<"systemDictTypeDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeDelete">>(
+        "post",
+        interpolate("/admin/system/dict-type/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeInfo(
+      input: OperationInput<"systemDictTypeInfo"> & {
+        body: OperationBody<"systemDictTypeInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeInfo">>(
+        "post",
+        interpolate("/admin/system/dict-type/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypePage(
+      input: OperationInput<"systemDictTypePage"> & {
+        body: OperationBody<"systemDictTypePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypePage">>(
+        "post",
+        interpolate("/admin/system/dict-type/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeSchema(
+      input: OperationInput<"systemDictTypeSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeSchema">>(
+        "get",
+        interpolate("/admin/system/dict-type/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeUpdate(
+      input: OperationInput<"systemDictTypeUpdate"> & {
+        body: OperationBody<"systemDictTypeUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeUpdate">>(
+        "post",
+        interpolate("/admin/system/dict-type/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemLoginLogInfo(
+      input: OperationInput<"systemLoginLogInfo"> & {
+        body: OperationBody<"systemLoginLogInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemLoginLogInfo">>(
+        "post",
+        interpolate("/admin/system/login-log/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemLoginLogPage(
+      input: OperationInput<"systemLoginLogPage"> & {
+        body: OperationBody<"systemLoginLogPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemLoginLogPage">>(
+        "post",
+        interpolate("/admin/system/login-log/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemLoginLogSchema(
+      input: OperationInput<"systemLoginLogSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemLoginLogSchema">>(
+        "get",
+        interpolate("/admin/system/login-log/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemMenuAdd(
       input: OperationInput<"systemMenuAdd"> & {
         body: OperationBody<"systemMenuAdd">;
@@ -217,6 +419,43 @@ export function createApiClient(
         config
       );
     },
+    systemOperationLogInfo(
+      input: OperationInput<"systemOperationLogInfo"> & {
+        body: OperationBody<"systemOperationLogInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOperationLogInfo">>(
+        "post",
+        interpolate("/admin/system/operation-log/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOperationLogPage(
+      input: OperationInput<"systemOperationLogPage"> & {
+        body: OperationBody<"systemOperationLogPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOperationLogPage">>(
+        "post",
+        interpolate("/admin/system/operation-log/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOperationLogSchema(
+      input: OperationInput<"systemOperationLogSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOperationLogSchema">>(
+        "get",
+        interpolate("/admin/system/operation-log/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemOrgAdd(
       input: OperationInput<"systemOrgAdd"> & {
         body: OperationBody<"systemOrgAdd">;
@@ -289,6 +528,82 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemOrgUpdate">>(
         "post",
         interpolate("/admin/system/org/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterAdd(
+      input: OperationInput<"systemParameterAdd"> & {
+        body: OperationBody<"systemParameterAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterAdd">>(
+        "post",
+        interpolate("/admin/system/parameter/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterDelete(
+      input: OperationInput<"systemParameterDelete"> & {
+        body: OperationBody<"systemParameterDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterDelete">>(
+        "post",
+        interpolate("/admin/system/parameter/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterInfo(
+      input: OperationInput<"systemParameterInfo"> & {
+        body: OperationBody<"systemParameterInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterInfo">>(
+        "post",
+        interpolate("/admin/system/parameter/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterPage(
+      input: OperationInput<"systemParameterPage"> & {
+        body: OperationBody<"systemParameterPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterPage">>(
+        "post",
+        interpolate("/admin/system/parameter/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterSchema(
+      input: OperationInput<"systemParameterSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterSchema">>(
+        "get",
+        interpolate("/admin/system/parameter/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterUpdate(
+      input: OperationInput<"systemParameterUpdate"> & {
+        body: OperationBody<"systemParameterUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterUpdate">>(
+        "post",
+        interpolate("/admin/system/parameter/update", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -580,6 +895,17 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemUserInfo">>(
         "post",
         interpolate("/admin/system/user/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserMe(
+      input: OperationInput<"systemUserMe"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserMe">>(
+        "get",
+        interpolate("/admin/system/user/me", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

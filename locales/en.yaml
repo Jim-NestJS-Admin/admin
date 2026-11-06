@@ -156,3 +156,39 @@ crud:
   confirmPurge: Permanently delete the {count} selected records and all their details? This cannot be undone.
   duplicateRow: Unique fields cannot repeat within these rows
   info: Details
+
+system:
+  createUser: Create user
+  resetPassword: Reset password
+  chooseUser: Choose user
+  name: Name
+  saved: Saved
+  lookupFailed: Could not load related options. Check your permissions and retry.
+  permissions: Permissions
+  organizations: Organizations
+  globalScope: Global scope
+  dataScope: Data scope
+  menuType: Menu type
+  enabled: Enabled
+  currentOrganization: Current organization
+  noOrganization: No organization
+  switchFailed: Could not switch organization. Please sign in again.
+  scopes:
+    all: All
+    org: Organization
+    org_and_children: Organization and descendants
+    self: Own records
+    custom: Selected organizations
+  menuTypes:
+    directory: Directory
+    page: Page
+    button: Button
+
+  changePassword: Change password
+  oldPassword: Current password
+  newPassword: New password
+  filterDefaultOrg: Filter by default organization
+  filterScope: Filter by role scope organization
+  filterDictionary: Filter by dictionary type
+  filterChildren: Show direct children
+  showAll: Show all

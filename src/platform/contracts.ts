@@ -7,6 +7,10 @@ export interface NavigationItem {
   view?: string;
   permission?: string;
   children?: NavigationItem[];
+  hidden?: boolean;
+  keepAlive?: boolean;
+  rank?: number;
+  icon?: string | null;
 }
 
 export interface SessionSnapshot {
@@ -15,6 +19,7 @@ export interface SessionSnapshot {
   user: { id: string; username: string; nickname?: string };
   organizationId: string;
   authVersion?: number;
+  organizations?: { id: string; name: string; path: string[] }[];
   permissions: string[];
   menus: NavigationItem[];
 }

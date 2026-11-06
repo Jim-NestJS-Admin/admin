@@ -124,6 +124,7 @@ export async function generateApi(input, provenance) {
   const operations = [];
   let multipartUsed = false;
   const permissions = new Set(permissionCodes(document));
+  const operationPermissions = {};
   const scopes = new Set(strings(document["x-scopes"]));
   const enums = {};
   const collect = (value, path = []) => {
@@ -143,6 +144,7 @@ export async function generateApi(input, provenance) {
     for (const [method, op] of Object.entries(item)) {
       if (!methods.has(method)) continue;
       permissionCodes(op).forEach(value => permissions.add(value));
+      operationPermissions[op.operationId] = permissionCodes(op);
       const required = [];
       const body = dereference(op.requestBody, document);
       if (body?.required)
@@ -211,7 +213,7 @@ export const api = createApiClient();
 `;
   const constants =
     header +
-    `export const PERMISSIONS = ${literal([...permissions].sort())} as const;\nexport type PermissionCode = typeof PERMISSIONS[number];\nexport const SCOPES = ${literal([...scopes].sort())} as const;\nexport const ENUMS = ${literal(stable(enums))} as const;\n`;
+    `export const PERMISSIONS = ${literal([...permissions].sort())} as const;\nexport type PermissionCode = typeof PERMISSIONS[number];\nexport const OPERATION_PERMISSIONS = ${literal(stable(operationPermissions))} as const;\nexport const SCOPES = ${literal([...scopes].sort())} as const;\nexport const ENUMS = ${literal(stable(enums))} as const;\n`;
   const files = new Map();
   const prettier = await resolveConfig(
     fileURLToPath(new URL("../src/api/client.ts", import.meta.url))

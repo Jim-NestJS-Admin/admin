@@ -55,6 +55,10 @@ export function createBackendGateway(
       kind: item.type,
       view: item.component ?? undefined,
       permission: item.permission ?? undefined,
+      hidden: item.hidden,
+      keepAlive: item.keepAlive,
+      rank: item.rank,
+      icon: item.icon,
       children: item.children ? menus(item.children) : undefined
     }));
 
@@ -92,6 +96,7 @@ export function createBackendGateway(
       user: data.user,
       organizationId: data.currentOrg?.id ?? "",
       authVersion: access.authVersion,
+      organizations: data.orgs,
       permissions: access.permissions,
       menus: menus(access.menus)
     };

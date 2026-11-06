@@ -42,6 +42,20 @@ const page = {
   view: "users",
   permission: "read"
 };
+test("导航保留后台配置的隐藏、缓存、排序和图标", () => {
+  const [route] = adaptNavigation(
+    [{ ...page, hidden: true, keepAlive: true, rank: 3, icon: "ep:user" }],
+    ["read"],
+    new Set(["users"])
+  );
+  assert.deepEqual(route.meta, {
+    title: "用户",
+    rank: 3,
+    showLink: false,
+    keepAlive: true,
+    icon: "ep:user"
+  });
+});
 test("未知视图、异常子树和外部路径不影响合法菜单", () => {
   const errors = [];
   const result = adaptNavigation(
