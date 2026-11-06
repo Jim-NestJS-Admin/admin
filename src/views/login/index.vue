@@ -7,6 +7,11 @@ import { useUserStoreHook } from "@/store/modules/user";
 import Verification from "./verification.vue";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
+import bg from "@/assets/login/bg.png";
+import Avatar from "@/assets/login/avatar.svg?component";
+import Illustration from "@/assets/login/illustration.svg?component";
+import User from "~icons/ri/user-3-fill";
+import Lock from "~icons/ri/lock-fill";
 const { t, locale } = useI18n();
 const router = useRouter();
 const account = ref("");
@@ -65,113 +70,129 @@ async function signIn() {
 }
 </script>
 <template>
-  <main class="login-page">
-    <section class="login-card" aria-labelledby="login-title">
-      <div class="login-language">
-        <el-select v-model="locale" aria-label="Language"
-          ><el-option label="简体中文" value="zh" /><el-option
-            label="English"
-            value="en"
-        /></el-select>
+  <main class="pure-login">
+    <img :src="bg" class="wave" alt="" aria-hidden="true" />
+    <div class="login-language">
+      <el-select v-model="locale" aria-label="Language" size="small">
+        <el-option label="简体中文" value="zh" />
+        <el-option label="English" value="en" />
+      </el-select>
+    </div>
+    <div class="login-container">
+      <div class="img" aria-hidden="true">
+        <Illustration class="login-illustration" />
       </div>
-      <h1 id="login-title">jim-nestjs-admin</h1>
-      <p>{{ t("admin.title") }}</p>
-      <el-alert
-        v-if="!gatewayReady()"
-        :title="t('admin.serviceUnavailable')"
-        type="info"
-        :closable="false"
-        show-icon
-      />
-      <form @submit.prevent="signIn">
-        <label for="account">{{ t("admin.account") }}</label>
-        <el-input
-          id="account"
-          v-model="account"
-          autocomplete="username"
-          :disabled="busy"
-          maxlength="64"
-        />
-        <label for="password">{{ t("admin.password") }}</label>
-        <el-input
-          id="password"
-          v-model="password"
-          type="password"
-          autocomplete="current-password"
-          show-password
-          :disabled="busy"
-        />
-        <Verification
-          :key="revision"
-          :account="account.trim()"
-          :language="locale"
-          @proof="proof = $event"
-        />
-        <div v-if="error" role="alert">
-          <p>{{ error }}</p>
-          <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
+      <section class="login-box" aria-labelledby="login-title">
+        <div class="login-form">
+          <Avatar class="avatar" aria-hidden="true" />
+          <h2 id="login-title">PureAdmin</h2>
+          <el-alert
+            v-if="!gatewayReady()"
+            :title="t('admin.serviceUnavailable')"
+            type="info"
+            :closable="false"
+            show-icon
+          />
+          <form @submit.prevent="signIn">
+            <el-input
+              id="account"
+              v-model="account"
+              :aria-label="t('admin.account')"
+              :placeholder="t('admin.account')"
+              :prefix-icon="User"
+              autocomplete="username"
+              :disabled="busy"
+              maxlength="64"
+              size="large"
+              clearable
+            />
+            <el-input
+              id="password"
+              v-model="password"
+              :aria-label="t('admin.password')"
+              :placeholder="t('admin.password')"
+              :prefix-icon="Lock"
+              type="password"
+              autocomplete="current-password"
+              show-password
+              :disabled="busy"
+              size="large"
+            />
+            <Verification
+              :key="revision"
+              :account="account.trim()"
+              :language="locale"
+              @proof="proof = $event"
+            />
+            <div v-if="error" class="login-error" role="alert">
+              <p>{{ error }}</p>
+              <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
+            </div>
+            <p v-if="retry > 0" role="status">
+              {{ t("admin.retryAfter", { seconds: retry }) }}
+            </p>
+            <el-button
+              class="login-submit"
+              native-type="submit"
+              type="primary"
+              :loading="busy"
+              :disabled="
+                !gatewayReady() ||
+                !proof ||
+                !account.trim() ||
+                !password ||
+                retry > 0
+              "
+              >{{ t("admin.signIn") }}</el-button
+            >
+          </form>
         </div>
-        <p v-if="retry > 0" role="status">
-          {{ t("admin.retryAfter", { seconds: retry }) }}
-        </p>
-        <el-button
-          native-type="submit"
-          type="primary"
-          :loading="busy"
-          :disabled="
-            !gatewayReady() ||
-            !proof ||
-            !account.trim() ||
-            !password ||
-            retry > 0
-          "
-          >{{ t("admin.signIn") }}</el-button
-        >
-      </form>
-    </section>
+      </section>
+    </div>
   </main>
 </template>
-<style scoped lang="scss">
-.login-page {
-  display: grid;
-  place-items: center;
-  min-height: 100dvh;
-  padding: 24px;
-  background: var(--el-fill-color-light);
-}
 
-.login-card {
-  width: min(100%, 420px);
-  padding: 28px;
+<style scoped>
+@import url("@/style/login.css");
+</style>
+
+<style scoped lang="scss">
+.pure-login {
+  position: relative;
+  min-height: 100dvh;
   background: var(--el-bg-color);
-  border: 1px solid var(--el-border-color-light);
-  border-radius: 12px;
+  isolation: isolate;
 }
 
 .login-language {
-  width: 130px;
-  margin-left: auto;
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 110px;
 }
 
-h1 {
-  margin-top: 28px;
-  font-size: 24px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-p {
-  margin: 12px 0 24px;
-  color: var(--el-text-color-secondary);
+.login-illustration {
+  width: min(100%, 500px);
+  height: auto;
 }
 
 form {
   display: grid;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 22px;
 }
 
-label {
-  margin-top: 8px;
+.login-submit {
+  width: 100%;
+}
+
+.login-error {
+  color: var(--el-color-danger);
+  text-align: left;
+}
+
+@media screen and (height <= 600px) {
+  .login-container {
+    min-height: 600px;
+  }
 }
 </style>
