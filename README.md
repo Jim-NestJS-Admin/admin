@@ -61,7 +61,7 @@ pnpm gen:api --input https://example.com/admin.json --source-revision <后端提
 
 默认读 ../server/openapi/admin.json，生成 src/api/schema.d.ts、client.ts、constants.ts、manifest.json，禁止手改。manifest 记录后端提交号、输入 SHA256 和操作数；api-source/admin.json 是同次输入快照，使只有 admin 仓库的 CI 仍可验证全部生成文件一致。若没有相邻后端仓库，默认使用已提交快照及 manifest 中的来源信息。远程地址必须显式给后端提交号，禁止 URL 携带凭据/查询参数，禁止重定向和外部引用。
 
-当前正式 admin.json 没有业务路径，正式客户端故意为空；权限扩展缺失时生成空集合并提示，不从路由猜权限。T06 可在根或操作上给 x-permissions 字符串数组，在根给 x-scopes 字符串数组；标准 OAuth2 flow 的 scopes 也会收集。ENUMS 按完整 schema 属性路径生成，保留原始枚举值。后端采用其他扩展结构时需共同对齐，不能静默猜测。
+当前版本化输入快照的正式 admin.json 没有业务路径，正式客户端故意为空；权限扩展缺失时生成空集合并提示，不从路由猜权限。生成器已兼容 T06 正式的 `x-permission: { code, risk }`，并继续读取根或操作上的 `x-permissions` 字符串数组，合并去重后生成权限常量；非法对象扩展拒绝生成，不能静默猜测。根的 x-scopes 字符串数组与标准 OAuth2 flow 的 scopes 也会收集。ENUMS 按完整 schema 属性路径生成，保留原始枚举值。T05/T06 正式客户端快照更新与真实前端联调仍单独推进，本批没有混入测试接口。
 
 使用示例：业务页从 src/api/client 导入 api，调用由 operationId 命名的函数；请求参数分 body/path/query/headers，统一返回值类型直接来自 OpenAPI 成功响应信封。原始出题响应在认证适配层显式传 responseMode: raw、authPolicy: none，不能把它误判为统一信封；实际认证适配仍待 T05/T06 导出。multipart 按契约构造 FormData，binary 类型生成 Blob。
 

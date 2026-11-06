@@ -100,6 +100,22 @@ function strings(value) {
     throw Error("x-permissions / x-scopes 必须是字符串数组");
   return value;
 }
+// T06 的正式权限声明是 { code, risk }；同时保留早期字符串数组扩展的兼容。
+function permissionCodes(value) {
+  const codes = strings(value["x-permissions"]);
+  const single = value["x-permission"];
+  if (single === undefined) return codes;
+  if (
+    !single ||
+    typeof single !== "object" ||
+    Array.isArray(single) ||
+    typeof single.code !== "string" ||
+    !/^[a-z][a-z0-9-]*(:[a-z][a-z0-9-]*)+$/.test(single.code) ||
+    (single.risk !== undefined && !["normal", "high"].includes(single.risk))
+  )
+    throw Error("x-permission 必须包含合法 code，risk 只能是 normal 或 high");
+  return [...codes, single.code];
+}
 export async function generateApi(input, provenance) {
   const document = stable(input);
   validateDocument(document);
@@ -107,7 +123,7 @@ export async function generateApi(input, provenance) {
     throw Error("必须记录有效的后端 Git 提交号");
   const operations = [];
   let multipartUsed = false;
-  const permissions = new Set(strings(document["x-permissions"]));
+  const permissions = new Set(permissionCodes(document));
   const scopes = new Set(strings(document["x-scopes"]));
   const enums = {};
   const collect = (value, path = []) => {
@@ -126,7 +142,7 @@ export async function generateApi(input, provenance) {
   for (const [path, item] of Object.entries(document.paths))
     for (const [method, op] of Object.entries(item)) {
       if (!methods.has(method)) continue;
-      strings(op["x-permissions"]).forEach(value => permissions.add(value));
+      permissionCodes(op).forEach(value => permissions.add(value));
       const required = [];
       const body = dereference(op.requestBody, document);
       if (body?.required)
