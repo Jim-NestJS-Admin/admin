@@ -76,3 +76,5 @@ T21 生成页面时使用本组件，最小页面结构是 `<CrudPage :page-key=
 浏览器已操作必填提示、新增、编辑冲突保留、列隐藏并重新加载、清空会话视图。`test/viewport.html` 在 iframe 内提供实际 **390×844 CSS 视口**，DOM 测量 viewport/document/body 宽度均390，抽屉宽390；这不是手机真机验收。截图位于 `shots/crud-desktop.png`、`shots/crud-mobile-form.png`。
 
 第二批浏览器验证 `test/aggregate-browser.html` 的复制、键盘排序及真实原生拖动（SKU-A 从首行移到第三行）、一次主表保存含明细差异、错误行定位/保留、只读详情、恢复携带 id/version。彻底删除只验证确认文字和取消，调用参数由控制器测试覆盖，没有在浏览器执行永久删除。`test/aggregate-viewport.html` 的390×844 CSS视口中页面/body宽390、可见抽屉390×844。截图 aggregate-desktop.png、aggregate-error.png、aggregate-mobile.png 位于 shots/。
+
+T17补充：正式接口已具备CrudSchema，types.ts现直接使用src/api/schema；早期crud-schema子集只留作历史测试输入。_fieldState明确区分只读/脱敏/隐藏，未知状态失败关闭，不根据星号推断。页面fieldPerms和逐行状态分别约束新增与修改；新增定向测试按Jimmy要求暂不执行。后端schema的Swagger属性遗漏已交接。

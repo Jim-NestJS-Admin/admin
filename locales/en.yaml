@@ -192,3 +192,34 @@ system:
   filterDictionary: Filter by dictionary type
   filterChildren: Show direct children
   showAll: Show all
+
+fieldPerm:
+  title: Field permissions
+  roles: Roles
+  explanation: Changes affect field security in the current tenant. Following defaults removes the override. Saving invalidates cached authorization.
+  chooseRole: Choose target role
+  module: Module
+  search: Search field labels or keys
+  field: Field
+  defaultState: Default state
+  setting: Override
+  mask: Mask rule
+  delegable: Delegation limit
+  followDefault: Follow default
+  bulkState: Bulk state
+  applyModule: Apply to all fields in selected module
+  copyRole: Copy from role
+  copy: Copy into current draft
+  saveCount: "Save {count} changes"
+  batchLimit: Save up to 500 changes at a time. Split changes by module.
+  states:
+    editable: Editable
+    readonly: Read only
+    masked: Masked
+    hidden: Hidden
+  masks:
+    phone: Phone (first 3, last 4)
+    email: Email
+    idcard: ID (first 3, last 4)
+    last4: Last 4 only
+    all: Mask all

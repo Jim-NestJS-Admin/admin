@@ -1,4 +1,4 @@
-import type { components } from "@/api/crud-schema";
+import type { components } from "@/api/schema";
 export type CrudSchema = components["schemas"]["CrudSchema"];
 export type CrudColumn = components["schemas"]["CrudSchemaColumn"];
 export type CrudChild = components["schemas"]["CrudSchemaChild"];
@@ -86,6 +86,6 @@ export interface CrudPort {
   };
 }
 export interface CrudCell {
-  state: "visible" | "masked" | "hidden";
+  state: "visible" | "readonly" | "masked" | "hidden";
   display: unknown;
 }

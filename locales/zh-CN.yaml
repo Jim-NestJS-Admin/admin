@@ -192,3 +192,34 @@ system:
   filterDictionary: 按字典类型筛选
   filterChildren: 查看直属下级
   showAll: 显示全部
+
+fieldPerm:
+  title: 字段权限
+  roles: 角色管理
+  explanation: 仅调整当前租户的字段安全配置；跟随默认会移除单独覆盖。保存后立即更新授权版本。
+  chooseRole: 选择要配置的角色
+  module: 模块
+  search: 搜索字段名称或标识
+  field: 字段
+  defaultState: 默认状态
+  setting: 单独设置
+  mask: 脱敏规则
+  delegable: 可委派上限
+  followDefault: 跟随默认
+  bulkState: 批量状态
+  applyModule: 应用到所选模块全部字段
+  copyRole: 从其他角色复制
+  copy: 复制到当前草稿
+  saveCount: "保存 {count} 项变更"
+  batchLimit: 单次最多保存500项，请按模块分批保存
+  states:
+    editable: 可编辑
+    readonly: 只读
+    masked: 脱敏
+    hidden: 隐藏
+  masks:
+    phone: 手机号（前3后4）
+    email: 邮箱
+    idcard: 证件号（前3后4）
+    last4: 仅后4位
+    all: 全部打码

@@ -352,6 +352,159 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/field-perm/registry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 字段权限清单（代码默认值） */
+    get: operations["systemFieldPermRegistry"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增模块字段默认权限 */
+    post: operations["systemFieldAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除模块字段默认权限（整批成败） */
+    post: operations["systemFieldDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 模块字段默认权限详情 */
+    post: operations["systemFieldInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 合并代码与当前租户模块字段默认配置 */
+    get: operations["systemFieldOverview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 模块字段默认权限分页列表 */
+    post: operations["systemFieldPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 同事务保存模块字段默认权限 */
+    post: operations["systemFieldSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 模块字段默认权限页面描述 */
+    get: operations["systemFieldSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/field/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改模块字段默认权限 */
+    post: operations["systemFieldUpdate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/login-log/info": {
     parameters: {
       query?: never;
@@ -771,6 +924,142 @@ export type paths = {
     get: operations["systemPermissionList"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增角色字段权限 */
+    post: operations["systemRoleFieldAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除角色字段权限（整批成败） */
+    post: operations["systemRoleFieldDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 角色字段权限详情 */
+    post: operations["systemRoleFieldInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 角色字段权限与模块默认的配置读模型 */
+    get: operations["systemRoleFieldOverview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 角色字段权限分页列表 */
+    post: operations["systemRoleFieldPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 同事务保存角色字段权限，支持整模块和复制后的变更 */
+    post: operations["systemRoleFieldSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 角色字段权限页面描述 */
+    get: operations["systemRoleFieldSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/role-field/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改角色字段权限 */
+    post: operations["systemRoleFieldUpdate"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1399,6 +1688,83 @@ export type components = {
     DictionaryOptions: {
       items: components["schemas"]["DictionaryOption"][];
     };
+    FieldConfigurationChange: {
+      /** @enum {string|null} */
+      delegable?: "editable" | "readonly" | "masked" | "hidden" | null;
+      field: string;
+      /** @enum {string|null} */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      resource: string;
+      /**
+       * @description null表示跟随默认；新增配置version传0
+       * @enum {string|null}
+       */
+      state: "editable" | "readonly" | "masked" | "hidden" | null;
+      version: number;
+    };
+    FieldConfigurationEntry: {
+      /** @enum {string} */
+      codeDefault: "editable" | "readonly" | "masked" | "hidden";
+      /** @enum {string|null} */
+      codeDelegable: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @enum {string|null} */
+      codeMask: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @enum {string|null} */
+      defaultDelegable: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @enum {string|null} */
+      defaultMask: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @enum {string} */
+      defaultState: "editable" | "readonly" | "masked" | "hidden";
+      /** @enum {string|null} */
+      delegable: "editable" | "readonly" | "masked" | "hidden" | null;
+      field: string;
+      label: string;
+      /** @enum {string|null} */
+      mask: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      resource: string;
+      resourceLabel: string;
+      /**
+       * @description null表示跟随默认
+       * @enum {string|null}
+       */
+      state: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @description 当前目标覆盖版本；没有覆盖为0 */
+      version: number;
+    };
+    FieldConfigurationOverview: {
+      fields: components["schemas"]["FieldConfigurationEntry"][];
+    };
+    FieldConfigurationResult: {
+      count: number;
+    };
+    FieldPermFieldDto: {
+      configurable: boolean;
+      /**
+       * @description 代码默认状态
+       * @enum {string}
+       */
+      default: "editable" | "readonly" | "masked" | "hidden";
+      /**
+       * @description 可委派上限
+       * @enum {string|null}
+       */
+      delegable: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @description 实体属性名 */
+      field: string;
+      label: string;
+      /** @enum {string|null} */
+      mask: "phone" | "email" | "idcard" | "last4" | "all" | null;
+    };
+    FieldPermRegistryDto: {
+      masks: components["schemas"]["MaskRuleDto"][];
+      resources: components["schemas"]["FieldPermResourceDto"][];
+    };
+    FieldPermResourceDto: {
+      fields: components["schemas"]["FieldPermFieldDto"][];
+      label: string;
+      /** @description 资源（权限码前缀），如 system:user */
+      resource: string;
+    };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
       captchaCode?: string;
@@ -1411,6 +1777,11 @@ export type components = {
        * @example admin
        */
       username: string;
+    };
+    MaskRuleDto: {
+      /** @enum {string} */
+      code: "phone" | "email" | "idcard" | "last4" | "all";
+      label: string;
     };
     MenuItemDto: {
       children?: components["schemas"]["MenuItemDto"][];
@@ -1468,6 +1839,13 @@ export type components = {
       id: string;
       password: string;
       version: number;
+    };
+    SaveFieldConfigurations: {
+      changes: components["schemas"]["FieldConfigurationChange"][];
+    };
+    SaveRoleFieldConfigurations: {
+      changes: components["schemas"]["FieldConfigurationChange"][];
+      roleId: string;
     };
     SwitchOrgDto: {
       /** @description 要切换到的组织编号 */
@@ -1532,6 +1910,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemDictItemRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -1547,13 +1929,13 @@ export type components = {
        */
       id: string;
       /** @description 显示名称 */
-      label: string;
+      label?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /** @description 排序 */
       rank?: number;
       /** @description 字典类型 */
-      typeId: string;
+      typeId?: string;
       /**
        * Format: date-time
        * @description 修改时间
@@ -1562,7 +1944,7 @@ export type components = {
       /** @description 修改人 */
       updatedBy: string | null;
       /** @description 字典值 */
-      value: string;
+      value?: string;
       /** @description 版本号，修改时原样带回 */
       version: number;
     };
@@ -1635,8 +2017,12 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemDictTypeRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 字典标识 */
-      code: string;
+      code?: string;
       /**
        * Format: date-time
        * @description 创建时间
@@ -1652,7 +2038,7 @@ export type components = {
        */
       id: string;
       /** @description 字典名称 */
-      name: string;
+      name?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /**
@@ -1678,6 +2064,158 @@ export type components = {
       enabled?: boolean;
       /** @description 字典名称 */
       name?: string;
+    };
+    SystemFieldAddBody: {
+      data: components["schemas"]["SystemFieldAddData"];
+    };
+    SystemFieldAddData: {
+      /**
+       * @description 可委派上限
+       * @enum {string|null}
+       */
+      delegable?: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 字段 */
+      field: string;
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @description 资源 */
+      resource: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state: "editable" | "readonly" | "masked" | "hidden";
+    };
+    SystemFieldDeleteBody: {
+      ids: string[];
+    };
+    SystemFieldDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    SystemFieldInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    SystemFieldPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemFieldPageEq"];
+      /** @description 搜索框，模糊匹配：resource、field */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemFieldPageSort"][];
+    };
+    SystemFieldPageEq: {
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 字段 */
+      field?: string;
+      /** @description 资源 */
+      resource?: string;
+    };
+    SystemFieldPageResult: {
+      list: components["schemas"]["SystemFieldRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    SystemFieldPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    SystemFieldRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 允许配置 */
+      configurable?: boolean;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /**
+       * @description 可委派上限
+       * @enum {string|null}
+       */
+      delegable?: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 字段 */
+      field?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 资源 */
+      resource?: string;
+      /** @description 来源 */
+      source?: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state?: "editable" | "readonly" | "masked" | "hidden";
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    SystemFieldUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["SystemFieldUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    SystemFieldUpdateData: {
+      /**
+       * @description 可委派上限
+       * @enum {string|null}
+       */
+      delegable?: "editable" | "readonly" | "masked" | "hidden" | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state?: "editable" | "readonly" | "masked" | "hidden";
     };
     SystemLoginLogInfoBody: {
       /** @example 1 */
@@ -1716,6 +2254,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemLoginLogRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -1823,6 +2365,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemMenuRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 页面组件 */
       component?: Record<string, never> | null;
       /**
@@ -1854,12 +2400,12 @@ export type components = {
       /** @description 排序 */
       rank?: number;
       /** @description 标题 */
-      title: string;
+      title?: string;
       /**
        * @description 类型
        * @enum {string}
        */
-      type: "directory" | "page" | "button";
+      type?: "directory" | "page" | "button";
       /**
        * Format: date-time
        * @description 修改时间
@@ -1941,6 +2487,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemOperationLogRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 动作 */
       action?: string;
       /**
@@ -2038,6 +2588,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemOrgRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -2053,7 +2607,7 @@ export type components = {
        */
       id: string;
       /** @description 组织名称 */
-      name: string;
+      name?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /** @description 上级组织 */
@@ -2138,6 +2692,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemParameterRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -2153,7 +2711,7 @@ export type components = {
        */
       id: string;
       /** @description 参数标识 */
-      key: string;
+      key?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /**
@@ -2209,6 +2767,137 @@ export type components = {
       /** @description 处理的行数 */
       count: number;
     };
+    SystemRoleFieldAddBody: {
+      data: components["schemas"]["SystemRoleFieldAddData"];
+    };
+    SystemRoleFieldAddData: {
+      /** @description 字段 */
+      field: string;
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @description 资源 */
+      resource: string;
+      /** @description 角色 */
+      roleId: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state: "editable" | "readonly" | "masked" | "hidden";
+    };
+    SystemRoleFieldDeleteBody: {
+      ids: string[];
+    };
+    SystemRoleFieldDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    SystemRoleFieldInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    SystemRoleFieldPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemRoleFieldPageEq"];
+      /** @description 搜索框，模糊匹配：resource、field */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemRoleFieldPageSort"][];
+    };
+    SystemRoleFieldPageEq: {
+      /** @description 字段 */
+      field?: string;
+      /** @description 资源 */
+      resource?: string;
+      /** @description 角色 */
+      roleId?: string;
+    };
+    SystemRoleFieldPageResult: {
+      list: components["schemas"]["SystemRoleFieldRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    SystemRoleFieldPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    SystemRoleFieldRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 字段 */
+      field?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 资源 */
+      resource?: string;
+      /** @description 角色 */
+      roleId?: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state?: "editable" | "readonly" | "masked" | "hidden";
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    SystemRoleFieldUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["SystemRoleFieldUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    SystemRoleFieldUpdateData: {
+      /**
+       * @description 脱敏规则
+       * @enum {string|null}
+       */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      state?: "editable" | "readonly" | "masked" | "hidden";
+    };
     SystemRoleInfoBody: {
       /** @example 1 */
       id: string;
@@ -2244,10 +2933,14 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemRoleRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 内置超级管理员 */
       allPermissions?: boolean;
       /** @description 角色标识 */
-      code: string;
+      code?: string;
       /**
        * Format: date-time
        * @description 创建时间
@@ -2261,7 +2954,7 @@ export type components = {
        * @description 数据范围
        * @enum {string}
        */
-      dataScope: "all" | "org" | "org_and_children" | "self" | "custom";
+      dataScope?: "all" | "org" | "org_and_children" | "self" | "custom";
       /** @description 启用 */
       enabled?: boolean;
       /**
@@ -2270,11 +2963,11 @@ export type components = {
        */
       id: string;
       /** @description 角色名称 */
-      name: string;
+      name?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /** @description 权限码 */
-      permissions: string[];
+      permissions?: string[];
       /**
        * Format: date-time
        * @description 修改时间
@@ -2414,6 +3107,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemUserRoleRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -2429,7 +3126,7 @@ export type components = {
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /** @description 角色 */
-      roleId: string;
+      roleId?: string;
       /** @description 作用范围组织 */
       scopeOrgId?: string | null;
       /**
@@ -2440,7 +3137,7 @@ export type components = {
       /** @description 修改人 */
       updatedBy: string | null;
       /** @description 用户 */
-      userId: string;
+      userId?: string;
       /** @description 版本号，修改时原样带回 */
       version: number;
     };
@@ -2459,6 +3156,10 @@ export type components = {
       scopeOrgId?: string | null;
     };
     SystemUserRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 头像 */
       avatar?: Record<string, never> | null;
       /**
@@ -2480,7 +3181,7 @@ export type components = {
       /** @description 语言 */
       locale?: string;
       /** @description 姓名 */
-      nickname: string;
+      nickname?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /**
@@ -2491,7 +3192,7 @@ export type components = {
       /** @description 修改人 */
       updatedBy: string | null;
       /** @description 账号 */
-      username: string;
+      username?: string;
       /** @description 版本号，修改时原样带回 */
       version: number;
     };
@@ -2548,6 +3249,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemUserSupervisorRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /**
        * Format: date-time
        * @description 创建时间
@@ -2563,7 +3268,7 @@ export type components = {
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
       /** @description 上级用户 */
-      supervisorId: string;
+      supervisorId?: string;
       /**
        * Format: date-time
        * @description 修改时间
@@ -2572,7 +3277,7 @@ export type components = {
       /** @description 修改人 */
       updatedBy: string | null;
       /** @description 用户 */
-      userId: string;
+      userId?: string;
       /** @description 版本号，修改时原样带回 */
       version: number;
     };
@@ -3473,6 +4178,408 @@ export interface operations {
             /** @enum {integer} */
             code: 1000;
             data: components["schemas"]["SystemDictTypeRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldPermRegistry: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FieldPermRegistryDto"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 5003：服务暂不可用 */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemFieldAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemFieldRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemFieldDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemFieldDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemFieldInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemFieldRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldOverview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FieldConfigurationOverview"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemFieldPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemFieldPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveFieldConfigurations"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FieldConfigurationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemFieldSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  systemFieldUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemFieldUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemFieldRow"];
             /** @example ok */
             message: string;
           };
@@ -4501,6 +5608,367 @@ export interface operations {
             /** @example ok */
             message: string;
           };
+        };
+      };
+    };
+  };
+  systemRoleFieldAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRoleFieldAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemRoleFieldRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRoleFieldDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemRoleFieldDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRoleFieldInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemRoleFieldRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldOverview: {
+    parameters: {
+      query: {
+        roleId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FieldConfigurationOverview"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRoleFieldPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemRoleFieldPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveRoleFieldConfigurations"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FieldConfigurationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleFieldSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  systemRoleFieldUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRoleFieldUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemRoleFieldRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
         };
       };
     };

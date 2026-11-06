@@ -4,6 +4,7 @@ import { RequestFailure } from "@/utils/http";
 import { childDraft, childIssues, relatedChanges } from "./children.mjs";
 import {
   columnChoices,
+  constrainFieldSchema,
   defaultCell,
   editableValues,
   identity,
@@ -211,7 +212,9 @@ export function useCrud(
       request = start();
     loading.value = true;
     try {
-      const description = await port.describe(request.signal);
+      const description: CrudSchema = constrainFieldSchema(
+        await port.describe(request.signal)
+      );
       if (context !== generation) return;
       schema.value = description;
       query.pageNumber = 1;

@@ -10,6 +10,12 @@ export const PERMISSIONS = [
   "system:dict-type:info",
   "system:dict-type:page",
   "system:dict-type:update",
+  "system:field:add",
+  "system:field:delete",
+  "system:field:info",
+  "system:field:list",
+  "system:field:page",
+  "system:field:update",
   "system:login-log:info",
   "system:login-log:page",
   "system:menu:add",
@@ -29,6 +35,11 @@ export const PERMISSIONS = [
   "system:parameter:info",
   "system:parameter:page",
   "system:parameter:update",
+  "system:role-field:add",
+  "system:role-field:delete",
+  "system:role-field:info",
+  "system:role-field:page",
+  "system:role-field:update",
   "system:role:add",
   "system:role:delete",
   "system:role:info",
@@ -73,6 +84,15 @@ export const OPERATION_PERMISSIONS = {
   systemDictTypeSchema: ["system:dict-type:page"],
   systemDictTypeUpdate: ["system:dict-type:update"],
   systemDictionaryOptions: [],
+  systemFieldAdd: ["system:field:add"],
+  systemFieldDelete: ["system:field:delete"],
+  systemFieldInfo: ["system:field:info"],
+  systemFieldOverview: ["system:field:page"],
+  systemFieldPage: ["system:field:page"],
+  systemFieldPermRegistry: ["system:field:list"],
+  systemFieldSave: ["system:field:update"],
+  systemFieldSchema: ["system:field:page"],
+  systemFieldUpdate: ["system:field:update"],
   systemLoginLogInfo: ["system:login-log:info"],
   systemLoginLogPage: ["system:login-log:page"],
   systemLoginLogSchema: ["system:login-log:page"],
@@ -100,6 +120,14 @@ export const OPERATION_PERMISSIONS = {
   systemPermissionList: ["system:role:info"],
   systemRoleAdd: ["system:role:add"],
   systemRoleDelete: ["system:role:delete"],
+  systemRoleFieldAdd: ["system:role-field:add"],
+  systemRoleFieldDelete: ["system:role-field:delete"],
+  systemRoleFieldInfo: ["system:role-field:info"],
+  systemRoleFieldOverview: ["system:role-field:page"],
+  systemRoleFieldPage: ["system:role-field:page"],
+  systemRoleFieldSave: ["system:role-field:update"],
+  systemRoleFieldSchema: ["system:role-field:page"],
+  systemRoleFieldUpdate: ["system:role-field:update"],
   systemRoleInfo: ["system:role:info"],
   systemRolePage: ["system:role:page"],
   systemRoleSchema: ["system:role:page"],
@@ -154,6 +182,108 @@ export const ENUMS = {
     "none"
   ],
   "components.schemas.CrudSchemaSort.properties.order": ["asc", "desc"],
+  "components.schemas.FieldConfigurationChange.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationChange.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.FieldConfigurationChange.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.codeDefault": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.codeDelegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.codeMask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.defaultDelegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.defaultMask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.defaultState": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.FieldConfigurationEntry.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldPermFieldDto.properties.default": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldPermFieldDto.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.FieldPermFieldDto.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.MaskRuleDto.properties.code": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
   "components.schemas.MenuItemDto.properties.type": ["directory", "page"],
   "components.schemas.PermissionItem.properties.risk": ["normal", "high"],
   "components.schemas.SystemDictItemPageSort.properties.field": [
@@ -163,18 +293,89 @@ export const ENUMS = {
     "rank"
   ],
   "components.schemas.SystemDictItemPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemDictItemRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemDictTypePageSort.properties.field": [
     "id",
     "createdAt",
     "updatedAt"
   ],
   "components.schemas.SystemDictTypePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemDictTypeRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemFieldAddData.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemFieldAddData.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemFieldAddData.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemFieldPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemFieldPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemFieldRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemFieldRow.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemFieldRow.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemFieldRow.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemFieldUpdateData.properties.delegable": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemFieldUpdateData.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemFieldUpdateData.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
   "components.schemas.SystemLoginLogPageSort.properties.field": [
     "id",
     "createdAt",
     "updatedAt"
   ],
   "components.schemas.SystemLoginLogPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemLoginLogRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemMenuAddData.properties.type": [
     "directory",
     "page",
@@ -192,6 +393,8 @@ export const ENUMS = {
     "rank"
   ],
   "components.schemas.SystemMenuPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemMenuRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemMenuRow.properties.type": [
     "directory",
     "page",
@@ -211,6 +414,8 @@ export const ENUMS = {
     "asc",
     "desc"
   ],
+  "components.schemas.SystemOperationLogRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemOrgPageSort.properties.field": [
     "id",
     "createdAt",
@@ -218,6 +423,8 @@ export const ENUMS = {
     "rank"
   ],
   "components.schemas.SystemOrgPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemOrgRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemParameterPageSort.properties.field": [
     "id",
     "createdAt",
@@ -227,6 +434,8 @@ export const ENUMS = {
     "asc",
     "desc"
   ],
+  "components.schemas.SystemParameterRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemRoleAddData.properties.dataScope": [
     "all",
     "org",
@@ -234,12 +443,64 @@ export const ENUMS = {
     "self",
     "custom"
   ],
+  "components.schemas.SystemRoleFieldAddData.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemRoleFieldAddData.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemRoleFieldPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemRoleFieldPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.SystemRoleFieldRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemRoleFieldRow.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemRoleFieldRow.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SystemRoleFieldUpdateData.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SystemRoleFieldUpdateData.properties.state": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
   "components.schemas.SystemRolePageSort.properties.field": [
     "id",
     "createdAt",
     "updatedAt"
   ],
   "components.schemas.SystemRolePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemRoleRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemRoleRow.properties.dataScope": [
     "all",
     "org",
@@ -267,6 +528,10 @@ export const ENUMS = {
     "updatedAt"
   ],
   "components.schemas.SystemUserRolePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemUserRoleRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemUserRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemUserSupervisorPageSort.properties.field": [
     "id",
     "createdAt",
@@ -276,5 +541,7 @@ export const ENUMS = {
     "asc",
     "desc"
   ],
+  "components.schemas.SystemUserSupervisorRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.TokenResult.properties.tokenType": ["Bearer"]
 } as const;

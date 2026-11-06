@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import {
   columnChoices,
+  constrainFieldSchema,
   defaultCell,
   cellText,
   editableValues,
@@ -20,6 +21,23 @@ const original = JSON.parse(
     "utf8"
   )
 );
+test("页面字段权限裁剪列、写字段和排序，用户偏好不能恢复被隐藏字段", () => {
+  const schema = constrainFieldSchema({
+    ...original,
+    fieldPerms: { nickname: { state: "hidden" }, status: { state: "readonly" } }
+  });
+  assert.equal(
+    schema.columns.some(item => item.field === "nickname"),
+    false
+  );
+  assert.equal(schema.actions.update.writable.includes("status"), false);
+  assert.equal(
+    columnChoices(schema, {
+      columns: [{ field: "nickname", visible: true }]
+    }).columns.some(item => item.field === "nickname"),
+    false
+  );
+});
 test("框架类型由真实后端 OpenAPI 子集生成，版本化产物无漂移", () => {
   const input = JSON.parse(
     readFileSync(
@@ -68,6 +86,38 @@ test("显示偏好不能恢复被收回的字段，并限制重复列、宽度�
     ],
     density: "default"
   });
+});
+test("逐行状态由服务端元数据决定，隐藏值不读取，原文带星号不被猜成脱敏", () => {
+  assert.equal(
+    defaultCell({ nickname: "正常*姓名" }, "nickname").state,
+    "visible"
+  );
+  assert.deepEqual(
+    defaultCell(
+      { nickname: "原文", _fieldState: { nickname: "readonly" } },
+      "nickname"
+    ),
+    { state: "readonly", display: "原文" }
+  );
+  assert.equal(
+    defaultCell(
+      { nickname: "已打码", _fieldState: { nickname: "masked" } },
+      "nickname"
+    ).state,
+    "masked"
+  );
+  assert.equal(
+    defaultCell(
+      {
+        _fieldState: { nickname: "hidden" },
+        get nickname() {
+          throw Error("不能读取隐藏值");
+        }
+      },
+      "nickname"
+    ).state,
+    "hidden"
+  );
 });
 test("逐行隐藏状态不读取原值，脱敏值不反向匹配字典", () => {
   const hidden = {

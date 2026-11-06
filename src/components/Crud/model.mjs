@@ -63,9 +63,52 @@ export function editableValues(schema, mode, values, record, cell) {
   return output;
 }
 export function defaultCell(row, field) {
-  return Object.hasOwn(row, field)
-    ? { state: "visible", display: row[field] }
-    : { state: "hidden", display: undefined };
+  const state = row?._fieldState?.[field];
+  if (
+    !Object.hasOwn(row, field) ||
+    state === "hidden" ||
+    (state !== undefined && !["readonly", "masked"].includes(state))
+  )
+    return { state: "hidden", display: undefined };
+  return { state: state ?? "visible", display: row[field] };
+}
+
+/** 页面最宽状态只控制列和新建表单；已有行写入还须核对_fieldState，不能靠星号猜测。 */
+export function constrainFieldSchema(schema) {
+  const state = field => schema.fieldPerms?.[field]?.state ?? "editable";
+  const raw = field => ["editable", "readonly"].includes(state(field));
+  const writable = field => state(field) === "editable";
+  return {
+    ...schema,
+    columns: schema.columns
+      .filter(column => state(column.field) !== "hidden")
+      .map(column => ({
+        ...column,
+        sortable: column.sortable && raw(column.field)
+      })),
+    form: schema.form.filter(item => state(item.field) !== "hidden"),
+    actions: Object.fromEntries(
+      Object.entries(schema.actions).map(([action, description]) => [
+        action,
+        {
+          ...description,
+          ...("writable" in description
+            ? { writable: description.writable.filter(writable) }
+            : {}),
+          ...("sortable" in description
+            ? { sortable: description.sortable.filter(raw) }
+            : {}),
+          ...("readable" in description
+            ? {
+                readable: description.readable.filter(
+                  field => state(field) !== "hidden"
+                )
+              }
+            : {})
+        }
+      ])
+    )
+  };
 }
 export function cellText(cell, dictionary) {
   if (cell.state === "hidden") return "—";

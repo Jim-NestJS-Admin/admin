@@ -306,6 +306,117 @@ export function createApiClient(
         config
       );
     },
+    systemFieldPermRegistry(
+      input: OperationInput<"systemFieldPermRegistry"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldPermRegistry">>(
+        "get",
+        interpolate("/admin/system/field-perm/registry", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldAdd(
+      input: OperationInput<"systemFieldAdd"> & {
+        body: OperationBody<"systemFieldAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldAdd">>(
+        "post",
+        interpolate("/admin/system/field/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldDelete(
+      input: OperationInput<"systemFieldDelete"> & {
+        body: OperationBody<"systemFieldDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldDelete">>(
+        "post",
+        interpolate("/admin/system/field/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldInfo(
+      input: OperationInput<"systemFieldInfo"> & {
+        body: OperationBody<"systemFieldInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldInfo">>(
+        "post",
+        interpolate("/admin/system/field/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldOverview(
+      input: OperationInput<"systemFieldOverview"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldOverview">>(
+        "get",
+        interpolate("/admin/system/field/overview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldPage(
+      input: OperationInput<"systemFieldPage"> & {
+        body: OperationBody<"systemFieldPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldPage">>(
+        "post",
+        interpolate("/admin/system/field/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldSave(
+      input: OperationInput<"systemFieldSave"> & {
+        body: OperationBody<"systemFieldSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldSave">>(
+        "post",
+        interpolate("/admin/system/field/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldSchema(
+      input: OperationInput<"systemFieldSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldSchema">>(
+        "get",
+        interpolate("/admin/system/field/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemFieldUpdate(
+      input: OperationInput<"systemFieldUpdate"> & {
+        body: OperationBody<"systemFieldUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemFieldUpdate">>(
+        "post",
+        interpolate("/admin/system/field/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemLoginLogInfo(
       input: OperationInput<"systemLoginLogInfo"> & {
         body: OperationBody<"systemLoginLogInfo">;
@@ -615,6 +726,108 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemPermissionList">>(
         "get",
         interpolate("/admin/system/permission/list", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldAdd(
+      input: OperationInput<"systemRoleFieldAdd"> & {
+        body: OperationBody<"systemRoleFieldAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldAdd">>(
+        "post",
+        interpolate("/admin/system/role-field/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldDelete(
+      input: OperationInput<"systemRoleFieldDelete"> & {
+        body: OperationBody<"systemRoleFieldDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldDelete">>(
+        "post",
+        interpolate("/admin/system/role-field/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldInfo(
+      input: OperationInput<"systemRoleFieldInfo"> & {
+        body: OperationBody<"systemRoleFieldInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldInfo">>(
+        "post",
+        interpolate("/admin/system/role-field/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldOverview(
+      input: OperationInput<"systemRoleFieldOverview"> & {
+        query: OperationParameter<"systemRoleFieldOverview", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldOverview">>(
+        "get",
+        interpolate("/admin/system/role-field/overview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldPage(
+      input: OperationInput<"systemRoleFieldPage"> & {
+        body: OperationBody<"systemRoleFieldPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldPage">>(
+        "post",
+        interpolate("/admin/system/role-field/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldSave(
+      input: OperationInput<"systemRoleFieldSave"> & {
+        body: OperationBody<"systemRoleFieldSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldSave">>(
+        "post",
+        interpolate("/admin/system/role-field/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldSchema(
+      input: OperationInput<"systemRoleFieldSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldSchema">>(
+        "get",
+        interpolate("/admin/system/role-field/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemRoleFieldUpdate(
+      input: OperationInput<"systemRoleFieldUpdate"> & {
+        body: OperationBody<"systemRoleFieldUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleFieldUpdate">>(
+        "post",
+        interpolate("/admin/system/role-field/update", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
