@@ -17,12 +17,27 @@ import {
   ElSplitter,
   ElSplitterPanel
 } from "element-plus";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import SearchIcon from "~icons/ri/search-line";
+import AddIcon from "~icons/ri/add-circle-line";
+import DeleteIcon from "~icons/ri/delete-bin-line";
+import DownloadIcon from "~icons/ri/download-2-line";
+import RecycleIcon from "~icons/ri/recycle-line";
+import BackIcon from "~icons/ri/arrow-go-back-line";
+import ViewIcon from "~icons/ri/eye-line";
+import EditIcon from "~icons/ri/edit-line";
+import FilterIcon from "~icons/ri/filter-3-line";
+import RefreshIcon from "@/assets/table-bar/refresh.svg?component";
+import DensityIcon from "@/assets/table-bar/collapse.svg?component";
+import SettingIcon from "@/assets/table-bar/settings.svg?component";
+import { useFillHeight } from "./useFillHeight";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import {
   cellText,
   columnChoices,
   defaultCell,
+  formatValue,
   formPresentation
 } from "./model.mjs";
 import { useCrud } from "./useCrud";
@@ -42,9 +57,14 @@ const props = defineProps<{
   };
   cell?: (row: CrudRecord, field: string) => CrudCell;
   childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
+  /** 撑满内容区（默认）：只有表格内部滚动，整页不滚动 */
+  fill?: boolean;
 }>();
 const { t } = useI18n();
 const slots = useSlots();
+const fill = computed(() => props.fill !== false);
+const pageEl = ref<HTMLElement>();
+const fillHeight = useFillHeight(pageEl);
 const mobile = useMediaQuery("(max-width: 760px)");
 const treeOpen = ref(false),
   settingsOpen = ref(false);
@@ -153,11 +173,56 @@ function writable(item) {
   );
 }
 function display(row: CrudRecord, column) {
+  const cell = readCell(row, column.field);
+  if (
+    column.type === "boolean" &&
+    cell.state === "visible" &&
+    typeof cell.display === "boolean"
+  )
+    return t(cell.display ? "crud.booleanYes" : "crud.booleanNo");
   return cellText(
     readCell(row, column.field),
-    schema.value?.dictionaries[column.dict]
+    schema.value?.dictionaries[column.dict],
+    column.type
   );
 }
+/** 关键字搜索的提示：列出能搜的字段名 */
+const keywordHint = computed(() => {
+  const words = schema.value?.actions.page?.keyWords ?? [];
+  const labels = words.map(
+    field =>
+      schema.value?.columns.find(column => column.field === field)?.label ??
+      field
+  );
+  return labels.length
+    ? t("crud.keywordHint", { fields: labels.join(" / ") })
+    : t("crud.search");
+});
+function resetSearch() {
+  query.search = "";
+  query.advanced = undefined;
+  view.search();
+}
+async function changeDensity(density: CrudChoices["density"]) {
+  if (!schema.value || density === choices.value.density) return;
+  await view.saveChoices({
+    ...columnChoices(schema.value, choices.value),
+    density
+  });
+}
+function columnAlign(column) {
+  return ["boolean", "datetime", "date", "number"].includes(column.type)
+    ? "center"
+    : "left";
+}
+/** 操作列宽度：按实际会出现的按钮数 */
+const actionWidth = computed(() => {
+  const count =
+    (props.permissions?.info && schema.value?.api.includes("info") ? 1 : 0) +
+    (props.port.update && schema.value?.api.includes("update") ? 1 : 0) +
+    (props.port.remove && schema.value?.api.includes("delete") ? 1 : 0);
+  return Math.max(90, count * 72 + 24);
+});
 function openSettings() {
   draft.value = columnChoices(schema.value, choices.value);
   settingsOpen.value = true;
@@ -235,96 +300,60 @@ defineExpose({ reload: view.initialize });
 </script>
 
 <template>
-  <section class="crud-page" :aria-label="schema?.label ?? t('crud.title')">
-    <el-splitter v-if="schema" class="crud-splitter">
+  <section
+    ref="pageEl"
+    class="crud-page"
+    :style="fill ? { height: `${fillHeight}px` } : undefined"
+    :aria-label="schema?.label ?? t('crud.title')"
+  >
+    <el-splitter v-if="schema" class="crud-splitter" lazy>
       <el-splitter-panel
         v-if="slots.tree && !mobile && !recycledView"
-        size="220px"
-        min="160px"
-        max="360px"
+        size="240px"
+        min="180px"
+        max="400px"
         collapsible
       >
-        <aside class="crud-tree">
+        <aside class="crud-card crud-tree">
           <slot name="tree" :filter="view.filter" />
         </aside>
       </el-splitter-panel>
       <el-splitter-panel>
         <div class="crud-main">
-          <header class="crud-toolbar">
-            <div class="crud-actions">
-              <el-button
-                v-if="slots.tree && mobile && !recycledView"
-                @click="treeOpen = true"
-                >{{ t("crud.filter") }}</el-button
-              >
-              <el-button
-                v-if="
-                  port.create && schema.api.includes('add') && !recycledView
-                "
-                v-perm="permissions?.create ?? []"
-                type="primary"
-                :disabled="saving"
-                @click="view.edit()"
-                >{{ t("crud.add") }}</el-button
-              >
-              <el-button
-                v-if="
-                  port.remove && schema.api.includes('delete') && !recycledView
-                "
-                v-perm="permissions?.remove ?? []"
-                :disabled="saving || !selected.length"
-                @click="confirmRemove([...selected])"
-                >{{ t("crud.batchRemove") }}</el-button
-              >
-              <slot name="toolbar" :query="query" :reload="view.load" />
-              <el-button
-                v-if="
-                  port.recycled &&
-                  schema.deleteMode === 'soft' &&
-                  schema.api.includes('recycle')
-                "
-                v-perm="permissions?.recycle ?? []"
-                :disabled="saving"
-                @click="view.showRecycled(!recycledView)"
-                >{{
-                  t(recycledView ? "crud.activeList" : "crud.recycle")
-                }}</el-button
-              >
-              <el-button
-                v-if="
-                  recycledView && port.restore && schema.api.includes('restore')
-                "
-                v-perm="permissions?.restore ?? []"
-                :disabled="saving || !selected.length || retrySeconds > 0"
-                @click="confirmRecycle('restore')"
-                >{{ t("crud.restore") }}</el-button
-              >
-              <el-button
-                v-if="
-                  recycledView && port.purge && schema.api.includes('purge')
-                "
-                v-perm="permissions?.purge ?? []"
-                type="danger"
-                :disabled="saving || !selected.length || retrySeconds > 0"
-                @click="confirmRecycle('purge')"
-                >{{ t("crud.purge") }}</el-button
-              >
-            </div>
-            <form class="crud-search" @submit.prevent="view.search">
+          <!-- 搜索区（Pure 规范：顶部内联表单，搜索 / 重置） -->
+          <el-form
+            v-if="!recycledView"
+            :inline="true"
+            class="crud-card crud-search-form"
+            @submit.prevent="view.search"
+          >
+            <el-form-item
+              v-if="schema.actions.page?.keyWords.length"
+              :label="`${t('crud.keyword')}：`"
+            >
               <el-input
-                v-if="schema.actions.page?.keyWords.length"
                 v-model="query.search"
                 clearable
                 :aria-label="t('crud.search')"
-                :placeholder="t('crud.search')"
+                :placeholder="keywordHint"
+                class="crud-keyword"
               />
+            </el-form-item>
+            <el-form-item>
               <el-button
                 v-if="schema.actions.page?.keyWords.length"
+                type="primary"
                 native-type="submit"
+                :icon="useRenderIcon(SearchIcon)"
+                :loading="loading"
                 >{{ t("crud.search") }}</el-button
               >
+              <el-button
+                :icon="useRenderIcon(RefreshIcon)"
+                @click="resetSearch"
+                >{{ t("crud.resetSearch") }}</el-button
+              >
               <slot
-                v-if="!recycledView"
                 name="advanced"
                 :apply="
                   (value: unknown) => {
@@ -343,130 +372,303 @@ defineExpose({ reload: view.initialize });
                   "
                 />
               </slot>
-              <el-button @click="openSettings">{{
-                t("crud.columns")
-              }}</el-button>
-              <el-button
-                v-if="port.export && !recycledView"
-                v-perm="permissions?.export ?? []"
-                :loading="exporting"
-                @click="exportRows"
-                >{{ t("query.export") }}</el-button
-              >
-            </form>
-          </header>
-          <el-alert
-            v-if="error"
-            :title="t(error)"
-            type="error"
-            show-icon
-            :closable="false"
-          />
-          <div class="crud-table">
-            <el-table
-              v-loading="loading"
-              :data="rows"
-              row-key="id"
-              :tree-props="{
-                children: '__crudTreeChildren',
-                hasChildren: '__crudTreeHasChildren'
-              }"
-              height="100%"
-              :size="choices.density"
-              @selection-change="selected = $event.map(row => String(row.id))"
-              @sort-change="view.sort($event.prop, $event.order)"
-            >
-              <el-table-column
-                v-if="
+            </el-form-item>
+          </el-form>
+
+          <!-- 表格区（Pure 规范：标题 + 操作按钮 + 刷新 / 密度 / 列设置） -->
+          <div class="crud-card crud-table-card">
+            <div class="crud-table-bar">
+              <div class="crud-table-title">
+                <el-button
+                  v-if="slots.tree && mobile && !recycledView"
+                  link
+                  :icon="useRenderIcon(FilterIcon)"
+                  @click="treeOpen = true"
+                />
+                <span>{{
                   recycledView
-                    ? (port.restore && permissions?.restore) ||
-                      (port.purge && permissions?.purge)
-                    : port.remove && permissions?.remove
-                "
-                type="selection"
-                width="48"
-              />
-              <el-table-column
-                v-for="column in visibleColumns"
-                :key="column.field"
-                :prop="column.field"
-                :label="column.label"
-                :width="column.width"
-                :fixed="column.fixed"
-                :sortable="
-                  !recycledView &&
-                  column.sortable &&
-                  schema.actions.page?.sortable.includes(column.field)
-                    ? 'custom'
-                    : false
-                "
-              >
-                <template #default="{ row }">
-                  <slot
-                    v-if="readCell(row, column.field).state === 'visible'"
-                    :name="`cell-${column.field}`"
-                    :value="readCell(row, column.field).display"
-                    :text="display(row, column)"
-                    >{{ display(row, column) }}</slot
-                  >
-                  <span v-else>{{ display(row, column) }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column
-                v-if="(port.update || permissions?.info) && !recycledView"
-                :label="t('crud.actions')"
-                fixed="right"
-                width="160"
-              >
-                <template #default="{ row }"
-                  ><el-button
-                    v-if="permissions?.info && schema.api.includes('info')"
-                    v-perm="permissions.info"
-                    link
-                    :disabled="saving"
-                    @click="view.edit(row, true)"
-                    >{{ t("crud.info") }}</el-button
-                  ><el-button
-                    v-if="port.update && schema.api.includes('update')"
-                    v-perm="permissions?.update ?? []"
-                    link
+                    ? `${schema.label ?? t("crud.title")} · ${t("crud.recycle")}`
+                    : (schema.label ?? t("crud.title"))
+                }}</span>
+              </div>
+              <div class="crud-table-tools">
+                <div class="crud-actions">
+                  <el-button
+                    v-if="
+                      port.create && schema.api.includes('add') && !recycledView
+                    "
+                    v-perm="permissions?.create ?? []"
                     type="primary"
+                    :icon="useRenderIcon(AddIcon)"
                     :disabled="saving"
-                    @click="view.edit(row)"
-                    >{{ t("crud.edit") }}</el-button
-                  ></template
-                >
-              </el-table-column>
-              <el-table-column
-                v-if="recycledView"
-                prop="deletedAt"
-                :label="t('crud.deletedAt')"
-                width="190"
-              />
-            </el-table>
-          </div>
-          <footer class="crud-pagination">
-            <el-pagination
-              v-if="
-                !schema.tree ||
-                recycledView ||
-                query.search ||
-                query.advanced ||
-                Object.keys(query.equality).length
-              "
-              v-model:current-page="query.pageNumber"
-              v-model:page-size="query.pageSize"
-              :page-sizes="
-                [10, 20, 50, 100].filter(size => size <= schema.maxSize)
-              "
-              :total="total"
-              :layout="
-                mobile ? 'prev, pager, next' : 'total, sizes, prev, pager, next'
-              "
-              @size-change="view.search"
-              @current-change="view.load"
+                    @click="view.edit()"
+                    >{{ t("crud.add") }}</el-button
+                  >
+                  <slot name="toolbar" :query="query" :reload="view.load" />
+                  <el-button
+                    v-if="
+                      port.remove &&
+                      schema.api.includes('delete') &&
+                      !recycledView
+                    "
+                    v-perm="permissions?.remove ?? []"
+                    type="danger"
+                    plain
+                    :icon="useRenderIcon(DeleteIcon)"
+                    :disabled="saving || !selected.length"
+                    @click="confirmRemove([...selected])"
+                    >{{ t("crud.batchRemove") }}</el-button
+                  >
+                  <el-button
+                    v-if="
+                      recycledView &&
+                      port.restore &&
+                      schema.api.includes('restore')
+                    "
+                    v-perm="permissions?.restore ?? []"
+                    type="primary"
+                    :disabled="saving || !selected.length || retrySeconds > 0"
+                    @click="confirmRecycle('restore')"
+                    >{{ t("crud.restore") }}</el-button
+                  >
+                  <el-button
+                    v-if="
+                      recycledView && port.purge && schema.api.includes('purge')
+                    "
+                    v-perm="permissions?.purge ?? []"
+                    type="danger"
+                    :disabled="saving || !selected.length || retrySeconds > 0"
+                    @click="confirmRecycle('purge')"
+                    >{{ t("crud.purge") }}</el-button
+                  >
+                  <el-button
+                    v-if="port.export && !recycledView"
+                    v-perm="permissions?.export ?? []"
+                    :icon="useRenderIcon(DownloadIcon)"
+                    :loading="exporting"
+                    @click="exportRows"
+                    >{{ t("query.export") }}</el-button
+                  >
+                  <el-button
+                    v-if="
+                      port.recycled &&
+                      schema.deleteMode === 'soft' &&
+                      schema.api.includes('recycle')
+                    "
+                    v-perm="permissions?.recycle ?? []"
+                    :icon="useRenderIcon(recycledView ? BackIcon : RecycleIcon)"
+                    :disabled="saving"
+                    @click="view.showRecycled(!recycledView)"
+                    >{{
+                      t(recycledView ? "crud.activeList" : "crud.recycle")
+                    }}</el-button
+                  >
+                </div>
+                <div class="crud-icons">
+                  <el-tooltip :content="t('crud.refresh')" placement="top">
+                    <component
+                      :is="RefreshIcon"
+                      :class="['crud-icon', { 'animate-spin': loading }]"
+                      @click="view.load"
+                    />
+                  </el-tooltip>
+                  <el-divider direction="vertical" />
+                  <el-dropdown trigger="click" @command="changeDensity">
+                    <span class="crud-icon-wrap">
+                      <el-tooltip :content="t('crud.density')" placement="top">
+                        <component :is="DensityIcon" class="crud-icon" />
+                      </el-tooltip>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item
+                          v-for="density in ['large', 'default', 'small']"
+                          :key="density"
+                          :command="density"
+                          :class="{
+                            'crud-density-active': choices.density === density
+                          }"
+                          >{{ t(`crud.${density}`) }}</el-dropdown-item
+                        >
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                  <el-divider direction="vertical" />
+                  <el-tooltip :content="t('crud.columns')" placement="top">
+                    <component
+                      :is="SettingIcon"
+                      class="crud-icon"
+                      @click="openSettings"
+                    />
+                  </el-tooltip>
+                </div>
+              </div>
+            </div>
+            <el-alert
+              v-if="error"
+              :title="t(error)"
+              type="error"
+              show-icon
+              :closable="false"
+              class="crud-error"
             />
-          </footer>
+            <div class="crud-table">
+              <el-table
+                v-loading="loading"
+                :data="rows"
+                row-key="id"
+                :tree-props="{
+                  children: '__crudTreeChildren',
+                  hasChildren: '__crudTreeHasChildren'
+                }"
+                height="100%"
+                :size="choices.density"
+                :header-cell-style="{
+                  background: 'var(--el-fill-color-light)',
+                  color: 'var(--el-text-color-primary)'
+                }"
+                @selection-change="selected = $event.map(row => String(row.id))"
+                @sort-change="view.sort($event.prop, $event.order)"
+              >
+                <el-table-column
+                  v-if="
+                    recycledView
+                      ? (port.restore && permissions?.restore) ||
+                        (port.purge && permissions?.purge)
+                      : port.remove && permissions?.remove
+                  "
+                  type="selection"
+                  width="48"
+                  align="center"
+                  fixed="left"
+                />
+                <el-table-column
+                  v-for="column in visibleColumns"
+                  :key="column.field"
+                  :prop="column.field"
+                  :label="column.label"
+                  :min-width="column.width"
+                  :fixed="column.fixed"
+                  :align="columnAlign(column)"
+                  show-overflow-tooltip
+                  :sortable="
+                    !recycledView &&
+                    column.sortable &&
+                    schema.actions.page?.sortable.includes(column.field)
+                      ? 'custom'
+                      : false
+                  "
+                >
+                  <template #default="{ row }">
+                    <slot
+                      v-if="readCell(row, column.field).state === 'visible'"
+                      :name="`cell-${column.field}`"
+                      :value="readCell(row, column.field).display"
+                      :text="display(row, column)"
+                      ><el-tag
+                        v-if="
+                          column.type === 'boolean' &&
+                          typeof readCell(row, column.field).display ===
+                            'boolean'
+                        "
+                        size="small"
+                        :type="
+                          readCell(row, column.field).display
+                            ? 'success'
+                            : 'info'
+                        "
+                        effect="light"
+                        >{{ display(row, column) }}</el-tag
+                      ><template v-else>{{
+                        display(row, column)
+                      }}</template></slot
+                    >
+                    <span v-else class="crud-muted">{{
+                      display(row, column)
+                    }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  v-if="recycledView"
+                  prop="deletedAt"
+                  :label="t('crud.deletedAt')"
+                  min-width="170"
+                  align="center"
+                >
+                  <template #default="{ row }">{{
+                    formatValue(row.deletedAt, "datetime")
+                  }}</template>
+                </el-table-column>
+                <el-table-column
+                  v-if="
+                    (port.update || port.remove || permissions?.info) &&
+                    !recycledView
+                  "
+                  :label="t('crud.actions')"
+                  fixed="right"
+                  :width="actionWidth"
+                  align="center"
+                >
+                  <template #default="{ row }"
+                    ><el-button
+                      v-if="permissions?.info && schema.api.includes('info')"
+                      v-perm="permissions.info"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(ViewIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row, true)"
+                      >{{ t("crud.info") }}</el-button
+                    ><el-button
+                      v-if="port.update && schema.api.includes('update')"
+                      v-perm="permissions?.update ?? []"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(EditIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row)"
+                      >{{ t("crud.edit") }}</el-button
+                    ><el-button
+                      v-if="port.remove && schema.api.includes('delete')"
+                      v-perm="permissions?.remove ?? []"
+                      link
+                      type="danger"
+                      :icon="useRenderIcon(DeleteIcon)"
+                      :disabled="saving"
+                      @click="confirmRemove([String(row.id)])"
+                      >{{ t("crud.remove") }}</el-button
+                    ></template
+                  >
+                </el-table-column>
+              </el-table>
+            </div>
+            <footer class="crud-pagination">
+              <el-pagination
+                v-if="
+                  !schema.tree ||
+                  recycledView ||
+                  query.search ||
+                  query.advanced ||
+                  Object.keys(query.equality).length
+                "
+                v-model:current-page="query.pageNumber"
+                v-model:page-size="query.pageSize"
+                background
+                :page-sizes="
+                  [10, 20, 50, 100].filter(size => size <= schema.maxSize)
+                "
+                :total="total"
+                :size="choices.density === 'small' ? 'small' : 'default'"
+                :layout="
+                  mobile
+                    ? 'prev, pager, next'
+                    : 'total, sizes, prev, pager, next, jumper'
+                "
+                @size-change="view.search"
+                @current-change="view.load"
+              />
+            </footer>
+          </div>
         </div>
       </el-splitter-panel>
     </el-splitter>
@@ -735,6 +937,26 @@ defineExpose({ reload: view.initialize });
 </template>
 
 <style scoped lang="scss">
+@media (width <= 760px) {
+  .crud-editor-form :deep(.el-form-item.half-field) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (width <= 760px) {
+  .crud-search-form {
+    padding: 12px 12px 0;
+  }
+
+  .crud-table-card {
+    padding: 0 12px 12px;
+  }
+
+  .crud-keyword {
+    width: 100%;
+  }
+}
+
 .crud-editor-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -749,59 +971,131 @@ defineExpose({ reload: view.initialize });
   grid-column: auto;
 }
 
-@media (width <= 760px) {
-  .crud-editor-form :deep(.el-form-item.half-field) {
-    grid-column: 1 / -1;
-  }
-}
-
+/* 整体：撑满内容区，只有表格内部滚动 */
 .crud-page {
-  height: 100%;
   min-height: 0;
   overflow: hidden;
-  background: var(--el-bg-color);
 }
 
 .crud-splitter {
   height: 100%;
 }
 
+.crud-splitter :deep(.el-splitter-bar) {
+  width: 8px !important;
+}
+
+.crud-card {
+  background: var(--el-bg-color);
+  border-radius: 4px;
+}
+
 .crud-tree {
   height: 100%;
-  padding: 16px;
+  padding: 12px;
   overflow: auto;
 }
 
 .crud-main {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
   height: 100%;
   min-height: 0;
-  padding: 16px;
 }
 
-.crud-toolbar,
-.crud-actions,
-.crud-search {
+/* 搜索区：和 Pure 的 search-form 一致 */
+.crud-search-form {
+  flex-shrink: 0;
+  padding: 12px 16px 0;
+}
+
+.crud-search-form :deep(.el-form-item) {
+  margin-bottom: 12px;
+}
+
+.crud-keyword {
+  width: 220px;
+}
+
+/* 表格区：标题栏 + 表格 + 分页 */
+.crud-table-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 16px 12px;
+}
+
+.crud-table-bar {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+  padding: 12px 0;
+}
+
+.crud-table-title {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+}
+
+.crud-table-tools {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }
 
-.crud-toolbar {
-  justify-content: space-between;
-}
-
-.crud-search .el-input {
-  width: 200px;
+.crud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-right: 8px;
 }
 
 .crud-actions :deep(.el-button + .el-button),
 .crud-choice :deep(.el-button + .el-button) {
   margin-left: 0;
+}
+
+.crud-icons {
+  display: flex;
+  align-items: center;
+}
+
+.crud-icon-wrap {
+  display: inline-flex;
+}
+
+.crud-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--el-text-color-primary);
+  cursor: pointer;
+  outline: none;
+  transition: color 0.1s;
+}
+
+.crud-icon:hover {
+  color: var(--el-color-primary);
+}
+
+.crud-density-active {
+  color: var(--el-color-primary);
+}
+
+.crud-error {
+  flex-shrink: 0;
+  margin-bottom: 8px;
 }
 
 .crud-table {
@@ -810,9 +1104,15 @@ defineExpose({ reload: view.initialize });
   overflow: hidden;
 }
 
+.crud-muted {
+  color: var(--el-text-color-placeholder);
+}
+
 .crud-pagination {
   display: flex;
+  flex-shrink: 0;
   justify-content: flex-end;
+  padding-top: 12px;
   overflow-x: auto;
 }
 
@@ -839,22 +1139,11 @@ defineExpose({ reload: view.initialize });
 }
 
 .crud-unavailable {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
   padding: 16px;
-}
-
-@media (width <= 760px) {
-  .crud-main {
-    padding: 12px;
-  }
-
-  .crud-search {
-    width: 100%;
-  }
-
-  .crud-search .el-input {
-    flex: 1;
-    width: 0;
-    min-width: 100px;
-  }
+  background: var(--el-bg-color);
 }
 </style>

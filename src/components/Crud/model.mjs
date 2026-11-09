@@ -70,7 +70,12 @@ export function defaultCell(row, field) {
     (state !== undefined && !["readonly", "masked"].includes(state))
   )
     return { state: "hidden", display: undefined };
-  return { state: state ?? "visible", display: row[field] };
+  // 编号字段（创建人、修改人、所属组织）后端在 _display 里给了名称，优先显示名称
+  const named = row?._display?.[field];
+  return {
+    state: state ?? "visible",
+    display: named !== undefined && named !== null ? named : row[field]
+  };
 }
 
 /** 页面最宽状态只控制列和新建表单；已有行写入还须核对_fieldState，不能靠星号猜测。 */
@@ -210,14 +215,30 @@ export function formPresentation(schema, field) {
     group: typeof item?.group === "string" ? item.group : ""
   };
 }
-export function cellText(cell, dictionary) {
+export function cellText(cell, dictionary, type) {
   if (cell.state === "hidden") return "—";
   if (cell.state === "masked")
     return cell.display == null ? "—" : String(cell.display);
   const found = dictionary?.find(item => item.value === cell.display);
-  const value = found?.label ?? cell.display;
-  if (value === null || value === undefined || typeof value === "object")
-    return "—";
+  if (found) return String(found.label);
+  return formatValue(cell.display, type);
+}
+
+const pad = value => String(value).padStart(2, "0");
+/** 按列类型格式化：时间转本地「年-月-日 时:分:秒」，布尔显示是 / 否，空值显示 — */
+export function formatValue(value, type) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (type === "boolean" && typeof value === "boolean")
+    return value ? "是" : "否";
+  if ((type === "datetime" || type === "date") && typeof value === "string") {
+    const time = new Date(value);
+    if (Number.isNaN(time.getTime())) return value;
+    const day = `${time.getFullYear()}-${pad(time.getMonth() + 1)}-${pad(time.getDate())}`;
+    return type === "date" || /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? day
+      : `${day} ${pad(time.getHours())}:${pad(time.getMinutes())}:${pad(time.getSeconds())}`;
+  }
+  if (typeof value === "object") return "—";
   return String(value);
 }
 export function requiredFields(schema, mode, values, record, cell) {

@@ -10,8 +10,9 @@ import {
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import type { TreeInstance } from "element-plus";
-import { useElementBounding, useWindowSize } from "@vueuse/core";
 import CrudPage from "@/components/Crud/CrudPage.vue";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import SearchIcon from "~icons/ri/search-line";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import type { CrudCell, CrudRecord } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
@@ -29,9 +30,6 @@ import { failureView } from "@/platform/failure-view.mjs";
 const props = defineProps<{ resource: SystemResource }>();
 const { t } = useI18n();
 const user = useUserStoreHook();
-const container = ref<HTMLElement>();
-const { top } = useElementBounding(container);
-const { height: windowHeight } = useWindowSize({ initialHeight: 800 });
 const definition = computed(() => resources[props.resource]);
 type Option = {
   id: string;
@@ -326,11 +324,7 @@ function cell(row: CrudRecord, field: string): CrudCell {
 }
 </script>
 <template>
-  <div
-    ref="container"
-    class="system-resource"
-    :style="{ height: `${Math.max(280, windowHeight - top - 32)}px` }"
-  >
+  <div class="system-resource">
     <el-alert
       v-if="loadError"
       :title="loadError"
@@ -345,8 +339,8 @@ function cell(row: CrudRecord, field: string): CrudCell {
       :cell="cell"
     >
       <template v-if="treeField" #tree="{ filter }">
-        <p class="tree-caption">
-          {{
+        <div class="tree-header">
+          <span class="tree-caption">{{
             t(
               resource === "user"
                 ? "system.filterDefaultOrg"
@@ -356,20 +350,32 @@ function cell(row: CrudRecord, field: string): CrudCell {
                     ? "system.filterDictionary"
                     : "system.filterChildren"
             )
-          }}
-        </p>
+          }}</span>
+          <el-button
+            link
+            type="primary"
+            @click="
+              () => {
+                treeRef?.setCurrentKey(undefined);
+                filter(treeField, undefined);
+              }
+            "
+            >{{ t("system.showAll") }}</el-button
+          >
+        </div>
         <el-input
           v-model="treeSearch"
           :placeholder="t('crud.search')"
+          :prefix-icon="useRenderIcon(SearchIcon)"
           clearable
+          class="tree-search"
         />
-        <el-button link @click="filter(treeField, undefined)">{{
-          t("system.showAll")
-        }}</el-button>
         <el-tree
           ref="treeRef"
           :data="treeNodes"
           node-key="id"
+          default-expand-all
+          highlight-current
           :filter-node-method="
             (value, node) =>
               node.label.toLowerCase().includes(String(value).toLowerCase())
@@ -594,12 +600,28 @@ function cell(row: CrudRecord, field: string): CrudCell {
 .system-resource {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  height: 100%;
+  gap: 8px;
   min-height: 0;
 }
 
-.system-resource :deep(.el-select) {
+.tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tree-caption {
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+}
+
+.tree-search {
+  margin-bottom: 8px;
+}
+
+.system-resource :deep(.el-dialog .el-select),
+.system-resource :deep(.el-drawer .el-select) {
   width: 100%;
 }
 </style>

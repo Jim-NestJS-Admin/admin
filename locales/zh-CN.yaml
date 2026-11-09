@@ -122,6 +122,12 @@ crud:
   apply: 应用
   filter: 分类筛选
   search: 搜索
+  keyword: 关键字
+  keywordHint: 搜索{fields}
+  resetSearch: 重置
+  booleanYes: 是
+  booleanNo: 否
+  refresh: 刷新
   columns: 列设置
   actions: 操作
   density: 表格密度

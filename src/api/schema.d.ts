@@ -2235,8 +2235,22 @@ export type components = {
       /** @description 字典名，对应 dictionaries 里的键 */
       dict?: string;
       field: string;
+      /** @description 默认不显示（用户可以在列设置里打开）：编号、版本号等系统字段 */
+      hidden?: boolean;
       label: string;
       sortable: boolean;
+      /**
+       * @description 显示方式：datetime / date 按本地时间格式化，boolean 显示是 / 否，reference 显示行里 _display 的名称
+       * @enum {string}
+       */
+      type:
+        | "text"
+        | "number"
+        | "boolean"
+        | "date"
+        | "datetime"
+        | "json"
+        | "reference";
       width?: number;
     };
     CrudSchemaDictItem: {
@@ -2447,6 +2461,10 @@ export type components = {
       order: "asc" | "desc";
     };
     FileAssetRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -2726,6 +2744,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemDictItemRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -2835,6 +2857,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemDictTypeRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -2957,6 +2983,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemFieldRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3076,6 +3106,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemLoginLogRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3189,6 +3223,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemMenuRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3313,6 +3351,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemOperationLogRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3416,6 +3458,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemOrgRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3522,6 +3568,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemParameterRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3666,6 +3716,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemRoleFieldRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3767,6 +3821,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemRoleRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3945,6 +4003,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemUserRoleRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -3994,6 +4056,10 @@ export type components = {
       scopeOrgId?: string | null;
     };
     SystemUserRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
@@ -4089,6 +4155,10 @@ export type components = {
       order: "asc" | "desc";
     };
     SystemUserSupervisorRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
       /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";

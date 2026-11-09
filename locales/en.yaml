@@ -122,6 +122,12 @@ crud:
   apply: Apply
   filter: Categories
   search: Search
+  keyword: Keyword
+  keywordHint: Search {fields}
+  resetSearch: Reset
+  booleanYes: Yes
+  booleanNo: No
+  refresh: Refresh
   columns: Columns
   actions: Actions
   density: Table density

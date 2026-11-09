@@ -225,6 +225,15 @@ export const ENUMS = {
     "tree"
   ],
   "components.schemas.CrudSchema.properties.deleteMode": ["soft", "hard"],
+  "components.schemas.CrudSchemaColumn.properties.type": [
+    "text",
+    "number",
+    "boolean",
+    "date",
+    "datetime",
+    "json",
+    "reference"
+  ],
   "components.schemas.CrudSchemaFormItem.properties.component": [
     "input",
     "textarea",
