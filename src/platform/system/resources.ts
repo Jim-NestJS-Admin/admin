@@ -604,7 +604,9 @@ for (const [resource, definition] of Object.entries(resources)) {
   const generated = generatedCrud(prefix, `system:${resource}`);
   Object.assign(definition.port, {
     preferences: generated.port.preferences,
-    ...(generated.port.export ? { export: generated.port.export } : {})
+    ...(generated.port.export ? { export: generated.port.export } : {}),
+    // 树形资源（组织、菜单）：没有搜索条件时整棵树一次加载，显示成树形表格
+    ...(generated.port.tree ? { tree: generated.port.tree } : {})
   });
   Object.assign(definition.permissions, {
     export: generated.permissions.export

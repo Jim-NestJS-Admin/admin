@@ -48,8 +48,6 @@ const treeSearch = ref("");
 const treeRef = ref<TreeInstance>();
 const treeFields: Partial<Record<SystemResource, string>> = {
   user: "defaultOrgId",
-  org: "parentId",
-  menu: "parentId",
   "user-role": "scopeOrgId",
   "dict-item": "typeId"
 };

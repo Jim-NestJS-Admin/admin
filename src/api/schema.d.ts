@@ -1015,6 +1015,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/menu/tree": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 菜单树形列表（全部可见节点，平铺） */
+    post: operations["systemMenuTree"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/menu/update": {
     parameters: {
       query?: never;
@@ -1196,6 +1213,23 @@ export type paths = {
     get: operations["systemOrgSchema"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/org/tree": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 组织树形列表（全部可见节点，平铺） */
+    post: operations["systemOrgTree"];
     delete?: never;
     options?: never;
     head?: never;
@@ -3278,6 +3312,10 @@ export type components = {
       /** @description 版本号，修改时原样带回 */
       version: number;
     };
+    SystemMenuTreeResult: {
+      /** @description 全部可见节点（平铺），前端按页面描述 tree.parentField 组树；父节点不在列表里的当作根节点 */
+      list: components["schemas"]["SystemMenuRow"][];
+    };
     SystemMenuUpdateBody: {
       /** @description 只传要改的字段 */
       data: components["schemas"]["SystemMenuUpdateData"];
@@ -3497,6 +3535,10 @@ export type components = {
       updatedBy: string | null;
       /** @description 版本号，修改时原样带回 */
       version: number;
+    };
+    SystemOrgTreeResult: {
+      /** @description 全部可见节点（平铺），前端按页面描述 tree.parentField 组树；父节点不在列表里的当作根节点 */
+      list: components["schemas"]["SystemOrgRow"][];
     };
     SystemOrgUpdateBody: {
       /** @description 只传要改的字段 */
@@ -6896,6 +6938,40 @@ export interface operations {
       };
     };
   };
+  systemMenuTree: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemMenuTreeResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemMenuUpdate: {
     parameters: {
       query?: never;
@@ -7337,6 +7413,40 @@ export interface operations {
             /** @example ok */
             message: string;
           };
+        };
+      };
+    };
+  };
+  systemOrgTree: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemOrgTreeResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
         };
       };
     };

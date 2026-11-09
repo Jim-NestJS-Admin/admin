@@ -809,6 +809,17 @@ export function createApiClient(
         config
       );
     },
+    systemMenuTree(
+      input: OperationInput<"systemMenuTree"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuTree">>(
+        "post",
+        interpolate("/admin/system/menu/tree", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemMenuUpdate(
       input: OperationInput<"systemMenuUpdate"> & {
         body: OperationBody<"systemMenuUpdate">;
@@ -944,6 +955,17 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemOrgSchema">>(
         "get",
         interpolate("/admin/system/org/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOrgTree(
+      input: OperationInput<"systemOrgTree"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgTree">>(
+        "post",
+        interpolate("/admin/system/org/tree", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

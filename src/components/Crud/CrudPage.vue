@@ -520,6 +520,7 @@ defineExpose({ reload: view.initialize });
                 v-loading="loading"
                 :data="rows"
                 row-key="id"
+                :default-expand-all="!!schema.tree"
                 :tree-props="{
                   children: '__crudTreeChildren',
                   hasChildren: '__crudTreeHasChildren'
