@@ -116,6 +116,6 @@ system/page-config从字段清单选择资源，提供字段安全配置、列�
 
 ## 前端集成分支（2026-11-09）
 
-Jimmy授权把T13（9bffad3）、T22（2db92f8）、T24（2a5be1d）合到codex/frontend-integration。工作目录admin-integration。保留生成器dev/codegen和模块配置system/page-config两个组件键，语言包与交接说明均完整保留。类型/lint/build集中检查；单元、e2e、浏览器测试仍留到统一验收。后端契约来源server-t13 7f2e837。
+Jimmy授权把T13（9bffad3）、T22（2db92f8）、T24（2a5be1d）合到codex/frontend-integration。工作目录admin-integration。保留生成器dev/codegen和模块配置system/page-config两个组件键，语言包与交接说明均完整保留。类型/lint/build集中检查；单元、e2e、浏览器测试仍留到统一验收。最新接口由server-integration / claude/integration的f295be83fd980f4e737e59850cacecbf6bdb5739生成，CSV、ZIP成功响应已描述为二进制；生成脚本按成功响应的binary声明统一设置blob/raw传输选项。
 
-这是独立集成分支，不包含T09的待修核心幂等集成，不自动切换main或当前本地运行服务。生成器前端renderer和后端修正仍按信箱交接执行。
+配套后端已纳入T09补偿、Claude的上传摘要/二进制/事务状态修复、前端模板渲染和本地初始化脚本。生成器预览和写入后显著列出后端manualSteps，提醒模块登记、迁移、接口生成、路由、语言包和菜单授权仍需人工完成；修改配置后隐藏过期清单，切换配置或会话时清除。这里仍是独立集成分支，未切换main或当前本地运行服务，未执行迁移、初始化或生成器文件写入。

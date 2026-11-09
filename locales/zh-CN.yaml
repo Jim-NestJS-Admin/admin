@@ -271,6 +271,8 @@ query:
     notNull: 不为空
 
 codegen:
+  manualStepsPreview: 生成后还需人工完成以下步骤；预览和写入均不会自动执行。
+  manualStepsAfterWrite: 文件已写入，功能尚未接通。还需人工完成以下步骤。
   title: 代码生成
   choose: 选择已保存配置
   developmentOnly: 仅开发环境可用。只生成文件，不自动执行建表、安装或发布。

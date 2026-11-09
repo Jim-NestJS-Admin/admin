@@ -247,6 +247,91 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/file/asset/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 鉴权下载文件 */
+    post: operations["fileAssetDownload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/file/asset/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 文件详情 */
+    post: operations["fileAssetInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/file/asset/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 文件分页列表 */
+    post: operations["fileAssetPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/file/asset/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 文件页面描述 */
+    get: operations["fileAssetSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/file/asset/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 上传文件 */
+    post: operations["fileAssetUpload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/session/menu": {
     parameters: {
       query?: never;
@@ -2328,6 +2413,85 @@ export type components = {
       /** @enum {string} */
       state: "editable" | "readonly" | "masked" | "hidden";
     };
+    FileAssetInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    FileAssetPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["FileAssetPageEq"];
+      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["FileAssetPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    FileAssetPageEq: Record<string, never>;
+    FileAssetPageResult: {
+      list: components["schemas"]["FileAssetRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    FileAssetPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt" | "bytes";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    FileAssetRow: {
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 大小（字节） */
+      bytes?: number;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 类型 */
+      mime?: string;
+      /** @description 文件名 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    FileIdBody: {
+      /** @example 1 */
+      id: string;
+    };
+    FileReceipt: {
+      bytes: number;
+      id: string;
+      mime: string;
+      /** @description 系统生成的文件名，不使用客户端提供的名称 */
+      name: string;
+    };
     HistoryBody: {
       page?: number;
       /**
@@ -4287,6 +4451,15 @@ export interface operations {
       };
     };
     responses: {
+      /** @description 代码压缩包 */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/zip": Blob;
+        };
+      };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
       400: {
         headers: {
@@ -4693,6 +4866,271 @@ export interface operations {
       };
     };
   };
+  fileAssetDownload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FileIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": Blob;
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/octet-stream": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  fileAssetInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FileAssetInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FileAssetRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  fileAssetPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FileAssetPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FileAssetPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  fileAssetSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  fileAssetUpload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /** Format: binary */
+          file: Blob;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FileReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   sessionMenu: {
     parameters: {
       query?: never;
@@ -5082,18 +5520,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -5407,18 +5840,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -6022,18 +6450,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -6264,18 +6687,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -6477,18 +6895,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -6719,18 +7132,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -7379,18 +7787,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -8063,18 +8466,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -8361,18 +8759,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -8659,18 +9052,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
@@ -9022,18 +9410,13 @@ export interface operations {
       };
     };
     responses: {
+      /** @description CSV 文件（UTF-8 带 BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @enum {integer} */
-            code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
-            message: string;
-          };
+          "text/csv": Blob;
         };
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */

@@ -25,6 +25,69 @@ const source = {
   source: "test/fixtures/t03-openapi.json",
   revision: provenance.serverCommit
 };
+test("二进制成功响应走原始Blob，JSON及二进制错误响应不改变传输模式", async () => {
+  const document = {
+    openapi: "3.0.0",
+    info: { title: "下载契约", version: "1" },
+    paths: Object.fromEntries(
+      ["csv", "zip", "json"].map(kind => [
+        `/${kind}`,
+        {
+          get: {
+            operationId: kind,
+            responses: {
+              200: {
+                description: "成功",
+                content: {
+                  [kind === "json"
+                    ? "application/json"
+                    : kind === "zip"
+                      ? "application/zip"
+                      : "text/csv"]: {
+                    schema:
+                      kind === "json"
+                        ? { type: "object" }
+                        : { type: "string", format: "binary" }
+                  }
+                }
+              },
+              400: {
+                description: "错误",
+                content: {
+                  "application/octet-stream": {
+                    schema: { type: "string", format: "binary" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ])
+    )
+  };
+  const files = await generateApi(document, source);
+  const compiled = ts.transpileModule(
+    files
+      .get("client.ts")
+      .replace('import { http } from "@/utils/http";', "const http = {};"),
+    { compilerOptions: { module: ts.ModuleKind.CommonJS } }
+  ).outputText;
+  const exports = {};
+  new Function("exports", compiled)(exports);
+  const calls = [];
+  const api = exports.createApiClient({
+    request: (...args) => calls.push(args)
+  });
+  for (const kind of ["csv", "zip", "json"])
+    api[kind]({}, { headers: { "X-Request-Id": "fixture" } });
+  for (const call of calls.slice(0, 2)) {
+    assert.equal(call[3].responseType, "blob");
+    assert.equal(call[3].responseMode, "raw");
+    assert.deepEqual(call[3].headers, { "X-Request-Id": "fixture" });
+  }
+  assert.equal(calls[2][3].responseType, undefined);
+  assert.equal(calls[2][3].responseMode, undefined);
+});
 test("正式生成文件与版本化输入快照完全一致，CI 无需克隆后端", async () => {
   const document = JSON.parse(
     readFileSync(new URL("../api-source/admin.json", import.meta.url), "utf8")

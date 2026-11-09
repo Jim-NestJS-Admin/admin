@@ -4,6 +4,10 @@ export const PERMISSIONS = [
   "dev:codegen:list",
   "dev:codegen:save",
   "dev:codegen:write",
+  "file:asset:info",
+  "file:asset:page",
+  "file:asset:read",
+  "file:asset:upload",
   "system:dict-item:add",
   "system:dict-item:delete",
   "system:dict-item:export",
@@ -95,6 +99,11 @@ export const OPERATION_PERMISSIONS = {
   devCodegenSync: ["dev:codegen:save"],
   devCodegenTables: ["dev:codegen:save"],
   devCodegenWrite: ["dev:codegen:write"],
+  fileAssetDownload: ["file:asset:read"],
+  fileAssetInfo: ["file:asset:info"],
+  fileAssetPage: ["file:asset:page"],
+  fileAssetSchema: ["file:asset:page"],
+  fileAssetUpload: ["file:asset:upload"],
   sessionMenu: [],
   sessionPreferenceDelete: [],
   sessionPreferenceGet: [],
@@ -361,6 +370,15 @@ export const ENUMS = {
     "masked",
     "hidden"
   ],
+  "components.schemas.FileAssetPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "bytes"
+  ],
+  "components.schemas.FileAssetPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.FileAssetRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.MaskRuleDto.properties.code": [
     "phone",
     "email",

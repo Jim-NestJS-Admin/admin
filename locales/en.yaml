@@ -271,6 +271,8 @@ query:
     notNull: Is not null
 
 codegen:
+  manualStepsPreview: Manual steps are still required after generation. Preview and write do not execute them.
+  manualStepsAfterWrite: Files written. Complete these manual steps before the feature is ready.
   title: Code generator
   choose: Choose saved configuration
   developmentOnly: Development only. Generates files without running migrations, installs or deployments.

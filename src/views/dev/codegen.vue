@@ -63,6 +63,15 @@ const files = ref<
   token = ref(""),
   resultText = ref(""),
   diffText = ref("");
+const manualSteps = ref<string[]>([]),
+  writeCompleted = ref(false);
+function showManualSteps(value: unknown) {
+  manualSteps.value = Array.isArray(value)
+    ? value.filter(
+        (step): step is string => typeof step === "string" && !!step.trim()
+      )
+    : [];
+}
 let original: Record<string, unknown> = {},
   baseline = "";
 const requests = new Set<AbortController>();
@@ -116,6 +125,8 @@ function fill(raw: unknown) {
   token.value = "";
   overwrite.value = [];
   resultText.value = "";
+  manualSteps.value = [];
+  writeCompleted.value = false;
   diffText.value = "";
   baseline = JSON.stringify(draftValue());
 }
@@ -165,6 +176,8 @@ function addChild() {
   });
 }
 function clear() {
+  manualSteps.value = [];
+  writeCompleted.value = false;
   intents.clear();
   requests.forEach(request => request.abort());
   requests.clear();
@@ -348,6 +361,9 @@ async function preview() {
         }))
       : [];
     token.value = text(response.token);
+    showManualSteps(response.manualSteps);
+    writeCompleted.value = false;
+    resultText.value = "";
     fileKey.value = files.value[0]?.key ?? "";
     overwrite.value = [];
     tab.value = "preview";
@@ -379,6 +395,8 @@ async function write() {
     );
     if (!request.signal.aborted) {
       resultText.value = JSON.stringify(response.data, null, 2);
+      showManualSteps(object(response.data).manualSteps);
+      writeCompleted.value = true;
       token.value = "";
     }
   });
@@ -403,9 +421,7 @@ async function download() {
       { body: { id: selected.value } },
       {
         signal: request.signal,
-        headers: headers("download"),
-        responseType: "blob",
-        responseMode: "raw"
+        headers: headers("download")
       }
     );
     if (request.signal.aborted) return;
@@ -480,6 +496,23 @@ async function remove() {
       type="info"
       :closable="false"
     /><el-alert v-if="error" :title="error" type="error" :closable="false" />
+    <el-alert
+      v-if="manualSteps.length && !dirty"
+      type="warning"
+      show-icon
+      :closable="false"
+      :title="
+        t(
+          writeCompleted
+            ? 'codegen.manualStepsAfterWrite'
+            : 'codegen.manualStepsPreview'
+        )
+      "
+    >
+      <ol class="list-decimal pl-5">
+        <li v-for="(step, index) in manualSteps" :key="index">{{ step }}</li>
+      </ol>
+    </el-alert>
     <el-tabs v-model="tab">
       <el-tab-pane name="fields" :label="t('codegen.configuration')">
         <div class="codegen-toolbar">

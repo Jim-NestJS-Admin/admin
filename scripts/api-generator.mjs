@@ -173,9 +173,16 @@ export async function generateApi(input, provenance) {
       }
       const type = `OperationInput<${literal(op.operationId)}>${required.length ? ` & { ${required.join("; ")} }` : ""}`;
       const multipart = !!body?.content?.["multipart/form-data"];
+      const binary = Object.entries(op.responses ?? {}).some(
+        ([status, value]) =>
+          /^2\d\d$/.test(status) &&
+          Object.values(dereference(value, document)?.content ?? {}).some(
+            media => dereference(media.schema, document)?.format === "binary"
+          )
+      );
       multipartUsed ||= multipart;
       operations.push(
-        `${literal(op.operationId)}(input: ${type}${required.length ? "" : " = {}"}, config: PureHttpRequestConfig = {}) { return transport.request<OperationResponse<${literal(op.operationId)}>>(${literal(method)}, interpolate(${literal(path)}, input.path), { params: input.query, headers: input.headers, data: ${multipart ? "multipart(input.body)" : "input.body"} }, config); }`
+        `${literal(op.operationId)}(input: ${type}${required.length ? "" : " = {}"}, config: PureHttpRequestConfig = {}) { return transport.request<OperationResponse<${literal(op.operationId)}>>(${literal(method)}, interpolate(${literal(path)}, input.path), { params: input.query, headers: input.headers, data: ${multipart ? "multipart(input.body)" : "input.body"} }, ${binary ? '{ ...config, responseType: "blob", responseMode: "raw" }' : "config"}); }`
       );
     }
   const ast = await openapiTS(document, {

@@ -54,7 +54,15 @@ function interpolate(path: string, params: unknown): string {
     return encodeURIComponent(String(value));
   });
 }
-
+function multipart(body: unknown): FormData {
+  const form = new FormData();
+  for (const [key, value] of Object.entries((body ?? {}) as object)) {
+    for (const item of Array.isArray(value) ? value : [value])
+      if (item !== undefined && item !== null)
+        form.append(key, item instanceof Blob ? item : String(item));
+  }
+  return form;
+}
 export function createApiClient(
   transport: Pick<typeof http, "request"> = http
 ) {
@@ -129,7 +137,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/dev/codegen/download", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     devCodegenImport(
@@ -229,6 +237,73 @@ export function createApiClient(
         "post",
         interpolate("/admin/dev/codegen/write", input.path),
         { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    fileAssetDownload(
+      input: OperationInput<"fileAssetDownload"> & {
+        body: OperationBody<"fileAssetDownload">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"fileAssetDownload">>(
+        "post",
+        interpolate("/admin/file/asset/download", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    fileAssetInfo(
+      input: OperationInput<"fileAssetInfo"> & {
+        body: OperationBody<"fileAssetInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"fileAssetInfo">>(
+        "post",
+        interpolate("/admin/file/asset/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    fileAssetPage(
+      input: OperationInput<"fileAssetPage"> & {
+        body: OperationBody<"fileAssetPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"fileAssetPage">>(
+        "post",
+        interpolate("/admin/file/asset/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    fileAssetSchema(
+      input: OperationInput<"fileAssetSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"fileAssetSchema">>(
+        "get",
+        interpolate("/admin/file/asset/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    fileAssetUpload(
+      input: OperationInput<"fileAssetUpload"> & {
+        body: OperationBody<"fileAssetUpload">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"fileAssetUpload">>(
+        "post",
+        interpolate("/admin/file/asset/upload", input.path),
+        {
+          params: input.query,
+          headers: input.headers,
+          data: multipart(input.body)
+        },
         config
       );
     },
@@ -342,7 +417,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/dict-item/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemDictItemInfo(
@@ -444,7 +519,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/dict-type/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemDictTypeInfo(
@@ -618,7 +693,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/login-log/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemLoginLogInfo(
@@ -694,7 +769,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/menu/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemMenuInfo(
@@ -757,7 +832,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/operation-log/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemOperationLogInfo(
@@ -833,7 +908,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/org/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemOrgInfo(
@@ -1002,7 +1077,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/parameter/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemParameterInfo(
@@ -1204,7 +1279,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/role/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemRoleInfo(
@@ -1293,7 +1368,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/user-role/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemUserRoleInfo(
@@ -1382,7 +1457,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/user-supervisor/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemUserSupervisorInfo(
@@ -1484,7 +1559,7 @@ export function createApiClient(
         "post",
         interpolate("/admin/system/user/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
-        config
+        { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
     systemUserInfo(
