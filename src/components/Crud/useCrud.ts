@@ -2,8 +2,11 @@ import { computed, onBeforeUnmount, reactive, ref, shallowRef } from "vue";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { childDraft, childIssues, relatedChanges } from "./children.mjs";
+import { treeRows } from "./tree.mjs";
 import {
   columnChoices,
+  applyPageView,
+  pageSize,
   constrainFieldSchema,
   defaultCell,
   editableValues,
@@ -33,6 +36,7 @@ export function useCrud(
   const schema = shallowRef<CrudSchema>();
   const rows = shallowRef<CrudRecord[]>([]),
     selected = ref<string[]>([]);
+  const treeOptions = shallowRef<CrudRecord[]>([]);
   const total = ref(0),
     loading = ref(false),
     saving = ref(false),
@@ -79,6 +83,7 @@ export function useCrud(
     pending.clear();
     schema.value = undefined;
     rows.value = [];
+    treeOptions.value = [];
     selected.value = [];
     choices.value = { columns: [], density: "default" };
     total.value = 0;
@@ -186,13 +191,27 @@ export function useCrud(
     try {
       const list = recycledView.value ? port.recycled : port.list;
       if (!list) throw Error("crud.requestFailed");
-      const result = await list.call(
-        port,
-        JSON.parse(JSON.stringify(query)),
-        request.signal
-      );
+      const useTree =
+        !recycledView.value &&
+        schema.value.tree &&
+        port.tree &&
+        !query.search &&
+        !query.advanced &&
+        !Object.keys(query.equality).length;
+      const flat = useTree ? await port.tree(request.signal) : undefined;
+      const result = flat
+        ? { rows: flat, totalRows: flat.length }
+        : await list.call(
+            port,
+            JSON.parse(JSON.stringify(query)),
+            request.signal
+          );
       if (context !== generation || sequence !== listSequence) return;
-      rows.value = result.rows;
+      if (flat) treeOptions.value = flat;
+      rows.value =
+        schema.value.tree && !recycledView.value
+          ? treeRows(result.rows, schema.value.tree.parentField)
+          : result.rows;
       total.value = result.totalRows;
     } catch (reason) {
       if (context === generation && sequence === listSequence) {
@@ -213,12 +232,12 @@ export function useCrud(
     loading.value = true;
     try {
       const description: CrudSchema = constrainFieldSchema(
-        await port.describe(request.signal)
+        applyPageView(await port.describe(request.signal))
       );
       if (context !== generation) return;
       schema.value = description;
       query.pageNumber = 1;
-      query.pageSize = Math.min(20, description.maxSize);
+      query.pageSize = pageSize(description);
       query.sorting = description.defaultSort
         .filter(sort => description.actions.page?.sortable.includes(sort.field))
         .map(sort => ({ field: sort.field, direction: sort.order }));
@@ -513,6 +532,7 @@ export function useCrud(
       }))
   );
   return {
+    treeOptions,
     schema,
     rows,
     selected,

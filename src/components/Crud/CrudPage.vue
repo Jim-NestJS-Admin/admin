@@ -12,6 +12,7 @@ import { useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
 import { ElMessageBox } from "element-plus";
 import ChildEditor from "./ChildEditor.vue";
+import AdvancedQuery from "./AdvancedQuery.vue";
 import { cellText, columnChoices, defaultCell } from "./model.mjs";
 import { useCrud } from "./useCrud";
 import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
@@ -26,6 +27,7 @@ const props = defineProps<{
     recycle?: string;
     restore?: string;
     purge?: string;
+    export?: string;
   };
   cell?: (row: CrudRecord, field: string) => CrudCell;
   childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
@@ -69,6 +71,38 @@ const {
   visibleColumns,
   retryUntil
 } = view;
+const exporting = ref(false);
+let exportRequest: AbortController | undefined;
+const stopExport = onSessionReset(() => exportRequest?.abort());
+onBeforeUnmount(() => {
+  stopExport();
+  exportRequest?.abort();
+});
+async function exportRows() {
+  if (!props.port.export || exporting.value) return;
+  exportRequest = new AbortController();
+  const request = exportRequest;
+  exporting.value = true;
+  try {
+    const file = await props.port.export(
+      JSON.parse(JSON.stringify(query)),
+      request.signal
+    );
+    if (request.signal.aborted) return;
+    const url = URL.createObjectURL(file),
+      link = document.createElement("a");
+    link.href = url;
+    link.download = `${schema.value.resource.replaceAll("/", "-")}.csv`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (reason) {
+    if (!request.signal.aborted)
+      error.value =
+        reason instanceof Error ? reason.message : "crud.requestFailed";
+  } finally {
+    exporting.value = false;
+  }
+}
 watch(
   () => editor.open,
   open => {
@@ -287,10 +321,27 @@ defineExpose({ reload: view.initialize });
                     view.search();
                   }
                 "
-              />
+              >
+                <AdvancedQuery
+                  :schema="schema"
+                  @apply="
+                    value => {
+                      query.advanced = value;
+                      view.search();
+                    }
+                  "
+                />
+              </slot>
               <el-button @click="openSettings">{{
                 t("crud.columns")
               }}</el-button>
+              <el-button
+                v-if="port.export && !recycledView"
+                v-perm="permissions?.export ?? []"
+                :loading="exporting"
+                @click="exportRows"
+                >{{ t("query.export") }}</el-button
+              >
             </form>
           </header>
           <el-alert
@@ -385,6 +436,13 @@ defineExpose({ reload: view.initialize });
           </div>
           <footer class="crud-pagination">
             <el-pagination
+              v-if="
+                !schema.tree ||
+                recycledView ||
+                query.search ||
+                query.advanced ||
+                Object.keys(query.equality).length
+              "
               v-model:current-page="query.pageNumber"
               v-model:page-size="query.pageSize"
               :page-sizes="
@@ -539,8 +597,24 @@ defineExpose({ reload: view.initialize });
             :field="item.field"
             :disabled="saving"
           >
+            <el-tree-select
+              v-if="item.component === 'tree-select' && schema.tree"
+              v-model="editor.values[item.field]"
+              :data="
+                view.treeOptions.value.map(row => ({
+                  value: row.id,
+                  label: String(row[schema.tree.nameField] ?? row.id),
+                  disabled: row.id === editor.record?.id
+                }))
+              "
+              :aria-label="item.label"
+              :disabled="saving"
+              clearable
+              filterable
+              check-strictly
+            />
             <el-input-number
-              v-if="item.component === 'number'"
+              v-else-if="item.component === 'number'"
               v-model="editor.values[item.field] as number"
               :aria-label="item.label"
               :disabled="saving"

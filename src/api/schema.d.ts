@@ -77,6 +77,176 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/dev/codegen/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除生成配置（不删已生成的代码） */
+    post: operations["devCodegenDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/download": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 下载生成的代码压缩包 */
+    post: operations["devCodegenDownload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/import": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 按表结构生成初始配置（不保存） */
+    post: operations["devCodegenImport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 生成配置详情 */
+    post: operations["devCodegenInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/list": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 生成配置列表 */
+    post: operations["devCodegenList"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 预览要生成的文件和每个文件的处理方式 */
+    post: operations["devCodegenPreview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存生成配置（新建或修改） */
+    post: operations["devCodegenSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/sync": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 表结构和配置的差异 */
+    post: operations["devCodegenSync"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/tables": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 数据库里还没导入的表 */
+    post: operations["devCodegenTables"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/write": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 确认写入本机项目（只写文件，不执行命令） */
+    post: operations["devCodegenWrite"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/session/menu": {
     parameters: {
       query?: never;
@@ -88,6 +258,57 @@ export type paths = {
     get: operations["sessionMenu"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/session/preference": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 读一项个人偏好 */
+    get: operations["sessionPreferenceGet"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/session/preference/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除一项个人偏好 */
+    post: operations["sessionPreferenceDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/session/preference/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存一项个人偏好（覆盖） */
+    post: operations["sessionPreferenceSave"];
     delete?: never;
     options?: never;
     head?: never;
@@ -159,6 +380,23 @@ export type paths = {
     put?: never;
     /** 删除字典项（整批成败） */
     post: operations["systemDictItemDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/dict-item/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出字典项（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemDictItemExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -278,6 +516,23 @@ export type paths = {
     put?: never;
     /** 删除字典类型（整批成败） */
     post: operations["systemDictTypeDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/dict-type/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出字典类型（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemDictTypeExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -505,6 +760,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/login-log/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出登录日志（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemLoginLogExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/login-log/info": {
     parameters: {
       query?: never;
@@ -590,6 +862,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/menu/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出菜单（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemMenuExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/menu/info": {
     parameters: {
       query?: never;
@@ -652,6 +941,23 @@ export type paths = {
     put?: never;
     /** 修改菜单 */
     post: operations["systemMenuUpdate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/operation-log/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出操作日志（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemOperationLogExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -743,6 +1049,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/org/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出组织（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemOrgExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/org/info": {
     parameters: {
       query?: never;
@@ -811,6 +1134,108 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/page-config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 模块显示配置 */
+    get: operations["systemPageConfigInfo"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/page-config/history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改历史 */
+    post: operations["systemPageConfigHistory"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/page-config/history-info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 历史版本内容 */
+    post: operations["systemPageConfigHistoryInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/page-config/reset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 恢复代码默认 */
+    post: operations["systemPageConfigReset"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/page-config/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 恢复历史版本 */
+    post: operations["systemPageConfigRestore"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/page-config/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存模块显示配置 */
+    post: operations["systemPageConfigSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/parameter/add": {
     parameters: {
       query?: never;
@@ -839,6 +1264,23 @@ export type paths = {
     put?: never;
     /** 删除系统参数（整批成败） */
     post: operations["systemParameterDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/parameter/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出系统参数（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemParameterExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1100,6 +1542,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/role/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出角色（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemRoleExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/role/info": {
     parameters: {
       query?: never;
@@ -1202,6 +1661,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/user-role/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出用户组织角色分配（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemUserRoleExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/user-role/info": {
     parameters: {
       query?: never;
@@ -1298,6 +1774,23 @@ export type paths = {
     put?: never;
     /** 删除用户多上级（整批成败） */
     post: operations["systemUserSupervisorDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/user-supervisor/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出用户多上级（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemUserSupervisorExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1417,6 +1910,23 @@ export type paths = {
     put?: never;
     /** 删除用户（整批成败） */
     post: operations["systemUserDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/user/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出用户（CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["systemUserExport"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1585,6 +2095,8 @@ export type components = {
         | "recycle"
         | "restore"
         | "purge"
+        | "export"
+        | "tree"
       )[];
       /** @description 子表；没有子表时为空数组 */
       children: components["schemas"]["CrudSchemaChild"][];
@@ -1594,6 +2106,10 @@ export type components = {
       deleteMode: "soft" | "hard";
       dictionaries: {
         [key: string]: components["schemas"]["CrudSchemaDictItem"][];
+      };
+      /** @description 每个业务字段在本页面（列表权限的本次有效角色）下的最宽字段权限状态；逐行以 _fieldState 为准 */
+      fieldPerms?: {
+        [key: string]: components["schemas"]["FieldPermStateDto"];
       };
       form: components["schemas"]["CrudSchemaFormItem"][];
       label: string;
@@ -1606,6 +2122,10 @@ export type components = {
       query: components["schemas"]["CrudSchemaQueryItem"][];
       /** @example system/user */
       resource: string;
+      /** @description 树形资源配置；不是树时为 null */
+      tree: components["schemas"]["CrudSchemaTree"] | null;
+      /** @description 生效的显示配置（代码默认 → 模块配置 → 用户列设置，按字段权限裁剪后），结构见契约 page-config.md 第 2、4 节 */
+      view?: Record<string, never>;
     };
     CrudSchemaActions: {
       add?: components["schemas"]["CrudSchemaWriteAction"];
@@ -1647,7 +2167,8 @@ export type components = {
         | "select"
         | "switch"
         | "date"
-        | "datetime";
+        | "datetime"
+        | "tree-select";
       dict?: string;
       /**
        * @description both：新增和修改都能写；add：只在新增时写；none：只读
@@ -1670,13 +2191,49 @@ export type components = {
     CrudSchemaQueryItem: {
       field: string;
       label: string;
-      /** @description 可用的运算符；高级查询在 T18 扩展 */
-      operators: string[];
+      /** @description 这个字段可用的运算符 */
+      operators: (
+        | "eq"
+        | "ne"
+        | "gt"
+        | "gte"
+        | "lt"
+        | "lte"
+        | "in"
+        | "notIn"
+        | "contains"
+        | "startsWith"
+        | "between"
+        | "isNull"
+        | "notNull"
+      )[];
+      /**
+       * @description 值的类型，前端据此选输入控件
+       * @enum {string}
+       */
+      type: "string" | "number" | "boolean" | "date";
     };
     CrudSchemaSort: {
       field: string;
       /** @enum {string} */
       order: "asc" | "desc";
+    };
+    CrudSchemaTree: {
+      /**
+       * @description 节点显示名称字段
+       * @example name
+       */
+      nameField: string;
+      /**
+       * @description 指向父节点编号的字段
+       * @example parentId
+       */
+      parentField: string;
+      /**
+       * @description 同级排序字段
+       * @example sort
+       */
+      sortField?: string;
     };
     CrudSchemaWriteAction: {
       writable: string[];
@@ -1765,6 +2322,32 @@ export type components = {
       /** @description 资源（权限码前缀），如 system:user */
       resource: string;
     };
+    FieldPermStateDto: {
+      /** @enum {string|null} */
+      mask: "phone" | "email" | "idcard" | "last4" | "all" | null;
+      /** @enum {string} */
+      state: "editable" | "readonly" | "masked" | "hidden";
+    };
+    HistoryBody: {
+      page?: number;
+      /**
+       * @description 资源（权限码前缀）
+       * @example system:user
+       */
+      resource: string;
+      size?: number;
+    };
+    HistoryInfoBody: {
+      historyId: string;
+      /**
+       * @description 资源（权限码前缀）
+       * @example system:user
+       */
+      resource: string;
+    };
+    IdBody: {
+      id: string;
+    };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
       captchaCode?: string;
@@ -1821,6 +2404,18 @@ export type components = {
     PermissionList: {
       list: components["schemas"]["PermissionItem"][];
     };
+    PreferenceKeyDto: {
+      /**
+       * @description 小写字母开头，最多 100 字
+       * @example query:system:user
+       */
+      key: string;
+    };
+    PreferenceResult: {
+      key: string;
+      /** @description 没有保存过时是 null */
+      value?: Record<string, never>;
+    };
     ProfileResult: {
       currentOrg: components["schemas"]["OrgOption"] | null;
       /** @example zh-CN */
@@ -1835,13 +2430,68 @@ export type components = {
       nickname: string;
       username: string;
     };
+    QueryConditionDto: {
+      /** @description 可筛选字段（页面描述 query[].field） */
+      field: string;
+      /** @enum {string} */
+      op:
+        | "eq"
+        | "ne"
+        | "gt"
+        | "gte"
+        | "lt"
+        | "lte"
+        | "in"
+        | "notIn"
+        | "contains"
+        | "startsWith"
+        | "between"
+        | "isNull"
+        | "notNull";
+      /** @description 值：eq…lte 是简单值；in / notIn 是数组；between 是 [下限, 上限]；isNull / notNull 不要 */
+      value?: Record<string, never>;
+    };
+    QueryGroupDto: {
+      items: (
+        | components["schemas"]["QueryConditionDto"]
+        | components["schemas"]["QueryGroupDto"]
+      )[];
+      /** @enum {string} */
+      op: "and" | "or";
+    };
     ResetSystemPassword: {
       id: string;
       password: string;
       version: number;
     };
+    RestoreBody: {
+      historyId: string;
+      /**
+       * @description 资源（权限码前缀）
+       * @example system:user
+       */
+      resource: string;
+      version: number;
+    };
+    SaveBody: {
+      /** @description 生成配置（契约 codegen.md 第 2 节） */
+      config: Record<string, never>;
+      /** @description 不带是新建 */
+      id?: string;
+      /** @description 修改时带读到的版本 */
+      version?: number;
+    };
     SaveFieldConfigurations: {
       changes: components["schemas"]["FieldConfigurationChange"][];
+    };
+    SavePreferenceDto: {
+      /**
+       * @description 小写字母开头，最多 100 字
+       * @example query:system:user
+       */
+      key: string;
+      /** @description 任意 JSON，最多 64KB（常用查询就是 query.md 的 where 加名字） */
+      value: Record<string, never>;
     };
     SaveRoleFieldConfigurations: {
       changes: components["schemas"]["FieldConfigurationChange"][];
@@ -1887,6 +2537,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemDictItemPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemDictItemPageEq: {
       /** @description 启用 */
@@ -1996,6 +2648,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemDictTypePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemDictTypePageEq: {
       /** @description 启用 */
@@ -2112,6 +2766,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemFieldPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemFieldPageEq: {
       /** @description 启用 */
@@ -2231,6 +2887,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemLoginLogPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemLoginLogPageEq: {
       /** @description 事件 */
@@ -2339,6 +2997,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemMenuPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemMenuPageEq: {
       /** @description 上级菜单 */
@@ -2466,6 +3126,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemOperationLogPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemOperationLogPageEq: {
       /** @description 成功 */
@@ -2565,6 +3227,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemOrgPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemOrgPageEq: {
       /** @description 启用 */
@@ -2674,6 +3338,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemParameterPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemParameterPageEq: Record<string, never>;
     SystemParameterPageResult: {
@@ -2809,6 +3475,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemRoleFieldPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemRoleFieldPageEq: {
       /** @description 字段 */
@@ -2912,6 +3580,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemRolePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemRolePageEq: {
       /** @description 启用 */
@@ -3028,6 +3698,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemUserPageEq: {
       /** @description 默认组织 */
@@ -3082,6 +3754,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserRolePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemUserRolePageEq: {
       /** @description 角色 */
@@ -3226,6 +3900,8 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserSupervisorPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemUserSupervisorPageEq: {
       /** @description 上级用户 */
@@ -3313,6 +3989,10 @@ export type components = {
       /** @description 姓名 */
       nickname?: string;
     };
+    TableBody: {
+      /** @example crm_customer */
+      table: string;
+    };
     TokenResult: {
       /** @description 访问令牌，只放内存，放在 Authorization: Bearer 头里 */
       accessToken: string;
@@ -3323,6 +4003,21 @@ export type components = {
       expiresIn: number;
       /** @enum {string} */
       tokenType: "Bearer";
+    };
+    VersionBody: {
+      /**
+       * @description 资源（权限码前缀）
+       * @example system:user
+       */
+      resource: string;
+      version: number;
+    };
+    WriteBody: {
+      id: string;
+      /** @description 手改过但仍要覆盖的文件路径 */
+      overwrite?: string[];
+      /** @description 预览返回的 token */
+      token: string;
     };
   };
   responses: never;
@@ -3532,6 +4227,472 @@ export interface operations {
       };
     };
   };
+  devCodegenDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenDownload: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IdBody"];
+      };
+    };
+    responses: {
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenImport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TableBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenPreview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenSync: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenTables: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenWrite: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WriteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   sessionMenu: {
     parameters: {
       query?: never;
@@ -3566,6 +4727,146 @@ export interface operations {
       };
       /** @description 5003：服务暂不可用 */
       503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  sessionPreferenceGet: {
+    parameters: {
+      query: {
+        /** @description 小写字母开头，最多 100 字 */
+        key: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PreferenceResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  sessionPreferenceDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PreferenceKeyDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  sessionPreferenceSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SavePreferenceDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PreferenceResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
         headers: {
           [name: string]: unknown;
         };
@@ -3759,6 +5060,53 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemDictItemExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemDictItemPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };
@@ -4037,6 +5385,53 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemDictTypeExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemDictTypePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };
@@ -4614,6 +6009,53 @@ export interface operations {
       };
     };
   };
+  systemLoginLogExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemLoginLogPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemLoginLogInfo: {
     parameters: {
       query?: never;
@@ -4809,6 +6251,53 @@ export interface operations {
       };
     };
   };
+  systemMenuExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemMenuPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemMenuInfo: {
     parameters: {
       query?: never;
@@ -4966,6 +6455,53 @@ export interface operations {
       };
       /** @description 4009：数据已被他人修改，请刷新后重试 */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemOperationLogExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemOperationLogPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };
@@ -5170,6 +6706,53 @@ export interface operations {
       };
     };
   };
+  systemOrgExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemOrgPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemOrgInfo: {
     parameters: {
       query?: never;
@@ -5336,6 +6919,368 @@ export interface operations {
       };
     };
   };
+  systemPageConfigInfo: {
+    parameters: {
+      query: {
+        /** @description 资源（权限码前缀） */
+        resource: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["HistoryBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigHistoryInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["HistoryInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigReset: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigRestore: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestoreBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemParameterAdd: {
     parameters: {
       query?: never;
@@ -5412,6 +7357,53 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemParameterExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemParameterPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };
@@ -6058,6 +8050,53 @@ export interface operations {
       };
     };
   };
+  systemRoleExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemRolePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemRoleInfo: {
     parameters: {
       query?: never;
@@ -6309,6 +8348,53 @@ export interface operations {
       };
     };
   };
+  systemUserRoleExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemUserRolePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   systemUserRoleInfo: {
     parameters: {
       query?: never;
@@ -6551,6 +8637,53 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemUserSupervisorExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemUserSupervisorPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };
@@ -6867,6 +9000,53 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemUserExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemUserPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: Record<string, never> | null;
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
         headers: {
           [name: string]: unknown;
         };

@@ -1,6 +1,7 @@
 import { api, type OperationBody } from "@/api/client";
 import { OPERATION_PERMISSIONS } from "@/api/constants";
 import { useUserStoreHook } from "@/store/modules/user";
+import { generatedCrud } from "@/platform/generated-crud";
 import type {
   CrudPort,
   CrudQuery,
@@ -19,7 +20,8 @@ const queryBody = (query: CrudQuery) => ({
     field: item.field,
     order: item.direction
   })),
-  eq: query.equality
+  eq: query.equality,
+  where: query.advanced
 });
 const mutationConfig = (context: CrudMutation) => ({
   signal: context.signal,
@@ -594,3 +596,17 @@ export const resources = {
   }
 } as const;
 export type SystemResource = keyof typeof resources;
+for (const [resource, definition] of Object.entries(resources)) {
+  const prefix = `system${resource
+    .split("-")
+    .map(part => part[0].toUpperCase() + part.slice(1))
+    .join("")}`;
+  const generated = generatedCrud(prefix, `system:${resource}`);
+  Object.assign(definition.port, {
+    preferences: generated.port.preferences,
+    ...(generated.port.export ? { export: generated.port.export } : {})
+  });
+  Object.assign(definition.permissions, {
+    export: generated.permissions.export
+  });
+}

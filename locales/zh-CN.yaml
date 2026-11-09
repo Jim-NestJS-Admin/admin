@@ -223,3 +223,49 @@ fieldPerm:
     idcard: 证件号（前3后4）
     last4: 仅后4位
     all: 全部打码
+
+query:
+  title: 高级查询
+  group: "第 {depth} 层条件组"
+  join: 条件关系
+  and: 全部满足（且）
+  or: 任一满足（或）
+  addCondition: 添加条件
+  addGroup: 添加分组
+  field: 字段
+  operator: 比较方式
+  value: 条件值
+  upper: 上限
+  true: 是
+  false: 否
+  listHint: 多个值用逗号分隔，最多100项
+  saved: 常用查询
+  name: 查询名称
+  save: 保存常用查询
+  apply: 应用查询
+  export: 导出CSV
+  invalidNumber: 请输入有效数字
+  invalidBoolean: 请选择是或否
+  invalidDate: 请输入有效日期
+  invalidList: 列表需要1～100个非空值
+  invalidText: 查询文字需要1～100字
+  unavailableField: 此查询字段或比较方式当前不可用，请重新选择
+  invalidSaved: 已保存的查询格式无效
+  invalidName: 查询名称需要1～60字
+  savedLimit: 最多保存30个常用查询
+  emptyGroup: 条件组至少包含一个条件
+  limit: 最多20个条件、3层分组
+  ops:
+    eq: 等于
+    ne: 不等于
+    gt: 大于
+    gte: 大于等于
+    lt: 小于
+    lte: 小于等于
+    in: 属于列表
+    notIn: 不属于列表
+    contains: 包含文字
+    startsWith: 以文字开头
+    between: 区间
+    isNull: 为空
+    notNull: 不为空

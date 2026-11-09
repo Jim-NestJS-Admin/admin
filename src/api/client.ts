@@ -106,6 +106,132 @@ export function createApiClient(
         config
       );
     },
+    devCodegenDelete(
+      input: OperationInput<"devCodegenDelete"> & {
+        body: OperationBody<"devCodegenDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenDelete">>(
+        "post",
+        interpolate("/admin/dev/codegen/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenDownload(
+      input: OperationInput<"devCodegenDownload"> & {
+        body: OperationBody<"devCodegenDownload">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenDownload">>(
+        "post",
+        interpolate("/admin/dev/codegen/download", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenImport(
+      input: OperationInput<"devCodegenImport"> & {
+        body: OperationBody<"devCodegenImport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenImport">>(
+        "post",
+        interpolate("/admin/dev/codegen/import", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenInfo(
+      input: OperationInput<"devCodegenInfo"> & {
+        body: OperationBody<"devCodegenInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenInfo">>(
+        "post",
+        interpolate("/admin/dev/codegen/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenList(
+      input: OperationInput<"devCodegenList"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenList">>(
+        "post",
+        interpolate("/admin/dev/codegen/list", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenPreview(
+      input: OperationInput<"devCodegenPreview"> & {
+        body: OperationBody<"devCodegenPreview">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenPreview">>(
+        "post",
+        interpolate("/admin/dev/codegen/preview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenSave(
+      input: OperationInput<"devCodegenSave"> & {
+        body: OperationBody<"devCodegenSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenSave">>(
+        "post",
+        interpolate("/admin/dev/codegen/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenSync(
+      input: OperationInput<"devCodegenSync"> & {
+        body: OperationBody<"devCodegenSync">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenSync">>(
+        "post",
+        interpolate("/admin/dev/codegen/sync", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenTables(
+      input: OperationInput<"devCodegenTables"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenTables">>(
+        "post",
+        interpolate("/admin/dev/codegen/tables", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenWrite(
+      input: OperationInput<"devCodegenWrite"> & {
+        body: OperationBody<"devCodegenWrite">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenWrite">>(
+        "post",
+        interpolate("/admin/dev/codegen/write", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     sessionMenu(
       input: OperationInput<"sessionMenu"> = {},
       config: PureHttpRequestConfig = {}
@@ -113,6 +239,45 @@ export function createApiClient(
       return transport.request<OperationResponse<"sessionMenu">>(
         "get",
         interpolate("/admin/session/menu", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    sessionPreferenceGet(
+      input: OperationInput<"sessionPreferenceGet"> & {
+        query: OperationParameter<"sessionPreferenceGet", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"sessionPreferenceGet">>(
+        "get",
+        interpolate("/admin/session/preference", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    sessionPreferenceDelete(
+      input: OperationInput<"sessionPreferenceDelete"> & {
+        body: OperationBody<"sessionPreferenceDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"sessionPreferenceDelete">>(
+        "post",
+        interpolate("/admin/session/preference/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    sessionPreferenceSave(
+      input: OperationInput<"sessionPreferenceSave"> & {
+        body: OperationBody<"sessionPreferenceSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"sessionPreferenceSave">>(
+        "post",
+        interpolate("/admin/session/preference/save", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -163,6 +328,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemDictItemDelete">>(
         "post",
         interpolate("/admin/system/dict-item/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictItemExport(
+      input: OperationInput<"systemDictItemExport"> & {
+        body: OperationBody<"systemDictItemExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictItemExport">>(
+        "post",
+        interpolate("/admin/system/dict-item/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -252,6 +430,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemDictTypeDelete">>(
         "post",
         interpolate("/admin/system/dict-type/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemDictTypeExport(
+      input: OperationInput<"systemDictTypeExport"> & {
+        body: OperationBody<"systemDictTypeExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemDictTypeExport">>(
+        "post",
+        interpolate("/admin/system/dict-type/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -417,6 +608,19 @@ export function createApiClient(
         config
       );
     },
+    systemLoginLogExport(
+      input: OperationInput<"systemLoginLogExport"> & {
+        body: OperationBody<"systemLoginLogExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemLoginLogExport">>(
+        "post",
+        interpolate("/admin/system/login-log/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemLoginLogInfo(
       input: OperationInput<"systemLoginLogInfo"> & {
         body: OperationBody<"systemLoginLogInfo">;
@@ -480,6 +684,19 @@ export function createApiClient(
         config
       );
     },
+    systemMenuExport(
+      input: OperationInput<"systemMenuExport"> & {
+        body: OperationBody<"systemMenuExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemMenuExport">>(
+        "post",
+        interpolate("/admin/system/menu/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemMenuInfo(
       input: OperationInput<"systemMenuInfo"> & {
         body: OperationBody<"systemMenuInfo">;
@@ -526,6 +743,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemMenuUpdate">>(
         "post",
         interpolate("/admin/system/menu/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemOperationLogExport(
+      input: OperationInput<"systemOperationLogExport"> & {
+        body: OperationBody<"systemOperationLogExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOperationLogExport">>(
+        "post",
+        interpolate("/admin/system/operation-log/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -593,6 +823,19 @@ export function createApiClient(
         config
       );
     },
+    systemOrgExport(
+      input: OperationInput<"systemOrgExport"> & {
+        body: OperationBody<"systemOrgExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemOrgExport">>(
+        "post",
+        interpolate("/admin/system/org/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemOrgInfo(
       input: OperationInput<"systemOrgInfo"> & {
         body: OperationBody<"systemOrgInfo">;
@@ -643,6 +886,86 @@ export function createApiClient(
         config
       );
     },
+    systemPageConfigInfo(
+      input: OperationInput<"systemPageConfigInfo"> & {
+        query: OperationParameter<"systemPageConfigInfo", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigInfo">>(
+        "get",
+        interpolate("/admin/system/page-config", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPageConfigHistory(
+      input: OperationInput<"systemPageConfigHistory"> & {
+        body: OperationBody<"systemPageConfigHistory">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigHistory">>(
+        "post",
+        interpolate("/admin/system/page-config/history", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPageConfigHistoryInfo(
+      input: OperationInput<"systemPageConfigHistoryInfo"> & {
+        body: OperationBody<"systemPageConfigHistoryInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"systemPageConfigHistoryInfo">
+      >(
+        "post",
+        interpolate("/admin/system/page-config/history-info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPageConfigReset(
+      input: OperationInput<"systemPageConfigReset"> & {
+        body: OperationBody<"systemPageConfigReset">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigReset">>(
+        "post",
+        interpolate("/admin/system/page-config/reset", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPageConfigRestore(
+      input: OperationInput<"systemPageConfigRestore"> & {
+        body: OperationBody<"systemPageConfigRestore">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigRestore">>(
+        "post",
+        interpolate("/admin/system/page-config/restore", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemPageConfigSave(
+      input: OperationInput<"systemPageConfigSave"> & {
+        body: OperationBody<"systemPageConfigSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigSave">>(
+        "post",
+        interpolate("/admin/system/page-config/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemParameterAdd(
       input: OperationInput<"systemParameterAdd"> & {
         body: OperationBody<"systemParameterAdd">;
@@ -665,6 +988,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemParameterDelete">>(
         "post",
         interpolate("/admin/system/parameter/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemParameterExport(
+      input: OperationInput<"systemParameterExport"> & {
+        body: OperationBody<"systemParameterExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemParameterExport">>(
+        "post",
+        interpolate("/admin/system/parameter/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -858,6 +1194,19 @@ export function createApiClient(
         config
       );
     },
+    systemRoleExport(
+      input: OperationInput<"systemRoleExport"> & {
+        body: OperationBody<"systemRoleExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemRoleExport">>(
+        "post",
+        interpolate("/admin/system/role/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemRoleInfo(
       input: OperationInput<"systemRoleInfo"> & {
         body: OperationBody<"systemRoleInfo">;
@@ -934,6 +1283,19 @@ export function createApiClient(
         config
       );
     },
+    systemUserRoleExport(
+      input: OperationInput<"systemUserRoleExport"> & {
+        body: OperationBody<"systemUserRoleExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserRoleExport">>(
+        "post",
+        interpolate("/admin/system/user-role/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemUserRoleInfo(
       input: OperationInput<"systemUserRoleInfo"> & {
         body: OperationBody<"systemUserRoleInfo">;
@@ -1006,6 +1368,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemUserSupervisorDelete">>(
         "post",
         interpolate("/admin/system/user-supervisor/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserSupervisorExport(
+      input: OperationInput<"systemUserSupervisorExport"> & {
+        body: OperationBody<"systemUserSupervisorExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserSupervisorExport">>(
+        "post",
+        interpolate("/admin/system/user-supervisor/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -1095,6 +1470,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemUserDelete">>(
         "post",
         interpolate("/admin/system/user/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemUserExport(
+      input: OperationInput<"systemUserExport"> & {
+        body: OperationBody<"systemUserExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemUserExport">>(
+        "post",
+        interpolate("/admin/system/user/export", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

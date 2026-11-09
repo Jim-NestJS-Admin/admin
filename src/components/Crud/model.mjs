@@ -20,9 +20,9 @@ export function columnChoices(schema, saved) {
     if (!seen.has(column.field))
       output.push({
         field: column.field,
-        visible: true,
+        visible: column.hidden !== true,
         width: width(column.width),
-        fixed: false
+        fixed: ["left", "right"].includes(column.fixed) ? column.fixed : false
       });
   return {
     columns: output,
@@ -110,6 +110,95 @@ export function constrainFieldSchema(schema) {
     )
   };
 }
+
+/** 读取已合并显示配置；仍和原schema白名单取交集，显示配置不能增加字段或写权限。 */
+export function applyPageView(schema) {
+  const list = schema.view?.list,
+    form = schema.view?.form;
+  if (!list && !form) return schema;
+  const columns = new Map(schema.columns.map(column => [column.field, column]));
+  const configured = [],
+    seen = new Set();
+  for (const choice of Array.isArray(list?.columns) ? list.columns : []) {
+    const column = columns.get(choice?.field);
+    if (!column || seen.has(column.field)) continue;
+    seen.add(column.field);
+    configured.push({
+      ...column,
+      width: width(choice.width ?? column.width),
+      hidden: choice.hidden === true,
+      fixed: ["left", "right"].includes(choice.fixed) ? choice.fixed : false
+    });
+  }
+  for (const column of schema.columns)
+    if (!seen.has(column.field)) configured.push(column);
+  const items = new Map(schema.form.map(item => [item.field, item])),
+    configuredForm = [],
+    formSeen = new Set();
+  for (const choice of Array.isArray(form?.items) ? form.items : []) {
+    const item = items.get(choice?.field);
+    if (!item || formSeen.has(item.field)) continue;
+    formSeen.add(item.field);
+    configuredForm.push({
+      ...item,
+      placeholder:
+        typeof choice.placeholder === "string"
+          ? choice.placeholder
+          : item.placeholder
+    });
+  }
+  for (const item of schema.form)
+    if (!formSeen.has(item.field)) configuredForm.push(item);
+  const page = schema.actions.page;
+  const intersect = (base, selected) =>
+    Array.isArray(selected)
+      ? base.filter(field => selected.includes(field))
+      : base;
+  return {
+    ...schema,
+    columns: configured,
+    form: configuredForm,
+    defaultSort: Array.isArray(list?.defaultSort)
+      ? list.defaultSort
+          .filter(
+            item =>
+              page?.sortable.includes(item.field) &&
+              ["asc", "desc"].includes(item.order)
+          )
+          .slice(0, 5)
+      : schema.defaultSort,
+    actions: {
+      ...schema.actions,
+      ...(page
+        ? {
+            page: {
+              ...page,
+              keyWords: intersect(page.keyWords, list?.keyWords),
+              filterable: intersect(page.filterable, list?.filterable)
+            }
+          }
+        : {}),
+      ...(form?.readonly
+        ? { add: { writable: [] }, update: { writable: [] } }
+        : {})
+    },
+    query: schema.query.filter(
+      field =>
+        !page ||
+        intersect(page.filterable, list?.filterable).includes(field.field)
+    )
+  };
+}
+export const pageSize = schema =>
+  Math.min(
+    schema.maxSize,
+    Math.max(
+      1,
+      Number.isSafeInteger(schema.view?.list?.pageSize)
+        ? schema.view.list.pageSize
+        : 20
+    )
+  );
 export function cellText(cell, dictionary) {
   if (cell.state === "hidden") return "—";
   if (cell.state === "masked")

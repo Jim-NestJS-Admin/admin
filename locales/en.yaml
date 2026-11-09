@@ -223,3 +223,49 @@ fieldPerm:
     idcard: ID (first 3, last 4)
     last4: Last 4 only
     all: Mask all
+
+query:
+  title: Advanced query
+  group: "Condition group (level {depth})"
+  join: Match mode
+  and: Match all (AND)
+  or: Match any (OR)
+  addCondition: Add condition
+  addGroup: Add group
+  field: Field
+  operator: Operator
+  value: Value
+  upper: Upper bound
+  true: Yes
+  false: No
+  listHint: Comma-separated values (up to 100)
+  saved: Saved queries
+  name: Query name
+  save: Save query
+  apply: Apply query
+  export: Export CSV
+  invalidNumber: Enter a valid number
+  invalidBoolean: Choose yes or no
+  invalidDate: Enter a valid date
+  invalidList: Enter 1–100 nonempty values
+  invalidText: Enter 1–100 characters
+  unavailableField: The field or operator is no longer available
+  invalidSaved: Invalid saved query
+  invalidName: Enter a name of 1–60 characters
+  savedLimit: Save up to 30 queries
+  emptyGroup: A group needs at least one condition
+  limit: Up to 20 conditions and 3 group levels
+  ops:
+    eq: Equals
+    ne: Does not equal
+    gt: Greater than
+    gte: Greater than or equal
+    lt: Less than
+    lte: Less than or equal
+    in: In list
+    notIn: Not in list
+    contains: Contains
+    startsWith: Starts with
+    between: Between
+    isNull: Is null
+    notNull: Is not null

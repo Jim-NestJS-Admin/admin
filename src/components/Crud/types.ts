@@ -48,6 +48,8 @@ export interface CrudMutation {
   relatedChanges?: CrudRelatedChange[];
 }
 export interface CrudPort {
+  tree?(signal: AbortSignal): Promise<CrudRecord[]>;
+  export?(query: CrudQuery, signal: AbortSignal): Promise<Blob>;
   describe(signal: AbortSignal): Promise<CrudSchema>;
   list(
     query: CrudQuery,

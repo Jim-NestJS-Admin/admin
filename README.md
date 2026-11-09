@@ -87,3 +87,13 @@ pnpm gen:api --input https://example.com/admin.json --source-revision <后端提
 客户端输入来自server-t17 ba3f69f（含T16 6616ae3、T07/T08、T17 fc6c80f）。通用CRUD改用正式src/api/schema的模型，并按_fieldState逐行隐藏、脱敏/只读；schema.fieldPerms裁剪页面列、可写字段和排序入口。后端CrudSchema的Swagger目前漏声明fieldPerms，已写入TASKS；运行时适配未手写后台DTO。T16子表字段处理仍未完成，不能把子表编辑器视为后端权限已经验收。
 
 节点类型检查通过，lint发现的样式空行已修复，生产构建通过。测试已补但未执行，未做浏览器/HTTP验证。新页面未自动合入main或切换当前本地运行分支。
+
+## T13 查询/偏好/导出与生成页面适配（2026-11-09）
+
+接口输入固定为server-t13 7f2e837，含Claude d4c5456及系统安全导出入口。高级查询从schema.query读取字段/类型/运算符，只开放当前可见原值字段；支持且/或、三层、20条件，in最多100项。常用查询走sessionPreference接口，键query:<权限前缀>；列设置走columns:<权限前缀>，身份完全由服务端会话决定。失效字段的旧查询拒绝恢复，不恢复已经收回的字段。CSV调用后端export二进制操作，不在浏览器导出原始数据。
+
+树表使用平铺tree接口转为树，处理不可见父节点和脏循环，支持父级选择；有搜索/高级查询时走后端分页并保留分页器。生成页面通过generatedCrud绑定固定的T12操作，聚合子表按资源分组发送added/updated/deleted，新增只发added。模板在codegen-templates/，变量约定已补docs/contracts/codegen.md，待Claude接进后端渲染流程。
+
+schema.view中的列显示/顺序/宽度、搜索筛选范围、默认排序、页大小、表单顺序/提示已接入，始终和原schema字段/动作权限取交集。T24的表单分组/跨度/显示方式在模块配置页批次继续完成。
+
+类型/lint/生产构建在本节点集中检查；查询与树的测试已写未执行。未启动浏览器或执行迁移，统一测试按Jimmy安排进行。
