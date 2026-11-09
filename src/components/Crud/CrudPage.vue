@@ -10,7 +10,13 @@ import {
 import { useI18n } from "vue-i18n";
 import { useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
-import { ElMessageBox, ElDrawer, ElDialog } from "element-plus";
+import {
+  ElMessageBox,
+  ElDrawer,
+  ElDialog,
+  ElSplitter,
+  ElSplitterPanel
+} from "element-plus";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import {
