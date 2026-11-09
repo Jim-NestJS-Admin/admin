@@ -31,7 +31,7 @@ test("二进制成功响应走原始Blob，JSON及二进制错误响应不改变
     info: { title: "下载契约", version: "1" },
     paths: Object.fromEntries(
       ["csv", "zip", "json"].map(kind => [
-        `/${kind}`,
+        `/admin/${kind}`,
         {
           get: {
             operationId: kind,
