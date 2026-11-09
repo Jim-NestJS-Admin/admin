@@ -6,6 +6,7 @@ import { api, type OperationBody, type OperationResponse } from "@/api/client";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
+import { notifyPageConfigChanged } from "@/platform/page-config-events";
 import { RequestFailure } from "@/utils/http";
 import type { CrudSchema } from "@/components/Crud/types";
 import FieldPermissions from "./FieldPermissions.vue";
@@ -314,6 +315,7 @@ async function mutation(
       );
     if (!request.signal.aborted) {
       intent = undefined;
+      notifyPageConfigChanged(selected.value);
       ElMessage.success(t("system.saved"));
       busy.value = false;
       await load();

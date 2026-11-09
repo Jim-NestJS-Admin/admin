@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, reactive, ref, shallowRef } from "vue";
 import { onSessionReset } from "@/platform/lifecycle";
+import { onPageConfigChanged } from "@/platform/page-config-events";
 import { RequestFailure } from "@/utils/http";
 import { childDraft, childIssues, relatedChanges } from "./children.mjs";
 import { treeRows } from "./tree.mjs";
@@ -106,8 +107,12 @@ export function useCrud(
   }
   const unsubscribe = onSessionReset(reset);
   onBeforeUnmount(() => {
+    stopConfigEvents();
     unsubscribe();
     reset();
+  });
+  const stopConfigEvents = onPageConfigChanged(resource => {
+    if (schema.value?.permPrefix === resource) void initialize();
   });
   function failure(reason: unknown) {
     error.value =
