@@ -269,3 +269,60 @@ query:
     between: Between
     isNull: Is null
     notNull: Is not null
+
+codegen:
+  title: Code generator
+  choose: Choose saved configuration
+  developmentOnly: Development only. Generates files without running migrations, installs or deployments.
+  configuration: Configuration
+  readTables: Read available tables
+  importTable: Import existing table
+  moduleName: Module key
+  businessName: Business key
+  titleLabel: Display name
+  permissionPrefix: Permission prefix
+  tableName: Database table
+  single: Single table
+  tree: Tree table
+  masterDetail: Master-detail
+  soft: Soft delete
+  hard: Hard delete
+  dialog: Dialog form
+  drawer: Drawer form
+  scope: Organization data scope
+  parent: Parent field
+  nodeName: Node label field
+  sort: Sort field (optional)
+  fieldHelp: Types are string/int/decimal/money/date/datetime/boolean/json. Components follow the backend contract. Field permissions use JSON. The server validates all settings.
+  addField: Add field
+  property: Property
+  column: Database column
+  label: Display name
+  kind: Data type
+  widget: Form component
+  query: Query mode
+  dictionary: Dictionary key
+  security: Field permissions JSON
+  size: Length
+  optional: Nullable
+  listed: Show in list
+  editable: Show in form
+  required: Required
+  unique: Unique
+  order: Reorder
+  addChild: Add child table
+  childTable: Child table
+  foreignKey: Foreign key
+  pagePreview: Page structure preview
+  preview: Preview code
+  previewRequired: Save and preview the current configuration. Modified files require an explicit overwrite selection. Refresh an expired preview.
+  file: File
+  overwrite: Explicitly overwrite
+  sync: Compare table structure
+  syncNotice: Shows differences only. Does not change the database or replace field settings.
+  download: Download ZIP
+  write: Confirm file writes
+  confirmWrite: Write the following files? This will not run migrations, install dependencies or commit code.
+  confirmDelete: Delete this configuration only? Generated code will remain.
+  invalidFields: Complete all fields with unique, valid identifiers. Up to 200 fields.
+  invalidDownload: The server did not return a valid archive
