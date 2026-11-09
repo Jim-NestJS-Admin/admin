@@ -31,10 +31,14 @@ export function columnChoices(schema, saved) {
       : "default"
   };
 }
+/**
+ * 没设置列宽时返回 undefined，由列表按字段类型给最小宽度、剩余空间自动分配。
+ * 160 是旧版本保存列设置时写进去的默认值，不算用户自己设的宽度。
+ */
 function width(value) {
-  return typeof value === "number" && Number.isFinite(value)
+  return typeof value === "number" && Number.isFinite(value) && value !== 160
     ? Math.min(600, Math.max(80, Math.round(value)))
-    : 160;
+    : undefined;
 }
 export function identity(row) {
   if (

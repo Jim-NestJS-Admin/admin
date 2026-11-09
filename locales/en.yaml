@@ -26,6 +26,10 @@ search:
   pureEmpty: Empty
   purePlaceholder: Search Menu
 panel:
+  pureComponentSize: Component size
+  pureSizeLarge: Large
+  pureSizeDefault: Default
+  pureSizeSmall: Small
   pureSystemSet: System Configs
   pureCloseSystemSet: Close System Configs
   pureClearCacheAndToLogin: Clear cache and return to login page
@@ -122,12 +126,15 @@ crud:
   apply: Apply
   filter: Categories
   search: Search
+  clear: Clear
   keyword: Keyword
   keywordHint: Search {fields}
   resetSearch: Reset
   booleanYes: Yes
   booleanNo: No
   refresh: Refresh
+  columnsShown: "Columns ({count}/{total})"
+  columnsTip: Drag to reorder; saved to your account
   columns: Columns
   actions: Actions
   density: Table density
@@ -135,6 +142,7 @@ crud:
   default: Standard
   large: Spacious
   width: Column width
+  widthAuto: Auto
   fixed: Pin column
   unfixed: Unpinned
   left: Left
@@ -190,14 +198,17 @@ system:
     page: Page
     button: Button
 
+  switchOrganization: Switch organization
+  switching: Switching…
   changePassword: Change password
   oldPassword: Current password
   newPassword: New password
-  filterDefaultOrg: Filter by default organization
-  filterScope: Filter by role scope organization
-  filterDictionary: Filter by dictionary type
-  filterChildren: Show direct children
-  showAll: Show all
+  filterDefaultOrg: Organizations
+  filterScope: Scopes
+  filterDictionary: Dictionaries
+  filterChildren: Parents
+  showAll: All
+  refreshTree: Refresh
 
 fieldPerm:
   title: Field permissions

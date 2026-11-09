@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import { api, type OperationBody } from "@/api/client";
 import type { CrudSchema } from "./types";
 import QueryGroupEditor from "./QueryGroupEditor.vue";
+import FilterIcon from "~icons/ri/filter-3-line";
 import {
   countConditions,
   newGroup,
@@ -153,9 +154,25 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <el-button v-if="fields.length" @click="show"
-    >{{ t("query.title") }}<span v-if="count"> ({{ count }})</span></el-button
+  <el-tooltip
+    v-if="fields.length"
+    :content="count ? `${t('query.title')}（${count}）` : t('query.title')"
+    placement="top"
   >
+    <button
+      type="button"
+      class="crud-addon"
+      :class="{ 'is-active': count }"
+      :aria-label="t('query.title')"
+      @click="show"
+    >
+      <component :is="FilterIcon" class="crud-addon-icon" /><span
+        v-if="count"
+        class="crud-addon-count"
+        >{{ count }}</span
+      >
+    </button>
+  </el-tooltip>
   <el-drawer v-model="open" :title="t('query.title')" size="min(960px, 100vw)">
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <div class="query-saved">

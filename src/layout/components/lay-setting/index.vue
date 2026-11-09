@@ -238,6 +238,20 @@ const markOptions = computed<Array<OptionsType>>(() => {
   ];
 });
 
+/** 全局组件尺寸（按钮、输入框、表格等 Element Plus 组件），存在本地配置里 */
+const sizeValue = ref<"large" | "default" | "small">(
+  $storage.configure?.size ?? "default"
+);
+const sizeOptions = computed<Array<OptionsType>>(() => [
+  { label: t("panel.pureSizeLarge"), value: "large" },
+  { label: t("panel.pureSizeDefault"), value: "default" },
+  { label: t("panel.pureSizeSmall"), value: "small" }
+]);
+function sizeChange({ option }) {
+  sizeValue.value = option.value;
+  storageConfigureChange("size", option.value);
+}
+
 /** 设置导航模式 */
 function setLayoutModel(layout: string) {
   layoutTheme.value.layout = layout;
@@ -445,6 +459,15 @@ onUnmounted(() => removeMatchMedia);
         :modelValue="markValue === 'smart' ? 0 : markValue === 'card' ? 1 : 2"
         :options="markOptions"
         @change="onChange"
+      />
+
+      <p :class="['mt-4!', pClass]">{{ t("panel.pureComponentSize") }}</p>
+      <Segmented
+        resize
+        class="select-none"
+        :modelValue="sizeValue === 'large' ? 0 : sizeValue === 'small' ? 2 : 1"
+        :options="sizeOptions"
+        @change="sizeChange"
       />
 
       <p class="mt-5! font-medium text-sm dark:text-white">

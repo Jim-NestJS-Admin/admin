@@ -28,10 +28,11 @@ import ViewIcon from "~icons/ri/eye-line";
 import EditIcon from "~icons/ri/edit-line";
 import FilterIcon from "~icons/ri/filter-3-line";
 import RefreshIcon from "@/assets/table-bar/refresh.svg?component";
-import SettingIcon from "@/assets/table-bar/settings.svg?component";
 import { useFillHeight } from "./useFillHeight";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
+import ColumnSettings from "./ColumnSettings.vue";
+import ClearIcon from "~icons/ri/close-circle-line";
 import {
   cellText,
   columnChoices,
@@ -68,14 +69,10 @@ const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const mobile = useMediaQuery("(max-width: 760px)");
-const treeOpen = ref(false),
-  settingsOpen = ref(false);
-const draft = ref<CrudChoices>({ columns: [], density: "default" });
+const treeOpen = ref(false);
 const activeChild = ref("");
 const stopReset = onSessionReset(() => {
   treeOpen.value = false;
-  settingsOpen.value = false;
-  draft.value = { columns: [], density: "default" };
 });
 onBeforeUnmount(stopReset);
 const view = useCrud(
@@ -205,29 +202,29 @@ function columnAlign(column) {
     ? "center"
     : "left";
 }
+/** 没设列宽时的最小宽度：按类型给一个够用的值，表格有空余时再按比例撑开 */
+const TYPE_WIDTH = {
+  boolean: 80,
+  number: 90,
+  date: 110,
+  datetime: 160,
+  reference: 140,
+  json: 160
+};
+function autoWidth(column) {
+  const base = TYPE_WIDTH[column.type] ?? 100;
+  const title =
+    [...String(column.label ?? "")].length * 14 + (column.sortable ? 52 : 32);
+  return Math.max(base, title);
+}
 /** 操作列宽度：按实际会出现的按钮数 */
 const actionWidth = computed(() => {
   const count =
     (props.permissions?.info && schema.value?.api.includes("info") ? 1 : 0) +
     (props.port.update && schema.value?.api.includes("update") ? 1 : 0) +
     (props.port.remove && schema.value?.api.includes("delete") ? 1 : 0);
-  return Math.max(90, count * 72 + 24);
+  return Math.max(90, count * 66 + 14);
 });
-function openSettings() {
-  draft.value = columnChoices(schema.value, choices.value);
-  settingsOpen.value = true;
-}
-function move(index: number, delta: number) {
-  const target = index + delta;
-  if (target < 0 || target >= draft.value.columns.length) return;
-  [draft.value.columns[index], draft.value.columns[target]] = [
-    draft.value.columns[target],
-    draft.value.columns[index]
-  ];
-}
-async function applySettings() {
-  if (await view.saveChoices(draft.value)) settingsOpen.value = false;
-}
 async function confirmRemove(ids: string[]) {
   const description = schema.value;
   try {
@@ -397,50 +394,78 @@ defineExpose({ reload: view.initialize });
               }}</el-tag>
             </div>
             <div class="crud-flex1" />
+            <!-- 搜索（参考 xinliwei）：输入框右侧是清空、搜索；后面是高级查询、列设置 -->
             <form class="crud-search" @submit.prevent="view.search">
-              <template v-if="schema.actions.page?.keyWords.length">
-                <el-input
-                  v-model="query.search"
-                  clearable
-                  :aria-label="t('crud.search')"
-                  :placeholder="keywordHint"
-                  class="crud-keyword"
-                  @clear="view.search"
-                />
-                <el-button
-                  type="primary"
-                  native-type="submit"
-                  :icon="useRenderIcon(SearchIcon)"
-                  >{{ t("crud.search") }}</el-button
-                >
-              </template>
-              <slot
-                v-if="!recycledView"
-                name="advanced"
-                :apply="
-                  (value: unknown) => {
-                    query.advanced = value;
-                    view.search();
-                  }
-                "
+              <el-input
+                v-if="schema.actions.page?.keyWords.length"
+                v-model="query.search"
+                :aria-label="t('crud.search')"
+                :placeholder="keywordHint"
+                class="crud-keyword"
               >
-                <AdvancedQuery
+                <template #suffix>
+                  <button
+                    v-if="query.search"
+                    type="button"
+                    class="crud-input-btn is-clear"
+                    :aria-label="t('crud.clear')"
+                    @click="
+                      () => {
+                        query.search = '';
+                        view.search();
+                      }
+                    "
+                  >
+                    <component :is="ClearIcon" />
+                  </button>
+                  <button
+                    type="submit"
+                    class="crud-input-btn"
+                    :aria-label="t('crud.search')"
+                    :title="t('crud.search')"
+                  >
+                    <component :is="SearchIcon" />
+                  </button>
+                </template>
+                <template #append>
+                  <div class="crud-addons">
+                    <slot
+                      v-if="!recycledView"
+                      name="advanced"
+                      :apply="
+                        (value: unknown) => {
+                          query.advanced = value;
+                          view.search();
+                        }
+                      "
+                    >
+                      <AdvancedQuery
+                        :schema="schema"
+                        @apply="
+                          value => {
+                            query.advanced = value;
+                            view.search();
+                          }
+                        "
+                      />
+                    </slot>
+                    <ColumnSettings
+                      :schema="schema"
+                      :choices="choices"
+                      :disabled="saving"
+                      @save="value => view.saveChoices(value)"
+                    />
+                  </div>
+                </template>
+              </el-input>
+              <div v-else class="crud-addons is-standalone">
+                <ColumnSettings
                   :schema="schema"
-                  @apply="
-                    value => {
-                      query.advanced = value;
-                      view.search();
-                    }
-                  "
+                  :choices="choices"
+                  :disabled="saving"
+                  @save="value => view.saveChoices(value)"
                 />
-              </slot>
-              <el-tooltip :content="t('crud.columns')" placement="top">
-                <el-button
-                  :icon="useRenderIcon(SettingIcon)"
-                  :aria-label="t('crud.columns')"
-                  @click="openSettings"
-                />
-              </el-tooltip>
+              </div>
             </form>
           </div>
           <el-alert
@@ -462,7 +487,9 @@ defineExpose({ reload: view.initialize });
                 hasChildren: '__crudTreeHasChildren'
               }"
               height="100%"
-              :size="choices.density"
+              :size="
+                choices.density === 'default' ? undefined : choices.density
+              "
               :header-cell-style="{
                 background: 'var(--el-fill-color-light)',
                 color: 'var(--el-text-color-primary)'
@@ -487,7 +514,7 @@ defineExpose({ reload: view.initialize });
                 :key="column.field"
                 :prop="column.field"
                 :label="column.label"
-                :min-width="column.width"
+                :min-width="column.width ?? autoWidth(column)"
                 :fixed="column.fixed"
                 :align="columnAlign(column)"
                 show-overflow-tooltip
@@ -625,65 +652,6 @@ defineExpose({ reload: view.initialize });
       size="85%"
       ><slot name="tree" :filter="view.filter"
     /></el-drawer>
-    <el-drawer
-      v-model="settingsOpen"
-      :title="t('crud.columns')"
-      :size="mobile ? '100%' : '520px'"
-    >
-      <div class="crud-settings">
-        <label
-          >{{ t("crud.density")
-          }}<el-select v-model="draft.density"
-            ><el-option
-              v-for="density in ['small', 'default', 'large']"
-              :key="density"
-              :label="t(`crud.${density}`)"
-              :value="density" /></el-select
-        ></label>
-        <div
-          v-for="(column, index) in draft.columns"
-          :key="column.field"
-          class="crud-choice"
-        >
-          <el-checkbox v-model="column.visible">{{
-            schema?.columns.find(item => item.field === column.field)?.label
-          }}</el-checkbox>
-          <el-input-number
-            v-model="column.width"
-            :aria-label="t('crud.width')"
-            :min="80"
-            :max="600"
-            controls-position="right"
-          />
-          <el-select v-model="column.fixed" :aria-label="t('crud.fixed')"
-            ><el-option :value="false" :label="t('crud.unfixed')" /><el-option
-              value="left"
-              :label="t('crud.left')" /><el-option
-              value="right"
-              :label="t('crud.right')"
-          /></el-select>
-          <el-button
-            :aria-label="t('crud.up')"
-            :disabled="index === 0"
-            @click="move(index, -1)"
-            >↑</el-button
-          ><el-button
-            :aria-label="t('crud.down')"
-            :disabled="index === draft.columns.length - 1"
-            @click="move(index, 1)"
-            >↓</el-button
-          >
-        </div>
-      </div>
-      <template #footer
-        ><el-button @click="draft = columnChoices(schema)">{{
-          t("crud.reset")
-        }}</el-button
-        ><el-button type="primary" @click="applySettings">{{
-          t("crud.apply")
-        }}</el-button></template
-      >
-    </el-drawer>
     <component
       :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
@@ -893,8 +861,7 @@ defineExpose({ reload: view.initialize });
   }
 
   .crud-keyword {
-    flex: 1;
-    width: auto;
+    width: 100%;
   }
 }
 
@@ -940,8 +907,7 @@ defineExpose({ reload: view.initialize });
 
 .crud-tree {
   height: 100%;
-  padding: 12px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .crud-main {
@@ -976,13 +942,101 @@ defineExpose({ reload: view.initialize });
 }
 
 .crud-actions :deep(.el-button + .el-button),
-.crud-search :deep(.el-button + .el-button),
-.crud-choice :deep(.el-button + .el-button) {
+.crud-search :deep(.el-button + .el-button) {
   margin-left: 0;
 }
 
 .crud-keyword {
-  width: 200px;
+  width: 300px;
+}
+
+.crud-keyword :deep(.el-input-group__append) {
+  padding: 0;
+  background: var(--el-fill-color-blank);
+}
+
+.crud-keyword :deep(.el-input__wrapper) {
+  padding-right: 4px;
+}
+
+/* 输入框里的清空、搜索小按钮 */
+.crud-input-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin-left: 2px;
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+}
+
+.crud-input-btn:hover {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+}
+
+.crud-input-btn.is-clear {
+  color: var(--el-text-color-placeholder);
+}
+
+/* 高级查询、列设置：输入框右侧附加按钮 */
+.crud-addons {
+  display: flex;
+  align-self: stretch;
+  height: 100%;
+}
+
+.crud-addons.is-standalone {
+  height: var(--el-component-size);
+  overflow: hidden;
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+}
+
+.crud-addons :deep(.crud-addon) {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 100%;
+  padding: 0 10px;
+  font-size: 14px;
+  color: var(--el-text-color-regular);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.crud-addons :deep(.crud-addon + .crud-addon),
+.crud-addons :deep(.el-only-child__content + .crud-addon) {
+  border-left: 1px solid var(--el-border-color);
+}
+
+.crud-addons :deep(.crud-addon:hover) {
+  color: var(--el-color-primary);
+  background: var(--el-fill-color-light);
+}
+
+.crud-addons :deep(.crud-addon.is-active) {
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+}
+
+.crud-addons :deep(.crud-addon-icon) {
+  width: 15px;
+  height: 15px;
+}
+
+.crud-addons :deep(.crud-addon-count) {
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .crud-density-active {
@@ -1010,28 +1064,6 @@ defineExpose({ reload: view.initialize });
   justify-content: flex-end;
   padding-top: 12px;
   overflow-x: auto;
-}
-
-.crud-settings {
-  display: grid;
-  gap: 16px;
-}
-
-.crud-choice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--el-border-color);
-}
-
-.crud-choice .el-checkbox {
-  width: 100%;
-}
-
-.crud-choice .el-select {
-  width: 110px;
 }
 
 .crud-unavailable {

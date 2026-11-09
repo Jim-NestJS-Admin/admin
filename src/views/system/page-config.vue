@@ -27,7 +27,8 @@ const columns = ref<
   {
     field: string;
     label: string;
-    width: number;
+    /** 空着表示按字段类型自动 */
+    width?: number | null;
     hidden: boolean;
     fixed: string;
   }[]
@@ -67,10 +68,13 @@ const record = (value: unknown): Record<string, unknown> =>
     : {};
 const config = () => ({
   list: {
-    columns: columns.value.map(({ label: _label, fixed, ...column }) => ({
-      ...column,
-      ...(fixed ? { fixed } : {})
-    })),
+    columns: columns.value.map(
+      ({ label: _label, fixed, width, ...column }) => ({
+        ...column,
+        ...(typeof width === "number" ? { width } : {}),
+        ...(fixed ? { fixed } : {})
+      })
+    ),
     keyWords: options.keyWords,
     filterable: options.filterable,
     defaultSort: options.sorting,
@@ -115,9 +119,9 @@ function fill(value: unknown) {
         field,
         label: original.label,
         width:
-          typeof saved.width === "number"
+          typeof saved.width === "number" && saved.width !== 160
             ? saved.width
-            : (original.width ?? 160),
+            : original.width,
         hidden: saved.hidden === true,
         fixed: ["left", "right"].includes(String(saved.fixed))
           ? String(saved.fixed)
@@ -535,6 +539,9 @@ async function previewHistory(id: string) {
                 v-model="row.width"
                 :min="40"
                 :max="800"
+                :value-on-clear="null"
+                :placeholder="t('crud.widthAuto')"
+                controls-position="right"
                 :disabled="busy" /></template
           ></el-table-column>
           <el-table-column :label="t('pageConfig.hidden')" width="95"

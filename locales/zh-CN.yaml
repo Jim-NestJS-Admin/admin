@@ -26,6 +26,10 @@ search:
   pureEmpty: 暂无搜索结果
   purePlaceholder: 搜索菜单（支持拼音搜索）
 panel:
+  pureComponentSize: 组件尺寸
+  pureSizeLarge: 大
+  pureSizeDefault: 默认
+  pureSizeSmall: 小
   pureSystemSet: 系统配置
   pureCloseSystemSet: 关闭配置
   pureClearCacheAndToLogin: 清空缓存并返回登录页
@@ -122,12 +126,15 @@ crud:
   apply: 应用
   filter: 分类筛选
   search: 搜索
+  clear: 清空
   keyword: 关键字
   keywordHint: 搜索{fields}
   resetSearch: 重置
   booleanYes: 是
   booleanNo: 否
   refresh: 刷新
+  columnsShown: "列显示（{count}/{total}）"
+  columnsTip: 拖动调整顺序，按账号保存，换电脑也保留
   columns: 列设置
   actions: 操作
   density: 表格密度
@@ -135,6 +142,7 @@ crud:
   default: 标准
   large: 宽松
   width: 列宽
+  widthAuto: 自动
   fixed: 固定列
   unfixed: 不固定
   left: 左侧
@@ -190,14 +198,17 @@ system:
     page: 页面
     button: 按钮
 
+  switchOrganization: 切换组织
+  switching: 正在切换…
   changePassword: 修改密码
   oldPassword: 原密码
   newPassword: 新密码
-  filterDefaultOrg: 按默认组织筛选
-  filterScope: 按角色作用组织筛选
-  filterDictionary: 按字典类型筛选
-  filterChildren: 查看直属下级
-  showAll: 显示全部
+  filterDefaultOrg: 组织架构
+  filterScope: 作用范围
+  filterDictionary: 字典类型
+  filterChildren: 上级
+  showAll: 全部
+  refreshTree: 刷新
 
 fieldPerm:
   title: 字段权限

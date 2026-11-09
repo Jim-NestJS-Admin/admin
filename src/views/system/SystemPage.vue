@@ -15,6 +15,8 @@ import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SearchIcon from "~icons/ri/search-line";
 import AddIcon from "~icons/ri/add-circle-line";
 import KeyIcon from "~icons/ri/key-2-line";
+import AllIcon from "~icons/ri/apps-line";
+import TreeRefreshIcon from "~icons/ri/refresh-line";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import type { CrudCell, CrudRecord } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
@@ -48,6 +50,8 @@ const users = ref<Option[]>([]),
 const loadError = ref("");
 const treeSearch = ref("");
 const treeRef = ref<TreeInstance>();
+/** 左侧树当前选中的节点；空表示全部 */
+const treeSelected = ref("");
 const treeFields: Partial<Record<SystemResource, string>> = {
   user: "defaultOrgId",
   "user-role": "scopeOrgId",
@@ -339,50 +343,76 @@ function cell(row: CrudRecord, field: string): CrudCell {
       :cell="cell"
     >
       <template v-if="treeField" #tree="{ filter }">
-        <div class="tree-header">
-          <span class="tree-caption">{{
-            t(
-              resource === "user"
-                ? "system.filterDefaultOrg"
-                : resource === "user-role"
-                  ? "system.filterScope"
-                  : resource === "dict-item"
-                    ? "system.filterDictionary"
-                    : "system.filterChildren"
-            )
-          }}</span>
-          <el-button
-            link
-            type="primary"
-            @click="
-              () => {
-                treeRef?.setCurrentKey(undefined);
-                filter(treeField, undefined);
-              }
-            "
-            >{{ t("system.showAll") }}</el-button
-          >
-        </div>
-        <el-input
-          v-model="treeSearch"
-          :placeholder="t('crud.search')"
-          :prefix-icon="useRenderIcon(SearchIcon)"
-          clearable
-          class="tree-search"
-        />
-        <el-tree
-          ref="treeRef"
-          :data="treeNodes"
-          node-key="id"
-          default-expand-all
-          highlight-current
-          :filter-node-method="
-            (value, node) =>
-              node.label.toLowerCase().includes(String(value).toLowerCase())
-          "
-          :expand-on-click-node="false"
-          @node-click="node => filter(treeField, node.id)"
-        />
+        <!-- 左侧树（参考 xinliwei）：标题 + 全部 / 刷新，搜索框，树 -->
+        <aside class="side">
+          <div class="side-header">
+            <span class="side-title">{{
+              t(
+                resource === "user"
+                  ? "system.filterDefaultOrg"
+                  : resource === "user-role"
+                    ? "system.filterScope"
+                    : resource === "dict-item"
+                      ? "system.filterDictionary"
+                      : "system.filterChildren"
+              )
+            }}</span>
+            <div class="side-actions">
+              <el-tooltip :content="t('system.showAll')" placement="top">
+                <el-button
+                  link
+                  :type="treeSelected ? 'default' : 'primary'"
+                  :icon="useRenderIcon(AllIcon)"
+                  :aria-label="t('system.showAll')"
+                  @click="
+                    () => {
+                      treeSelected = '';
+                      treeRef?.setCurrentKey(undefined);
+                      filter(treeField, undefined);
+                    }
+                  "
+                />
+              </el-tooltip>
+              <el-tooltip :content="t('system.refreshTree')" placement="top">
+                <el-button
+                  link
+                  type="primary"
+                  :icon="useRenderIcon(TreeRefreshIcon)"
+                  :aria-label="t('system.refreshTree')"
+                  @click="loadOptions"
+                />
+              </el-tooltip>
+            </div>
+          </div>
+          <div class="side-search">
+            <el-input
+              v-model="treeSearch"
+              :placeholder="t('crud.search')"
+              :prefix-icon="useRenderIcon(SearchIcon)"
+              clearable
+            />
+          </div>
+          <el-scrollbar class="side-tree">
+            <el-tree
+              ref="treeRef"
+              :data="treeNodes"
+              node-key="id"
+              default-expand-all
+              highlight-current
+              :filter-node-method="
+                (value, node) =>
+                  node.label.toLowerCase().includes(String(value).toLowerCase())
+              "
+              :expand-on-click-node="false"
+              @node-click="
+                node => {
+                  treeSelected = node.id;
+                  filter(treeField, node.id);
+                }
+              "
+            />
+          </el-scrollbar>
+        </aside>
       </template>
       <template #toolbar="{ reload }">
         <template v-if="resource === 'user'">
@@ -610,20 +640,53 @@ function cell(row: CrudRecord, field: string): CrudCell {
   min-height: 0;
 }
 
-.tree-header {
+.side {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
-.tree-caption {
-  font-weight: 700;
+.side-header {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.side-title {
+  font-weight: 600;
   color: var(--el-text-color-primary);
 }
 
-.tree-search {
-  margin-bottom: 8px;
+.side-actions {
+  display: flex;
+  align-items: center;
+}
+
+.side-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.side-search {
+  flex-shrink: 0;
+  padding: 10px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.side-tree {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 5px 10px;
+}
+
+.side-tree :deep(.el-tree-node__content) {
+  height: 36px;
+  border-radius: 6px;
 }
 
 .system-resource :deep(.el-dialog .el-select),

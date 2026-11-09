@@ -164,6 +164,7 @@ declare global {
       showModel?: string;
       multiTagsCache?: boolean;
       stretch?: boolean | number;
+      size?: "large" | "default" | "small";
     };
     tags?: Array<any>;
   }

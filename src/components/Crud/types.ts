@@ -35,7 +35,8 @@ export interface CrudQuery {
 export interface CrudColumnChoice {
   field: string;
   visible: boolean;
-  width: number;
+  /** 不设置时按字段类型自动 */
+  width?: number;
   fixed: false | "left" | "right";
 }
 export interface CrudChoices {

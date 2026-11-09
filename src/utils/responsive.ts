@@ -31,7 +31,8 @@ export const injectResponsiveStorage = (app: App, config: PlatformConfigs) => {
         showLogo: config.ShowLogo ?? true,
         showModel: config.ShowModel ?? "smart",
         multiTagsCache: config.MultiTagsCache ?? false,
-        stretch: config.Stretch ?? false
+        stretch: config.Stretch ?? false,
+        size: "default"
       }
     },
     config.MultiTagsCache

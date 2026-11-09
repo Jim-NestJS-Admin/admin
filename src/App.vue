@@ -6,12 +6,16 @@ import { ReDialog } from "@/components/ReDialog";
 import en from "element-plus/es/locale/lang/en";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useGlobal } from "@pureadmin/utils";
+const { $storage } = useGlobal<GlobalPropertiesApi>();
+/** 全局组件尺寸：系统配置面板里设置 */
+const size = computed(() => $storage?.configure?.size ?? "default");
 const user = useUserStoreHook();
 const { locale } = useI18n();
 const currentLocale = computed(() => (locale.value === "zh" ? zhCn : en));
 </script>
 <template>
-  <el-config-provider :locale="currentLocale"
+  <el-config-provider :locale="currentLocale" :size="size"
     ><router-view
       v-if="!user.transitioning"
       :key="user.isAuthenticated ? user.epoch : 'public'" /><el-skeleton
