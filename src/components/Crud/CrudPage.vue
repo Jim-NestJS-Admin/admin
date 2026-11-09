@@ -687,7 +687,10 @@ defineExpose({ reload: view.initialize });
     <component
       :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
-      width="min(820px, 100vw)"
+      :width="
+        schema?.children?.length ? 'min(1080px, 96vw)' : 'min(720px, 96vw)'
+      "
+      class="crud-editor"
       :title="
         t(
           editor.readOnly
@@ -725,7 +728,8 @@ defineExpose({ reload: view.initialize });
       />
       <el-form
         class="crud-editor-form"
-        label-position="top"
+        :label-position="mobile ? 'top' : 'right'"
+        label-width="110px"
         @submit.prevent="view.save"
       >
         <el-form-item
@@ -898,6 +902,13 @@ defineExpose({ reload: view.initialize });
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 16px;
+  padding: 8px 8px 0 0;
+}
+
+.crud-editor-form :deep(.el-select),
+.crud-editor-form :deep(.el-input-number),
+.crud-editor-form :deep(.el-date-editor) {
+  width: 100%;
 }
 
 .crud-editor-form :deep(.el-form-item) {

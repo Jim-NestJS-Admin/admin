@@ -529,7 +529,11 @@ function cell(row: CrudRecord, field: string): CrudCell {
       "
     >
       <el-alert v-if="error" :title="error" type="error" :closable="false" />
-      <el-form label-position="top" @submit.prevent="submit">
+      <el-form
+        label-position="right"
+        label-width="100px"
+        @submit.prevent="submit"
+      >
         <template v-if="dialog === 'create'">
           <el-form-item :label="t('admin.account')" required
             ><el-input

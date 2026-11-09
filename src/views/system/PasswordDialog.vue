@@ -100,7 +100,7 @@ async function save() {
     @close="emit('update:modelValue', false)"
   >
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
-    <el-form label-position="top" @submit.prevent="save">
+    <el-form label-position="right" label-width="100px" @submit.prevent="save">
       <el-form-item :label="t('system.oldPassword')" required
         ><el-input
           v-model="form.oldPassword"
