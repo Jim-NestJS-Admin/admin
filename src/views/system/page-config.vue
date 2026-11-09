@@ -678,6 +678,16 @@ async function previewHistory(id: string) {
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  padding: 16px 20px;
+  background: var(--el-bg-color);
+  border-radius: 4px;
+}
+
+.config-toolbar h2 {
+  margin: 0 8px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
 }
 
 .config-toolbar {

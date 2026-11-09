@@ -9,7 +9,3 @@ const { port, permissions } = generatedCrud({{operationPrefixJson}}, {{resourceJ
     <CrudPage :port="port" :permissions="permissions" :page-key="{{pageKeyExpression}}" />
   </div>
 </template>
-
-<style scoped>
-.generated-page { height: calc(100vh - 160px); min-height: 280px; }
-</style>

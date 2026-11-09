@@ -429,6 +429,13 @@ onMounted(async () => {
   min-width: 0;
 }
 
+/* 单独作为页面（字段权限菜单）时是一张卡片；嵌在模块配置的页签里时不加 */
+.field-permissions.main-content {
+  padding: 16px 20px;
+  background: var(--el-bg-color);
+  border-radius: 4px;
+}
+
 .field-toolbar {
   display: flex;
   flex-wrap: wrap;

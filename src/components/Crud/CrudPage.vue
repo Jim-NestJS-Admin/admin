@@ -42,27 +42,30 @@ import {
 } from "./model.mjs";
 import { useCrud } from "./useCrud";
 import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
-const props = defineProps<{
-  port: CrudPort;
-  pageKey: string;
-  permissions?: {
-    create?: string;
-    info?: string;
-    update?: string;
-    remove?: string;
-    recycle?: string;
-    restore?: string;
-    purge?: string;
-    export?: string;
-  };
-  cell?: (row: CrudRecord, field: string) => CrudCell;
-  childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
-  /** 撑满内容区（默认）：只有表格内部滚动，整页不滚动 */
-  fill?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    port: CrudPort;
+    pageKey: string;
+    permissions?: {
+      create?: string;
+      info?: string;
+      update?: string;
+      remove?: string;
+      recycle?: string;
+      restore?: string;
+      purge?: string;
+      export?: string;
+    };
+    cell?: (row: CrudRecord, field: string) => CrudCell;
+    childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
+    /** 撑满内容区（默认）：只有表格内部滚动，整页不滚动 */
+    fill?: boolean;
+  }>(),
+  { fill: true }
+);
 const { t } = useI18n();
 const slots = useSlots();
-const fill = computed(() => props.fill !== false);
+const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const mobile = useMediaQuery("(max-width: 760px)");

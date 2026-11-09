@@ -12,6 +12,8 @@ import Avatar from "@/assets/login/avatar.svg?component";
 import Illustration from "@/assets/login/illustration.svg?component";
 import User from "~icons/ri/user-3-fill";
 import Lock from "~icons/ri/lock-fill";
+import { getConfig } from "@/config";
+const TITLE = getConfig("Title");
 const { t, locale } = useI18n();
 const router = useRouter();
 const account = ref("");
@@ -94,7 +96,7 @@ async function signIn() {
       <section class="login-box" aria-labelledby="login-title">
         <div class="login-form">
           <Avatar class="avatar" aria-hidden="true" />
-          <h2 id="login-title">PureAdmin</h2>
+          <h2 id="login-title">{{ TITLE }}</h2>
           <el-alert
             v-if="!gatewayReady()"
             :title="t('admin.serviceUnavailable')"

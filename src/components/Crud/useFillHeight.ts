@@ -11,8 +11,18 @@ export function useFillHeight(target: Ref<HTMLElement | undefined>, min = 320) {
     const el = target.value;
     if (!el) return;
     const wrap = el.closest(".el-scrollbar__wrap") as HTMLElement | null;
-    const style = getComputedStyle(el);
-    const marginBottom = parseFloat(style.marginBottom) || 0;
+    const wrapEl = el.closest(".el-scrollbar__wrap");
+    // 自己和祖先（到滚动容器为止）的下外边距、祖先的下内边距，例如布局给页面根元素的 margin: 24px
+    let marginBottom = 0;
+    for (
+      let node: HTMLElement | null = el;
+      node && node !== wrapEl;
+      node = node.parentElement
+    ) {
+      const style = getComputedStyle(node);
+      marginBottom += parseFloat(style.marginBottom) || 0;
+      if (node !== el) marginBottom += parseFloat(style.paddingBottom) || 0;
+    }
     if (!wrap) {
       const top = el.getBoundingClientRect().top + window.scrollY;
       height.value = Math.max(min, window.innerHeight - top - marginBottom);
