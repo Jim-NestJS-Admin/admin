@@ -6,7 +6,13 @@ defineProps<{ disabled: boolean }>();
 const { t } = useI18n();
 let dragged = -1;
 function move(index: number, target: number) {
-  if (index < 0 || target < 0 || target >= rows.value.length) return;
+  if (
+    index < 0 ||
+    index >= rows.value.length ||
+    target < 0 ||
+    target >= rows.value.length
+  )
+    return;
   const [row] = rows.value.splice(index, 1);
   rows.value.splice(target, 0, row);
 }
