@@ -245,7 +245,14 @@ async function load() {
   }
 }
 function move(rows: unknown[], index: number, target: number) {
-  if (busy.value || target < 0 || target >= rows.length) return;
+  if (
+    busy.value ||
+    index < 0 ||
+    index >= rows.length ||
+    target < 0 ||
+    target >= rows.length
+  )
+    return;
   const [row] = rows.splice(index, 1);
   rows.splice(target, 0, row);
 }
