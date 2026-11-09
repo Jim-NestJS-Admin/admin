@@ -199,6 +199,17 @@ export const pageSize = schema =>
         : 20
     )
   );
+export function formPresentation(schema, field) {
+  const form = schema?.view?.form;
+  const item = Array.isArray(form?.items)
+    ? form.items.find(item => item.field === field)
+    : undefined;
+  return {
+    mode: form?.mode === "dialog" ? "dialog" : "drawer",
+    span: item?.span === 12 ? 12 : 24,
+    group: typeof item?.group === "string" ? item.group : ""
+  };
+}
 export function cellText(cell, dictionary) {
   if (cell.state === "hidden") return "—";
   if (cell.state === "masked")

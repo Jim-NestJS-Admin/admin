@@ -10,10 +10,15 @@ import {
 import { useI18n } from "vue-i18n";
 import { useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
-import { ElMessageBox } from "element-plus";
+import { ElMessageBox, ElDrawer, ElDialog } from "element-plus";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
-import { cellText, columnChoices, defaultCell } from "./model.mjs";
+import {
+  cellText,
+  columnChoices,
+  defaultCell,
+  formPresentation
+} from "./model.mjs";
 import { useCrud } from "./useCrud";
 import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
 const props = defineProps<{
@@ -535,8 +540,10 @@ defineExpose({ reload: view.initialize });
         }}</el-button></template
       >
     </el-drawer>
-    <el-drawer
+    <component
+      :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
+      width="min(820px, 100vw)"
       :title="
         t(
           editor.readOnly
@@ -572,11 +579,22 @@ defineExpose({ reload: view.initialize });
         type="warning"
         :closable="false"
       />
-      <el-form label-position="top" @submit.prevent="view.save">
+      <el-form
+        class="crud-editor-form"
+        label-position="top"
+        @submit.prevent="view.save"
+      >
         <el-form-item
           v-for="item in formItems"
           :key="item.field"
-          :label="item.label"
+          :label="
+            formPresentation(schema, item.field).group
+              ? `${formPresentation(schema, item.field).group} / ${item.label}`
+              : item.label
+          "
+          :class="{
+            'half-field': formPresentation(schema, item.field).span === 12
+          }"
           :required="item.required && writable(item)"
           :error="fields[item.field]?.map(message => t(message)).join('；')"
         >
@@ -706,11 +724,31 @@ defineExpose({ reload: view.initialize });
           >{{ t("crud.save") }}</el-button
         ></template
       >
-    </el-drawer>
+    </component>
   </section>
 </template>
 
 <style scoped lang="scss">
+.crud-editor-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
+.crud-editor-form :deep(.el-form-item) {
+  grid-column: 1 / -1;
+}
+
+.crud-editor-form :deep(.el-form-item.half-field) {
+  grid-column: auto;
+}
+
+@media (width <= 760px) {
+  .crud-editor-form :deep(.el-form-item.half-field) {
+    grid-column: 1 / -1;
+  }
+}
+
 .crud-page {
   height: 100%;
   min-height: 0;
