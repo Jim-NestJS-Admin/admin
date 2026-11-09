@@ -13,6 +13,8 @@ import type { TreeInstance } from "element-plus";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SearchIcon from "~icons/ri/search-line";
+import AddIcon from "~icons/ri/add-circle-line";
+import KeyIcon from "~icons/ri/key-2-line";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import type { CrudCell, CrudRecord } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
@@ -387,11 +389,13 @@ function cell(row: CrudRecord, field: string): CrudCell {
           <el-button
             v-perm="permission('systemUserCreate')"
             type="primary"
+            :icon="useRenderIcon(AddIcon)"
             @click="openDialog('create', reload)"
             >{{ t("crud.add") }}</el-button
           >
           <el-button
             v-perm="permission('systemUserResetPassword')"
+            :icon="useRenderIcon(KeyIcon)"
             @click="openDialog('reset', reload)"
             >{{ t("system.resetPassword") }}</el-button
           >
