@@ -10,7 +10,10 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
 
-const props = defineProps<{ mode: "role" | "default" }>();
+const props = defineProps<{
+  mode: "role" | "default";
+  resourceFilter?: string;
+}>();
 const { t } = useI18n();
 const user = useUserStoreHook();
 type Entry = OperationResponse<"systemFieldOverview">["data"]["fields"][number];
@@ -133,7 +136,9 @@ async function load() {
           )
         : await api.systemFieldOverview({}, { signal: request.signal });
     if (request.signal.aborted || turn !== serial) return;
-    rows.value = result.data.fields;
+    rows.value = result.data.fields.filter(
+      row => !props.resourceFilter || row.resource === props.resourceFilter
+    );
     baseline = new Map(rows.value.map(row => [key(row), stateValue(row)]));
   } catch (reason) {
     if (!request.signal.aborted && turn === serial) showError(reason);

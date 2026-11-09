@@ -326,3 +326,33 @@ codegen:
   confirmDelete: 只删除生成配置，不删除已生成的代码。确定继续？
   invalidFields: 字段配置需完整且名称唯一，最多200项；属性/列名必须符合标识符规则。
   invalidDownload: 后端未返回有效压缩包
+
+pageConfig:
+  title: 模块配置
+  version: "当前版本 {version}"
+  versionLabel: 版本
+  history: 修改历史
+  list: 列表页
+  form: 表单
+  pageSize: 每页条数
+  keyWords: 搜索框字段
+  filterable: 筛选字段
+  tree: 显示树表
+  sort: 排序字段
+  order: 排序方向
+  asc: 升序
+  desc: 降序
+  addSort: 添加排序
+  reorder: 调整顺序
+  hidden: 隐藏列
+  preview: 效果预览
+  group: 分组名称
+  span: 字段宽度
+  half: 半行
+  full: 整行
+  placeholder: 输入提示
+  dialog: 弹窗
+  drawer: 抽屉
+  changedBy: 修改人
+  date: 修改时间
+  confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。

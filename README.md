@@ -105,3 +105,17 @@ dev/codegen接入正式devCodegen接口：导入表/新建配置、三种模板�
 导航组件键dev/codegen，后端未启用开发工具时会返回404。现有后端配置/返回大量为通用JSON，前端只维护编辑器草稿，经生成客户端发送，由后端最终校验；未手写后台DTO。字段类型、组件、字段安全JSON可编辑，复杂规则按契约由后端拒绝。T21前端文件渲染待Claude接收T13的codegen-templates模板。ZIP成功响应缺binary描述，目前通过生成操作的responseType/responseMode传输选项适配，并已交接补文档。T25二进制重放问题已交后端修正。
 
 类型检查、lint、构建通过；字段配置往返与非法输入测试已写未执行。未在本机执行生成/覆盖文件、未做浏览器/HTTP测试。设计依据见docs/configuration-ui.md。
+
+## T24 模块配置（2026-11-09，代码阶段）
+
+system/page-config从字段清单选择资源，提供字段安全配置、列表显示和表单三个页签。显示配置通过生成的systemPageConfig接口按版本保存，可读取历史、预览、恢复、回到代码默认；字段安全配置复用T17独立接口，不能通过显示配置放宽权限。列/表单支持拖动与键盘上下按钮，右侧结构预览不使用假业务数据；旧历史响应受上下文版本限制。保存失败保留草稿与幂等键。
+
+通用CRUD进一步读取schema.view的表单dialog/drawer、分组与12/24跨度，手机断点改为整行。模板和导航仍保留Pure底座。接口来自T13快照server7f2e837，schema.view及配置响应部分仍为通用JSON，只做编辑器内部视图状态，不另手写后端DTO。
+
+类型检查、lint、构建通过；显示白名单测试已写未执行。未做浏览器验收、未执行迁移或切换主线。界面依据见docs/configuration-ui.md。
+
+## 前端集成分支（2026-11-09）
+
+Jimmy授权把T13（9bffad3）、T22（2db92f8）、T24（2a5be1d）合到codex/frontend-integration。工作目录admin-integration。保留生成器dev/codegen和模块配置system/page-config两个组件键，语言包与交接说明均完整保留。类型/lint/build集中检查；单元、e2e、浏览器测试仍留到统一验收。后端契约来源server-t13 7f2e837。
+
+这是独立集成分支，不包含T09的待修核心幂等集成，不自动切换main或当前本地运行服务。生成器前端renderer和后端修正仍按信箱交接执行。

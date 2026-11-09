@@ -3,6 +3,8 @@ import { useUserStoreHook } from "@/store/modules/user";
 // 只注册实际实现的业务页，T14/T13 添加页面时显式扩展，禁止任意组件路径。
 export const navigationViews = new Map<string, () => Promise<unknown>>([
   ["dev/codegen", () => import("@/views/dev/codegen.vue")],
+
+  ["system/page-config", () => import("@/views/system/page-config.vue")],
   ["system/field", () => import("@/views/system/field.vue")],
   ["system/user", () => import("@/views/system/user.vue")],
   ["system/role", () => import("@/views/system/role.vue")],
