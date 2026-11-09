@@ -269,3 +269,60 @@ query:
     between: 区间
     isNull: 为空
     notNull: 不为空
+
+codegen:
+  title: 代码生成
+  choose: 选择已保存配置
+  developmentOnly: 仅开发环境可用。只生成文件，不自动执行建表、安装或发布。
+  configuration: 生成配置
+  readTables: 读取可导入表
+  importTable: 导入已有表
+  moduleName: 模块标识
+  businessName: 业务标识
+  titleLabel: 显示名称
+  permissionPrefix: 权限前缀
+  tableName: 数据库表名
+  single: 单表
+  tree: 树表
+  masterDetail: 主子表
+  soft: 软删除
+  hard: 物理删除
+  dialog: 弹窗表单
+  drawer: 抽屉表单
+  scope: 启用组织数据权限
+  parent: 父级字段
+  nodeName: 节点名称字段
+  sort: 顺序字段（可选）
+  fieldHelp: 类型可填string/int/decimal/money/date/datetime/boolean/json；组件按后端契约填写；字段安全设置为JSON。保存时由后端再次校验。
+  addField: 添加字段
+  property: 属性名
+  column: 数据库列名
+  label: 显示名称
+  kind: 数据类型
+  widget: 表单组件
+  query: 查询方式
+  dictionary: 字典标识
+  security: 字段权限JSON
+  size: 长度
+  optional: 可为空
+  listed: 列表显示
+  editable: 表单显示
+  required: 必填
+  unique: 唯一
+  order: 调整顺序
+  addChild: 添加子表
+  childTable: 子表名
+  foreignKey: 子表关联字段
+  pagePreview: 页面结构预览
+  preview: 预览代码
+  previewRequired: 保存当前配置后重新预览。覆盖已修改的文件必须逐项勾选，预览过期时需重新生成。
+  file: 文件
+  overwrite: 明确覆盖
+  sync: 比较表结构
+  syncNotice: 以下只显示结构差异，不自动修改数据库或覆盖字段配置。
+  download: 下载ZIP
+  write: 确认写入文件
+  confirmWrite: 将写入以下文件。不会执行迁移、安装依赖或提交代码，是否继续？
+  confirmDelete: 只删除生成配置，不删除已生成的代码。确定继续？
+  invalidFields: 字段配置需完整且名称唯一，最多200项；属性/列名必须符合标识符规则。
+  invalidDownload: 后端未返回有效压缩包
