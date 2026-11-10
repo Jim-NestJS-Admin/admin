@@ -31,6 +31,15 @@ const config = (context: CrudMutation) => ({
   signal: context.signal,
   headers: { "Idempotency-Key": context.idempotencyKey }
 });
+/** 导出的日期时间按浏览器时区格式化，和列表显示一致；取不到时交给服务器默认 */
+function browserTimeZone(): { timeZone?: string } {
+  try {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return zone ? { timeZone: zone } : {};
+  } catch {
+    return {};
+  }
+}
 export function generatedCrud(prefix: string, resource = "") {
   const operation = (suffix: string) => `${prefix}${suffix}` as Operation;
   const available = (suffix: string) => Object.hasOwn(api, operation(suffix));
@@ -126,7 +135,8 @@ export function generatedCrud(prefix: string, resource = "") {
                 body: {
                   ...body(query),
                   format: options?.format ?? "csv",
-                  ...(options?.columns ? { columns: options.columns } : {})
+                  ...(options?.columns ? { columns: options.columns } : {}),
+                  ...browserTimeZone()
                 }
               },
               { signal }

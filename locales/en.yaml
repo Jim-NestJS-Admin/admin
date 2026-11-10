@@ -319,63 +319,201 @@ query:
     notNull: Is not null
 
 codegen:
-  manualStepsPreview: Manual steps are still required after generation. Preview and write do not execute them.
-  manualStepsAfterWrite: Files written. Complete these manual steps before the feature is ready.
   title: Code generator
-  choose: Choose saved configuration
-  developmentOnly: Development only. Generates files without running migrations, installs or deployments.
-  configuration: Configuration
-  readTables: Read available tables
-  importTable: Import existing table
-  moduleName: Module key
-  businessName: Business key
+  developmentOnly: Development only. Generates files; never creates tables, installs packages or deploys.
+  newModule: New module
+  editModule: Edit module
+  searchHint: Search name, module or table
+  emptyList: No modules yet. Click "New module" to start.
+  confirmDelete: Delete only the generator configuration of "{name}"? Generated code is kept.
+  deleted: Deleted
   titleLabel: Display name
+  moduleKey: Module key
+  tableName: Table name
+  template: Template
+  fieldCount: Fields
+  status: Status
+  updatedAt: Updated
+  templates:
+    single: Single table
+    tree: Tree
+    masterDetail: Master-detail
+  templateTips:
+    single: One table, one list page. Most common.
+    tree: Hierarchical data with a parent, such as categories.
+    masterDetail: A document with detail rows, such as orders and order lines.
+  statuses:
+    notGenerated: Not generated
+    generated: Generated
+    modified: Changed since generation
+    invalid: Invalid
+  steps:
+    source: Source
+    table: Table
+    fields: Fields
+    relations: Relations
+    options: Options
+    generate: Preview & generate
+  invalidRecord: This configuration cannot be read. Import or fill it in again; saving replaces it. Or delete it from the list.
+  modifiedChoose: "These files were edited after the last generation and are skipped by default. Checked files will be overwritten:"
+  overwriteThis: Overwrite this file
+  overwriteChosenTip: "Marked for overwrite. The edited file will be replaced by the generated content. Differences are shown below."
+  backToList: Back to list
+  unsaved: Unsaved
+  pagePreview: Page preview
+  sourceNew: New table
+  sourceNewTip: Fill in the fields row by row; a create-table migration is generated.
+  sourceImport: Import existing tables
+  sourceImportTip: Read existing tables and infer fields from comments and types. The first table is the master, the others become detail tables.
+  sourceLocked: This configuration is saved; its source can no longer change. Edit it in the following steps.
+  searchTable: Search table or comment
+  importTip: Up to 6 tables; the order you pick decides master and details
+  noTables: No importable tables (system tables and configured tables are hidden)
+  tableComment: Comment
+  importAs: Import as
+  mainTable: Master
+  childTable: Detail table
+  detail: Details
+  pickLimit: Pick at most 6 tables
+  importAndNext: Import {count} tables and continue
+  sectionTable: Table and module
+  tableNameTip: Starts with a lowercase letter; lowercase letters, digits and underscores only; must not start with sys_. Module, business key and permission prefix are derived from it.
+  titlePlaceholder: e.g. Customers
+  moduleName: Module
+  businessName: Business key
   permissionPrefix: Permission prefix
-  tableName: Database table
-  single: Single table
-  tree: Tree table
-  masterDetail: Master-detail
-  soft: Soft delete
-  hard: Hard delete
-  dialog: Dialog form
-  drawer: Drawer form
-  scope: Organization data scope
-  parent: Parent field
-  nodeName: Node label field
-  sort: Sort field (optional)
-  fieldHelp: Types are string/int/decimal/money/date/datetime/boolean/json. Components follow the backend contract. Field permissions use JSON. The server validates all settings.
+  namesTip: Permission codes are "prefix:action", e.g. crm:customer:add.
+  resetNames: Derive from table name again
   addField: Add field
+  insertField: Insert
+  removeField: Delete
+  moveUp: Move up
+  moveDown: Move down
+  dragHint: Drag to reorder
+  fieldTotal: "{count} fields"
+  foreignKeyHint: The foreign key {name} to the master table is maintained by the framework; do not add it here
+  column: Column
+  columnPlaceholder: e.g. customer_name
+  kind: Type
+  length: Length
+  nullable: Nullable
+  defaultValue: Default
+  noDefault: None
+  boolYes: "Yes"
+  boolNo: "No"
+  comment: Comment
+  noFields: No fields yet
+  fieldProperties: Field properties
+  unnamed: Unnamed
+  pickField: Select a row to see its properties
   property: Property
-  column: Database column
+  propertyTip: Field name in code (camelCase), converted from the column by default
   label: Display name
-  kind: Data type
-  widget: Form component
-  query: Query mode
-  dictionary: Dictionary key
-  security: Field permissions JSON
-  size: Length
-  optional: Nullable
-  listed: Show in list
-  editable: Show in form
-  required: Required
+  typeHint: Database type {database}, default form control "{component}"
+  components:
+    input: Input
+    textarea: Text area
+    number: Number
+    select: Select
+    radio: Radio
+    checkbox: Checkbox
+    switch: Switch
+    date: Date
+    datetime: Date and time
+    image: Image
+    file: File
+    rich: Rich text
+    tree-select: Tree select
+    relation: Relation
+  precision: Precision (digits)
+  scale: Scale
+  dictionary: Dictionary
+  dictRequired: Required for the dictionary type
+  dictOptional: Optional; the list shows dictionary labels
+  dictUnknown: This code is not in the dictionary list; make sure it exists in Dictionaries
   unique: Unique
-  order: Reorder
-  addChild: Add child table
-  childTable: Child table
+  uniqueTip: Must not repeat within a tenant (deleted rows excluded)
+  fieldPerm: Default field permission
+  perm:
+    editable: Editable
+    readonly: Read-only
+    masked: Masked
+    hidden: Hidden
+  mask: Mask rule
+  masks:
+    phone: Phone
+    email: Email
+    idcard: ID card
+    last4: Last 4 only
+    all: Hide all
+  displayLater: List columns, search items, form controls and layout get defaults by type; adjust them in Module settings after generation.
+  childInRelations: Detail table names and foreign keys are edited in the Relations step
+  addChild: Add detail table
+  singleNoRelation: A single table needs no relations. Continue to the next step.
+  treeSection: Tree fields
+  treeTip: The parent field stores the parent record id (empty for roots); the name field is shown in the tree; the sort field is optional.
+  treeParent: Parent field
+  treeName: Name field
+  treeSort: Sort field
+  addTreeFields: Add missing tree fields
+  childSection: Detail tables
+  childTip: Each detail table links to the master by a foreign key that the framework creates and maintains. Up to 5 detail tables.
   foreignKey: Foreign key
-  pagePreview: Page structure preview
-  preview: Preview code
-  previewRequired: Save and preview the current configuration. Modified files require an explicit overwrite selection. Refresh an expired preview.
-  file: File
-  overwrite: Explicitly overwrite
-  sync: Compare table structure
-  syncNotice: Shows differences only. Does not change the database or replace field settings.
-  download: Download ZIP
-  write: Confirm file writes
-  confirmWrite: Write the following files? This will not run migrations, install dependencies or commit code.
-  confirmDelete: Delete this configuration only? Generated code will remain.
-  invalidFields: Complete all fields with unique, valid identifiers. Up to 200 fields.
-  invalidDownload: The server did not return a valid archive
+  childFields: "{count} fields, edit"
+  deleteMode: Delete mode
+  soft: Soft delete
+  softTip: Deleted rows go to the recycle bin and can be restored or purged (recommended)
+  hard: Hard delete
+  hardTip: Removed from the database immediately; cannot be restored
+  otherOptions: Other
+  scope: Organization data scope
+  scopeTip: Isolate data by organization; role data scopes apply
+  exportEnabled: Export
+  exportTip: The list toolbar offers Excel / CSV export
+  saveDraft: Save draft
+  draftSaved: Draft saved
+  checking: Checking…
+  checkPending: Checked when you continue
+  checkPassed: All checks passed
+  problems: "{count} problems to fix"
+  fixFirst: Fix the highlighted items first
+  prev: Previous
+  next: Next
+  leave: Leave page
+  leaveConfirm: You have unsaved changes; they will be lost.
+  leaveDiscard: Discard changes
+  leaveStay: Stay
+  repreview: Preview again
+  previewStale: The specification changed after the preview. Preview again before writing.
+  previewNote: Existing files that differ can be compared; files edited by hand are skipped by default.
+  sqlFile: Create-table SQL
+  sqlTip: For reading only. A migration file is generated; run the migration yourself after confirming.
+  projects:
+    server: Server
+    admin: Admin
+  actions:
+    create: New
+    overwrite: Overwrite
+    unchanged: Unchanged
+    skip-modified: Edited, skipped
+  viewDiff: Diff
+  viewCode: Code
+  copy: Copy
+  copied: Copied
+  copyFailed: Copy failed; select and copy manually
+  skipModifiedTip: This file was edited after the last generation and will be skipped, not overwritten. The differences are shown below.
+  skippedLines: "… {count} unchanged lines …"
+  write: Write files
+  writeCount: Write {count} files
+  confirmWrite: The following files will be written. Nothing is migrated, installed or committed.
+  written: Written
+  writePartial: Some files were not written
+  writeSummary: "{written} written, {skipped} skipped, {failed} failed"
+  writeFailed: Failed
+  writeSkipped: Skipped (edited by hand)
+  manualSteps: Still to do by hand
+  previewNotice: Sample data, matching the generated list, detail and add/edit forms. Add, edit and delete are not saved here.
+  previewNoSave: Changes in the preview are not saved
 
 pageConfig:
   title: Module settings
