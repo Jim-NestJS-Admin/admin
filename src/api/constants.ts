@@ -91,14 +91,21 @@ export const OPERATION_PERMISSIONS = {
   authRefresh: [],
   devCodegenDelete: ["dev:codegen:delete"],
   devCodegenDownload: ["dev:codegen:save"],
+  devCodegenFieldTypes: ["dev:codegen:save"],
   devCodegenImport: ["dev:codegen:save"],
+  devCodegenImportSpec: ["dev:codegen:save"],
   devCodegenInfo: ["dev:codegen:list"],
   devCodegenList: ["dev:codegen:list"],
   devCodegenPreview: ["dev:codegen:save"],
+  devCodegenPreviewSpec: ["dev:codegen:save"],
   devCodegenSave: ["dev:codegen:save"],
+  devCodegenSaveSpec: ["dev:codegen:save"],
+  devCodegenSchemaSpec: ["dev:codegen:save"],
   devCodegenSync: ["dev:codegen:save"],
   devCodegenTables: ["dev:codegen:save"],
+  devCodegenValidateSpec: ["dev:codegen:save"],
   devCodegenWrite: ["dev:codegen:write"],
+  devCodegenWriteSpec: ["dev:codegen:write"],
   fileAssetDownload: ["file:asset:read"],
   fileAssetInfo: ["file:asset:info"],
   fileAssetPage: ["file:asset:page"],
@@ -398,6 +405,12 @@ export const ENUMS = {
     "all"
   ],
   "components.schemas.MenuItemDto.properties.type": ["directory", "page"],
+  "components.schemas.ModuleSpec.properties.template": [
+    "single",
+    "tree",
+    "masterDetail"
+  ],
+  "components.schemas.ModuleSpec.properties.version": [1],
   "components.schemas.PermissionItem.properties.risk": ["normal", "high"],
   "components.schemas.QueryConditionDto.properties.op": [
     "eq",
@@ -415,6 +428,47 @@ export const ENUMS = {
     "notNull"
   ],
   "components.schemas.QueryGroupDto.properties.op": ["and", "or"],
+  "components.schemas.SpecField.properties.type": [
+    "string",
+    "text",
+    "int",
+    "decimal",
+    "money",
+    "date",
+    "datetime",
+    "boolean",
+    "json",
+    "dictionary",
+    "reference",
+    "image",
+    "file"
+  ],
+  "components.schemas.SpecFieldPerm.properties.default": [
+    "editable",
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.SpecFieldPerm.properties.mask": [
+    "phone",
+    "email",
+    "idcard",
+    "last4",
+    "all"
+  ],
+  "components.schemas.SpecFile.properties.action": [
+    "create",
+    "overwrite",
+    "unchanged",
+    "skip-modified"
+  ],
+  "components.schemas.SpecFile.properties.project": ["server", "admin"],
+  "components.schemas.SpecOptions.properties.deleteMode": ["soft", "hard"],
+  "components.schemas.SpecRecord.properties.status": [
+    "notGenerated",
+    "generated",
+    "modified"
+  ],
   "components.schemas.SystemDictItemExportBody.properties.format": [
     "csv",
     "xlsx"
