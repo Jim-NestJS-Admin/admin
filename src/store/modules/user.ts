@@ -21,6 +21,7 @@ export const useUserStore = defineStore("admin-user", {
     username: "",
     nickname: "",
     roles: [] as string[],
+    superAdmin: false,
     permissions: [] as string[],
     accessToken: "",
     expiresAt: 0,
@@ -61,6 +62,7 @@ export const useUserStore = defineStore("admin-user", {
       this.expiresAt = session.expiresAt;
       this.username = session.user.username;
       this.nickname = session.user.nickname ?? "";
+      this.superAdmin = session.superAdmin === true;
       this.organizationId = session.organizationId;
       this.organizations = session.organizations ?? [];
       this.authVersion = session.authVersion;
@@ -80,6 +82,7 @@ export const useUserStore = defineStore("admin-user", {
       this.username = "";
       this.nickname = "";
       this.roles = [];
+      this.superAdmin = false;
       this.permissions = [];
       this.menus = [];
       this.organizationId = "";

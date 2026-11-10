@@ -42,6 +42,19 @@ test("关联列表的查询、导出和保存不能切换归属，分页和请�
     context
   ]);
   assert.deepEqual((await port.describe(signal)).form, [{ field: "roleId" }]);
+  const described = await scopePort(
+    {
+      ...base,
+      describe: async () => ({
+        form: [{ field: "userId" }],
+        columns: [{ field: "userId" }, { field: "roleId" }],
+        query: [{ field: "userId" }, { field: "roleId" }]
+      })
+    },
+    { userId: "current" }
+  ).describe(signal);
+  assert.deepEqual(described.columns, [{ field: "roleId" }]);
+  assert.deepEqual(described.query, [{ field: "roleId" }]);
   assert.equal(query.equality.userId, "other");
   assert.equal(scopePort(base), base);
 });

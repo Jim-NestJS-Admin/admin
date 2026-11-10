@@ -15,8 +15,7 @@ import {
   ElDrawer,
   ElDialog,
   ElSplitter,
-  ElSplitterPanel,
-  useGlobalSize
+  ElSplitterPanel
 } from "element-plus";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SearchIcon from "~icons/ri/search-line";
@@ -30,6 +29,7 @@ import EditIcon from "~icons/ri/edit-line";
 import FilterIcon from "~icons/ri/filter-3-line";
 import RefreshIcon from "@/assets/table-bar/refresh.svg?component";
 import { useFillHeight } from "./useFillHeight";
+import { useHeadStyle } from "./useHeadStyle";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
@@ -69,16 +69,7 @@ const slots = useSlots();
 const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
-/** 标题栏高度跟随全局组件尺寸：左侧树标题栏和右侧工具栏共用，底边线才能对齐 */
-const globalSize = useGlobalSize();
-const headStyle = computed(() => {
-  const control = { large: 40, default: 32, small: 24 }[globalSize.value] ?? 32;
-  return {
-    "--crud-control-height": `${control}px`,
-    // 上下各留 8px，再加 1px 底边线；保证控件落在整数像素上，边线不发虚
-    "--crud-head-height": `${control + 17}px`
-  };
-});
+const headStyle = useHeadStyle();
 const mobile = useMediaQuery("(max-width: 760px)");
 const treeOpen = ref(false);
 const activeChild = ref("");

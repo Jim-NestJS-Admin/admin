@@ -9,9 +9,13 @@ export function scopePort(base, fixed) {
     ...base,
     describe: async signal => {
       const schema = await base.describe(signal);
+      // 固定归属的字段每行都相同：表单、列表列、查询项里都不再显示
+      const free = item => !(item.field in fixed);
       return {
         ...schema,
-        form: schema.form.filter(item => !(item.field in fixed))
+        form: schema.form.filter(free),
+        ...(schema.columns ? { columns: schema.columns.filter(free) } : {}),
+        ...(schema.query ? { query: schema.query.filter(free) } : {})
       };
     },
     list: (query, signal) => base.list(scopedQuery(query), signal),

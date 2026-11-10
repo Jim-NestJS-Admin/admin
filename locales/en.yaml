@@ -175,6 +175,20 @@ system:
   roleAssignments: Role assignments
   supervisors: Supervisors
   dictionaryItems: Dictionary items
+  dictionaries: Dictionaries
+  dictCode: Code
+  dictName: Name
+  dictCodeHint: Starts with a lowercase letter; lowercase letters, digits, _ . - allowed; 2-64 characters
+  addDictionary: New dictionary
+  editDictionary: Edit dictionary
+  noDictionary: No dictionaries yet
+  pickDictionary: Select a dictionary on the left first
+  disabled: Disabled
+  confirmRemoveDictionary: "Delete dictionary \"{name}\"?"
+  noItemPermission: You are not allowed to view dictionary items
+  dictKinds:
+    system: System
+    business: Business
   createUser: Create user
   resetPassword: Reset password
   chooseUser: Choose user
@@ -266,7 +280,7 @@ query:
   name: Query name
   save: Save query
   apply: Apply query
-  export: Export CSV
+  export: Export
   invalidNumber: Enter a valid number
   invalidBoolean: Choose yes or no
   invalidDate: Enter a valid date

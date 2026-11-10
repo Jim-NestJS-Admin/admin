@@ -17,6 +17,8 @@ export interface SessionSnapshot {
   accessToken: string;
   expiresAt: number;
   user: { id: string; username: string; nickname?: string };
+  /** 内置超级管理员：可以管理系统字典等平台级配置；后端仍独立鉴权 */
+  superAdmin?: boolean;
   organizationId: string;
   authVersion?: number;
   organizations?: { id: string; name: string; path: string[] }[];
