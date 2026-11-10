@@ -2921,6 +2921,7 @@ export type components = {
       action: "create" | "overwrite" | "unchanged" | "skip-modified";
       content: string;
       diff: string;
+      key: string;
       path: string;
       previous: string;
       /** @enum {string} */
@@ -2946,12 +2947,13 @@ export type components = {
       token: string;
     };
     SpecRecord: {
+      error?: string;
       id: string;
       label: string;
       name: string;
-      spec: components["schemas"]["ModuleSpec"];
+      spec?: components["schemas"]["ModuleSpec"];
       /** @enum {string} */
-      status: "notGenerated" | "generated" | "modified";
+      status: "notGenerated" | "generated" | "modified" | "invalid";
       updatedAt: string;
       version: number;
     };
@@ -4861,6 +4863,8 @@ export type components = {
     WriteSpecBody: {
       /** @description preview-spec 返回的 fingerprint */
       fingerprint: string;
+      /** @description 显式确认覆盖的文件key（project:path）或预览路径；其他手改文件继续跳过 */
+      overwrite?: string[];
       spec: components["schemas"]["ModuleSpec"];
     };
   };

@@ -467,7 +467,8 @@ export const ENUMS = {
   "components.schemas.SpecRecord.properties.status": [
     "notGenerated",
     "generated",
-    "modified"
+    "modified",
+    "invalid"
   ],
   "components.schemas.SystemDictItemExportBody.properties.format": [
     "csv",
