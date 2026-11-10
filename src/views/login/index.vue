@@ -13,6 +13,7 @@ import Illustration from "@/assets/login/illustration.svg?component";
 import User from "~icons/ri/user-3-fill";
 import Lock from "~icons/ri/lock-fill";
 import { getConfig } from "@/config";
+import { message } from "@/utils/message";
 const TITLE = getConfig("Title");
 /** 记住账号：只在本机保存账号，不保存密码（密码交给浏览器自带的密码管理） */
 const REMEMBER_KEY = "jna-remember-account";
@@ -40,8 +41,6 @@ const proof = ref("");
 const captchaId = ref("");
 const revision = ref(0);
 const busy = ref(false);
-const error = ref("");
-const fields = ref<string[]>([]);
 const retry = ref(0);
 const timer = setInterval(() => {
   if (retry.value > 0) retry.value--;
@@ -51,21 +50,11 @@ watch([account, locale], () => {
   proof.value = "";
   captchaId.value = "";
   revision.value++;
-  error.value = "";
-  fields.value = [];
-});
-// 重新输入验证码时清掉上一次的错误提示
-watch(proof, value => {
-  if (!value) return;
-  error.value = "";
-  fields.value = [];
 });
 async function signIn() {
   if (busy.value || retry.value > 0) return;
-  error.value = "";
-  fields.value = [];
   if (!gatewayReady()) {
-    error.value = t("admin.serviceUnavailable");
+    message(t("admin.serviceUnavailable"), { type: "error" });
     return;
   }
   if (
@@ -74,7 +63,7 @@ async function signIn() {
     !proof.value ||
     !captchaId.value
   ) {
-    error.value = t("admin.verificationRequired");
+    message(t("admin.verificationRequired"), { type: "warning" });
     return;
   }
   busy.value = true;
@@ -92,10 +81,14 @@ async function signIn() {
     const view = failureView(
       reason instanceof RequestFailure ? reason.failure : null
     );
-    error.value = view.message.startsWith("admin.")
+    // 和 Pure 一样用顶部消息提示，不在表单里堆红字
+    const text = view.message.startsWith("admin.")
       ? t(view.message)
       : view.message;
-    fields.value = view.fields;
+    message([text, ...view.fields].join("；"), {
+      type: "error",
+      duration: 3000
+    });
     retry.value = view.retrySeconds;
     // 只是验证码错了：保留密码，只重新输入验证码
     const data: { errors?: unknown } | null =
@@ -170,16 +163,14 @@ async function signIn() {
               @proof="proof = $event"
               @challenge="captchaId = $event"
             />
-            <el-checkbox v-model="remember" class="login-remember">{{
-              t("admin.rememberAccount")
-            }}</el-checkbox>
-            <div v-if="error" class="login-error" role="alert">
-              <p>{{ error }}</p>
-              <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
+            <div class="login-options">
+              <el-checkbox v-model="remember">{{
+                t("admin.rememberAccount")
+              }}</el-checkbox>
+              <span v-if="retry > 0" class="login-retry" role="status">{{
+                t("admin.retryAfter", { seconds: retry })
+              }}</span>
             </div>
-            <p v-if="retry > 0" role="status">
-              {{ t("admin.retryAfter", { seconds: retry }) }}
-            </p>
             <el-button
               class="login-submit"
               native-type="submit"
@@ -241,15 +232,17 @@ form {
   width: 100%;
 }
 
-/* 记住账号：靠左，和上下输入框的间距保持一致 */
-.login-remember {
-  justify-self: start;
-  height: auto;
+/* 记住账号一行（参考 Pure 的「记住密码 / 忘记密码」行）：贴近上方输入框 */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
   margin-top: -8px;
 }
 
-.login-error {
-  color: var(--el-color-danger);
-  text-align: left;
+.login-retry {
+  font-size: var(--el-font-size-small);
+  color: var(--el-text-color-secondary);
 }
 </style>
