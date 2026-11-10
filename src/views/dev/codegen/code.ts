@@ -128,7 +128,8 @@ export type Token = {
 /** 按文件名选语言：.sql / .ts / .vue / .json / .yaml，其余当纯文本 */
 export function languageOf(path: string) {
   if (path.endsWith(".sql")) return "sql";
-  if (/\.(ts|mts|js|mjs|vue|tsx)$/.test(path)) return "ts";
+  if (path.endsWith(".vue")) return "vue";
+  if (/\.(ts|mts|js|mjs|tsx)$/.test(path)) return "ts";
   if (path.endsWith(".json")) return "json";
   if (/\.ya?ml$/.test(path)) return "yaml";
   return "text";
@@ -143,6 +144,9 @@ const PATTERNS: Record<string, RegExp> = {
 
 /** 把一段代码切成带类别的片段；模板里逐段渲染成 span，不拼 HTML */
 export function tokenize(code: string, language: string): Token[] {
+  // .vue 和 .ts 用同一套规则，只有 .vue 把 <标签> 标成标签色（.ts 里的 <T> 是泛型）
+  const vue = language === "vue";
+  if (vue) language = "ts";
   const pattern = PATTERNS[language];
   if (!pattern) return [{ kind: "plain", text: code }];
   const tokens: Token[] = [];
@@ -164,7 +168,7 @@ export function tokenize(code: string, language: string): Token[] {
     if (language === "ts") {
       if (match[1]) push("comment", match[1]);
       else if (match[2]) push("string", match[2]);
-      else if (match[3]) push("tag", match[3]);
+      else if (match[3]) push(vue ? "tag" : "plain", match[3]);
       else if (match[4]) push("number", match[4]);
       else push(KEYWORDS.ts.has(match[5]) ? "keyword" : "plain", match[5]);
     } else if (language === "sql") {
