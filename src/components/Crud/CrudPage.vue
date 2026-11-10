@@ -189,6 +189,62 @@ const formItems = computed(
           readCell(editor.record, item.field).state !== "hidden"
     ) ?? []
 );
+/**
+ * 详情：表单里的字段 + 列表里有、表单里没有的字段（如创建时间），
+ * 类型取列表列的类型（没有列时按表单组件推断），和列表显示一致。
+ */
+const infoItems = computed(() => {
+  const record = editor.record,
+    current = schema.value;
+  if (!editor.readOnly || !record || !current) return [];
+  const typeOf = (field: string, component?: string) =>
+    current.columns.find(column => column.field === field)?.type ??
+    (component === "switch"
+      ? "boolean"
+      : component === "date" || component === "datetime"
+        ? component
+        : undefined);
+  const items: {
+    field: string;
+    label: string;
+    dict?: string;
+    type?: string;
+    wide: boolean;
+  }[] = [];
+  const seen = new Set<string>();
+  for (const item of current.form) {
+    if (readCell(record, item.field).state === "hidden") continue;
+    seen.add(item.field);
+    items.push({
+      field: item.field,
+      label: item.label,
+      dict: item.dict,
+      type: typeOf(item.field, item.component),
+      wide: item.component === "textarea"
+    });
+  }
+  for (const column of current.columns)
+    if (
+      !seen.has(column.field) &&
+      readCell(record, column.field).state !== "hidden"
+    )
+      items.push({
+        field: column.field,
+        label: column.label,
+        dict: column.dict,
+        type: column.type,
+        wide: false
+      });
+  return items;
+});
+/** 头像等图片地址在详情里直接显示图片 */
+function imageUrl(value: unknown) {
+  return typeof value === "string" &&
+    /^(https?:\/\/|\/|data:image\/)/.test(value) &&
+    /(^data:image\/|\.(png|jpe?g|gif|webp|svg)(\?.*)?$)/i.test(value)
+    ? value
+    : "";
+}
 function readCell(row: CrudRecord, field: string) {
   return (props.cell ?? defaultCell)(row, field);
 }
@@ -662,7 +718,9 @@ defineExpose({ reload: view.initialize });
               v-model:page-size="query.pageSize"
               background
               :page-sizes="
-                [10, 20, 50, 100].filter(size => size <= schema.maxSize)
+                [...new Set([10, 20, 50, 100, query.pageSize])]
+                  .filter(size => size <= schema.maxSize)
+                  .sort((a, b) => a - b)
               "
               :total="total"
               :size="choices.density === 'small' ? 'small' : 'default'"
@@ -709,10 +767,11 @@ defineExpose({ reload: view.initialize });
       :title="
         t(
           editor.readOnly
-            ? 'crud.info'
+            ? 'crud.infoOf'
             : editor.mode === 'add'
-              ? 'crud.add'
-              : 'crud.edit'
+              ? 'crud.addOf'
+              : 'crud.editOf',
+          { name: schema?.label ?? '' }
         )
       "
       :size="
@@ -741,7 +800,50 @@ defineExpose({ reload: view.initialize });
         type="warning"
         :closable="false"
       />
+      <!-- 详情：两列描述列表（Pure / Element 的 Descriptions），值和列表显示一致 -->
+      <el-descriptions
+        v-if="editor.readOnly && editor.record"
+        class="crud-info"
+        :column="mobile ? 1 : 2"
+        border
+      >
+        <el-descriptions-item
+          v-for="item in infoItems"
+          :key="item.field"
+          :label="item.label"
+          :span="item.wide && !mobile ? 2 : 1"
+          label-class-name="crud-info-label"
+        >
+          <el-tag
+            v-if="
+              item.type === 'boolean' &&
+              readCell(editor.record, item.field).state === 'visible' &&
+              typeof readCell(editor.record, item.field).display === 'boolean'
+            "
+            size="small"
+            effect="light"
+            :type="
+              readCell(editor.record, item.field).display ? 'success' : 'info'
+            "
+            >{{ display(editor.record, item) }}</el-tag
+          >
+          <el-avatar
+            v-else-if="imageUrl(readCell(editor.record, item.field).display)"
+            :size="40"
+            :src="imageUrl(readCell(editor.record, item.field).display)"
+          />
+          <span
+            v-else
+            :class="{
+              'crud-muted':
+                readCell(editor.record, item.field).state !== 'visible'
+            }"
+            >{{ display(editor.record, item) }}</span
+          >
+        </el-descriptions-item>
+      </el-descriptions>
       <el-form
+        v-else
         class="crud-editor-form"
         :label-position="mobile ? 'top' : 'right'"
         label-width="110px"
@@ -922,6 +1024,22 @@ defineExpose({ reload: view.initialize });
     flex: 1;
     width: auto;
   }
+}
+
+/* 详情：标签列固定宽度、浅灰底，值列铺满；下面的页签（关联数据）留出间距 */
+.crud-info {
+  margin-bottom: 20px;
+}
+
+.crud-info :deep(.crud-info-label) {
+  width: 120px;
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
+}
+
+.crud-info :deep(.el-descriptions__content) {
+  word-break: break-all;
 }
 
 .crud-editor-form {

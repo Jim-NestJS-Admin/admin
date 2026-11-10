@@ -174,6 +174,9 @@ crud:
   confirmPurge: 确定彻底删除选中的 {count} 条记录及其全部明细吗？此操作无法撤销。
   duplicateRow: 同组明细的唯一字段不能重复
   info: 详情
+  infoOf: "{name}详情"
+  addOf: "新增{name}"
+  editOf: "编辑{name}"
 
 system:
   roleAssignments: 角色分配
