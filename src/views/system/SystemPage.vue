@@ -17,8 +17,9 @@ import AddIcon from "~icons/ri/add-circle-line";
 import KeyIcon from "~icons/ri/key-2-line";
 import AllIcon from "~icons/ri/apps-line";
 import TreeRefreshIcon from "~icons/ri/refresh-line";
+import { scopePort } from "@/platform/system/scoped-port.mjs";
 import { defaultCell } from "@/components/Crud/model.mjs";
-import type { CrudCell, CrudRecord } from "@/components/Crud/types";
+import type { CrudCell, CrudRecord, CrudPort } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
 import { PERMISSIONS, ENUMS } from "@/api/constants";
 import {
@@ -31,10 +32,20 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
 
-const props = defineProps<{ resource: SystemResource }>();
+const props = withDefaults(
+  defineProps<{
+    resource: SystemResource;
+    fixed?: Record<string, string>;
+    fill?: boolean;
+  }>(),
+  { fill: true }
+);
 const { t } = useI18n();
 const user = useUserStoreHook();
 const definition = computed(() => resources[props.resource]);
+const port = computed<CrudPort>(() =>
+  scopePort(definition.value.port, props.fixed)
+);
 type Option = {
   id: string;
   label: string;
@@ -336,13 +347,14 @@ function cell(row: CrudRecord, field: string): CrudCell {
       :closable="false"
     />
     <CrudPage
-      :key="resource"
-      :port="definition.port"
+      :key="`${resource}:${JSON.stringify(fixed)}`"
+      :port="port"
+      :fill="fill"
       :page-key="`system/${resource}`"
       :permissions="definition.permissions"
       :cell="cell"
     >
-      <template v-if="treeField" #tree="{ filter }">
+      <template v-if="treeField && !fixed" #tree="{ filter }">
         <!-- 左侧树（参考 xinliwei）：标题 + 全部 / 刷新，搜索框，树 -->
         <aside class="side">
           <div class="side-header">
@@ -413,6 +425,9 @@ function cell(row: CrudRecord, field: string): CrudCell {
             />
           </el-scrollbar>
         </aside>
+      </template>
+      <template v-if="$slots['editor-related']" #editor-related="scope">
+        <slot name="editor-related" v-bind="scope" />
       </template>
       <template #toolbar="{ reload }">
         <template v-if="resource === 'user'">

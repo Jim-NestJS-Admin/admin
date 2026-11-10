@@ -13,6 +13,7 @@ import { failureView } from "@/platform/failure-view.mjs";
 const props = defineProps<{
   mode: "role" | "default";
   resourceFilter?: string;
+  fixedRoleId?: string;
 }>();
 const { t } = useI18n();
 const user = useUserStoreHook();
@@ -21,7 +22,7 @@ type Role = OperationResponse<"systemRolePage">["data"]["list"][number];
 type Change = OperationBody<"systemFieldSave">["changes"][number];
 const rows = ref<Entry[]>([]),
   roles = ref<Role[]>([]);
-const roleId = ref(""),
+const roleId = ref(props.fixedRoleId ?? ""),
   copyRoleId = ref(""),
   resource = ref(""),
   search = ref("");
@@ -239,8 +240,10 @@ async function save() {
   }
 }
 onMounted(async () => {
-  if (props.mode === "role") await loadRoles();
-  else await load();
+  if (props.mode === "role") {
+    await loadRoles();
+    if (props.fixedRoleId) await load();
+  } else await load();
 });
 </script>
 <template>
@@ -253,7 +256,7 @@ onMounted(async () => {
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <div class="field-toolbar">
       <el-select
-        v-if="mode === 'role'"
+        v-if="mode === 'role' && !fixedRoleId"
         v-model="roleId"
         filterable
         :placeholder="t('fieldPerm.chooseRole')"

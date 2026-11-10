@@ -172,6 +172,9 @@ crud:
   info: 详情
 
 system:
+  roleAssignments: 角色分配
+  supervisors: 上级关系
+  dictionaryItems: 字典项
   createUser: 新增用户
   resetPassword: 重置密码
   chooseUser: 选择用户

@@ -172,6 +172,9 @@ crud:
   info: Details
 
 system:
+  roleAssignments: Role assignments
+  supervisors: Supervisors
+  dictionaryItems: Dictionary items
   createUser: Create user
   resetPassword: Reset password
   chooseUser: Choose user

@@ -85,6 +85,7 @@ export function adaptNavigation(
           ...(item.kind === "page" ? { component: item.view } : {}),
           meta: {
             title: item.title,
+            ...(depth > 0 ? { showParent: true } : {}),
             rank: Number.isFinite(item.rank) ? item.rank : 10,
             showLink: !item.hidden,
             keepAlive: !!item.keepAlive,

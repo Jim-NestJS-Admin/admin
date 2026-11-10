@@ -656,7 +656,9 @@ defineExpose({ reload: view.initialize });
       :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
       :width="
-        schema?.children?.length ? 'min(1080px, 96vw)' : 'min(720px, 96vw)'
+        schema?.children?.length || slots['editor-related']
+          ? 'min(1080px, 96vw)'
+          : 'min(720px, 96vw)'
       "
       class="crud-editor"
       :title="
@@ -671,7 +673,7 @@ defineExpose({ reload: view.initialize });
       :size="
         mobile
           ? '100%'
-          : schema?.children?.length
+          : schema?.children?.length || slots['editor-related']
             ? 'min(1080px, 92vw)'
             : '560px'
       "
@@ -827,6 +829,11 @@ defineExpose({ reload: view.initialize });
           />
         </el-tab-pane>
       </el-tabs>
+      <slot
+        v-if="editor.open && editor.record"
+        name="editor-related"
+        :record="editor.record"
+      />
       <template #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
           t("crud.cancel")
