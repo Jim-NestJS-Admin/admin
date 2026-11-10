@@ -187,3 +187,22 @@
     background: rgb(199 201 203); /* 滑块hover颜色 */
   }
 }
+
+/* 抽屉：标题栏和底部按钮栏用细线隔开，去掉 Element 默认标题下方 32px 的大空白。
+   Element 的组件样式按需加载、排在本文件后面，所以前面加 .el-drawer 提高优先级 */
+.el-drawer {
+  .el-drawer__header {
+    padding: 14px 20px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+
+  .el-drawer__body {
+    padding: 16px 20px;
+  }
+
+  .el-drawer__footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--el-border-color-lighter);
+  }
+}
