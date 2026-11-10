@@ -111,6 +111,7 @@ admin:
   signOut: Sign out
   confirmSignOut: Are you sure you want to sign out?
   captchaAfterAccount: Enter account first
+  rememberAccount: Remember account
   requiredAccount: Enter your account
   requiredPassword: Enter your password
   retry: Retry
@@ -189,7 +190,7 @@ system:
   noDictionary: No dictionaries yet
   pickDictionary: Select a dictionary on the left first
   disabled: Disabled
-  confirmRemoveDictionary: "Delete dictionary \"{name}\"?"
+  confirmRemoveDictionary: 'Delete dictionary "{name}"?'
   noItemPermission: You are not allowed to view dictionary items
   dictKinds:
     system: System

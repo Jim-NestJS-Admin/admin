@@ -14,9 +14,27 @@ import User from "~icons/ri/user-3-fill";
 import Lock from "~icons/ri/lock-fill";
 import { getConfig } from "@/config";
 const TITLE = getConfig("Title");
+/** 记住账号：只在本机保存账号，不保存密码（密码交给浏览器自带的密码管理） */
+const REMEMBER_KEY = "jna-remember-account";
+function readRemembered() {
+  try {
+    return localStorage.getItem(REMEMBER_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+function writeRemembered(value: string) {
+  try {
+    if (value) localStorage.setItem(REMEMBER_KEY, value);
+    else localStorage.removeItem(REMEMBER_KEY);
+  } catch {
+    // 浏览器禁用本地存储时忽略
+  }
+}
 const { t, locale } = useI18n();
 const router = useRouter();
-const account = ref("");
+const account = ref(readRemembered());
+const remember = ref(!!account.value);
 const password = ref("");
 const proof = ref("");
 const captchaId = ref("");
@@ -60,6 +78,7 @@ async function signIn() {
     return;
   }
   busy.value = true;
+  let keepPassword = false;
   try {
     await useUserStoreHook().loginByUsername({
       account: account.value.trim(),
@@ -67,6 +86,7 @@ async function signIn() {
       captchaId: captchaId.value,
       captchaCode: proof.value
     });
+    writeRemembered(remember.value ? account.value.trim() : "");
     await router.replace("/welcome");
   } catch (reason) {
     const view = failureView(
@@ -77,9 +97,17 @@ async function signIn() {
       : view.message;
     fields.value = view.fields;
     retry.value = view.retrySeconds;
+    // 只是验证码错了：保留密码，只重新输入验证码
+    const data: { errors?: unknown } | null =
+      reason instanceof RequestFailure ? reason.failure.data : null;
+    const errors = Array.isArray(data?.errors)
+      ? (data.errors as { field?: unknown }[])
+      : [];
+    keepPassword =
+      errors.length > 0 && errors.every(item => item?.field === "captchaCode");
   } finally {
     busy.value = false;
-    password.value = "";
+    if (!keepPassword) password.value = "";
     proof.value = "";
     captchaId.value = "";
     revision.value++;
@@ -142,6 +170,9 @@ async function signIn() {
               @proof="proof = $event"
               @challenge="captchaId = $event"
             />
+            <el-checkbox v-model="remember" class="login-remember">{{
+              t("admin.rememberAccount")
+            }}</el-checkbox>
             <div v-if="error" class="login-error" role="alert">
               <p>{{ error }}</p>
               <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
@@ -176,6 +207,12 @@ async function signIn() {
 </style>
 
 <style scoped lang="scss">
+@media screen and (height <= 600px) {
+  .login-container {
+    min-height: 600px;
+  }
+}
+
 .pure-login {
   position: relative;
   min-height: 100dvh;
@@ -204,14 +241,15 @@ form {
   width: 100%;
 }
 
+/* 记住账号：靠左，和上下输入框的间距保持一致 */
+.login-remember {
+  justify-self: start;
+  height: auto;
+  margin-top: -8px;
+}
+
 .login-error {
   color: var(--el-color-danger);
   text-align: left;
-}
-
-@media screen and (height <= 600px) {
-  .login-container {
-    min-height: 600px;
-  }
 }
 </style>
