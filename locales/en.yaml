@@ -108,6 +108,9 @@ admin:
   captcha: Verification code
   refreshCaptcha: Refresh verification code
   captchaLoading: Loading
+  signOut: Sign out
+  confirmSignOut: Are you sure you want to sign out?
+  captchaAfterAccount: Enter account first
   requiredAccount: Enter your account
   requiredPassword: Enter your password
   retry: Retry

@@ -6,7 +6,8 @@ import Avatar from "@/assets/user.jpg";
 import { getTopMenu } from "@/router/utils";
 import { useFullscreen } from "@vueuse/core";
 import type { routeMetaType } from "../types";
-import { transformI18n } from "@/plugins/i18n";
+import { transformI18n, $t } from "@/plugins/i18n";
+import { ElMessageBox } from "element-plus";
 import { router, remainingPaths } from "@/router";
 import { computed, type CSSProperties } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
@@ -96,8 +97,21 @@ export function useNav() {
     else document.title = transformI18n(meta.title);
   }
 
-  /** 退出登录 */
-  function logout() {
+  /** 退出登录：先确认，避免误点 */
+  async function logout() {
+    try {
+      await ElMessageBox.confirm(
+        transformI18n($t("admin.confirmSignOut")),
+        transformI18n($t("buttons.pureLoginOut")),
+        {
+          confirmButtonText: transformI18n($t("admin.signOut")),
+          cancelButtonText: transformI18n($t("crud.cancel")),
+          type: "warning"
+        }
+      );
+    } catch {
+      return;
+    }
     useUserStoreHook().logOut();
   }
 

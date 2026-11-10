@@ -26,6 +26,19 @@ test("字段错误与限流等待提示来自公开响应，异常数值不启�
     0
   );
   assert.equal(failureView(null).message, "admin.serviceUnavailable");
+  assert.deepEqual(
+    failureView({
+      status: 400,
+      message: "验证码错误，请重新输入",
+      data: {
+        errors: [
+          { field: "captchaCode", messages: ["验证码错误，请重新输入"] },
+          { field: "a", messages: ["重复", "重复"] }
+        ]
+      }
+    }).fields,
+    ["重复"]
+  );
 });
 test("权限必须逐项明确授予，空列表与通配符不能放行", () => {
   assert.equal(allows(["*:*:*"], "system:user:page"), false);

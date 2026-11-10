@@ -108,6 +108,9 @@ admin:
   captcha: 验证码
   refreshCaptcha: 点击刷新验证码
   captchaLoading: 加载中
+  signOut: 退出
+  confirmSignOut: 确定要退出登录吗？
+  captchaAfterAccount: 输入账号后显示
   requiredAccount: 请输入账号
   requiredPassword: 请输入密码
   retry: 重试

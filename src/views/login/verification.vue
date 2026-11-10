@@ -81,8 +81,14 @@ onBeforeUnmount(() => {
       @click="reload"
     >
       <img v-if="image" :src="image" :alt="t('admin.captcha')" />
-      <span v-else>{{
-        t(loading ? "admin.captchaLoading" : "admin.refreshCaptcha")
+      <span v-else class="captcha-hint">{{
+        t(
+          loading
+            ? "admin.captchaLoading"
+            : !account
+              ? "admin.captchaAfterAccount"
+              : "admin.refreshCaptcha"
+        )
       }}</span>
     </button>
   </div>
@@ -98,12 +104,21 @@ onBeforeUnmount(() => {
 }
 
 .captcha-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 40px;
+  padding: 0;
   overflow: hidden;
   cursor: pointer;
-  background: var(--el-fill-color-light);
+  background: var(--el-fill-color-blank);
   border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
+  transition: border-color var(--el-transition-duration);
+
+  &:hover:not(:disabled) {
+    border-color: var(--el-color-primary);
+  }
 
   img {
     display: block;
@@ -114,7 +129,18 @@ onBeforeUnmount(() => {
 
   &:disabled {
     cursor: default;
+    background: var(--el-fill-color-light);
   }
+}
+
+/* 还没有图片时的提示文字：和输入框占位文字同样大小、颜色，放不下时省略 */
+.captcha-hint {
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--el-font-size-small);
+  color: var(--el-text-color-placeholder);
+  white-space: nowrap;
 }
 
 .captcha-error {

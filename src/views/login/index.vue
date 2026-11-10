@@ -36,6 +36,12 @@ watch([account, locale], () => {
   error.value = "";
   fields.value = [];
 });
+// 重新输入验证码时清掉上一次的错误提示
+watch(proof, value => {
+  if (!value) return;
+  error.value = "";
+  fields.value = [];
+});
 async function signIn() {
   if (busy.value || retry.value > 0) return;
   error.value = "";
