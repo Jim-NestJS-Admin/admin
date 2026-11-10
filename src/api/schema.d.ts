@@ -480,7 +480,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出字典项（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出字典项（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemDictItemExport"];
     delete?: never;
     options?: never;
@@ -616,7 +616,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出字典类型（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出字典类型（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemDictTypeExport"];
     delete?: never;
     options?: never;
@@ -854,7 +854,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出登录日志（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出登录日志（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemLoginLogExport"];
     delete?: never;
     options?: never;
@@ -956,7 +956,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出菜单（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出菜单（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemMenuExport"];
     delete?: never;
     options?: never;
@@ -1058,7 +1058,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出操作日志（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出操作日志（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemOperationLogExport"];
     delete?: never;
     options?: never;
@@ -1160,7 +1160,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出组织（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出组织（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemOrgExport"];
     delete?: never;
     options?: never;
@@ -1398,7 +1398,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出系统参数（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出系统参数（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemParameterExport"];
     delete?: never;
     options?: never;
@@ -1670,7 +1670,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出角色（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出角色（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemRoleExport"];
     delete?: never;
     options?: never;
@@ -1789,7 +1789,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出用户组织角色分配（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出用户组织角色分配（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemUserRoleExport"];
     delete?: never;
     options?: never;
@@ -1908,7 +1908,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出用户多上级（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出用户多上级（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemUserSupervisorExport"];
     delete?: never;
     options?: never;
@@ -2044,7 +2044,7 @@ export type paths = {
     };
     get?: never;
     put?: never;
-    /** 导出用户（CSV，按列表的查询条件，最多 1 万行） */
+    /** 导出用户（Excel / CSV，按列表的查询条件，最多 1 万行） */
     post: operations["systemUserExport"];
     delete?: never;
     options?: never;
@@ -2638,6 +2638,8 @@ export type components = {
       locale: string;
       /** @description 有角色的组织，可以切换 */
       orgs: components["schemas"]["OrgOption"][];
+      /** @description 当前组织下有效的超级管理员身份 */
+      superAdmin: boolean;
       user: components["schemas"]["ProfileUser"];
     };
     ProfileUser: {
@@ -2739,6 +2741,26 @@ export type components = {
       /** @description 处理的行数 */
       count: number;
     };
+    SystemDictItemExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemDictItemPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：label、value */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemDictItemPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     SystemDictItemInfoBody: {
       /** @example 1 */
       id: string;
@@ -2835,17 +2857,23 @@ export type components = {
       label?: string;
       /** @description 排序 */
       rank?: number;
+      /** @description 字典值 */
+      value?: string;
     };
     SystemDictTypeAddBody: {
       data: components["schemas"]["SystemDictTypeAddData"];
     };
     SystemDictTypeAddData: {
+      /** @description 内置 */
+      builtin?: boolean;
       /** @description 字典标识 */
       code: string;
       /** @description 启用 */
       enabled?: boolean;
       /** @description 字典名称 */
       name: string;
+      /** @description 排序 */
+      rank?: number;
     };
     SystemDictTypeDeleteBody: {
       ids: string[];
@@ -2853,6 +2881,26 @@ export type components = {
     SystemDictTypeDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemDictTypeExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemDictTypePageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemDictTypePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemDictTypeInfoBody: {
       /** @example 1 */
@@ -2872,6 +2920,8 @@ export type components = {
       where?: components["schemas"]["QueryGroupDto"];
     };
     SystemDictTypePageEq: {
+      /** @description 内置 */
+      builtin?: boolean;
       /** @description 启用 */
       enabled?: boolean;
     };
@@ -2886,7 +2936,7 @@ export type components = {
        * @description 排序字段
        * @enum {string}
        */
-      field: "id" | "createdAt" | "updatedAt";
+      field: "id" | "createdAt" | "updatedAt" | "rank";
       /** @enum {string} */
       order: "asc" | "desc";
     };
@@ -2899,6 +2949,8 @@ export type components = {
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
       };
+      /** @description 内置 */
+      builtin?: boolean;
       /** @description 字典标识 */
       code?: string;
       /**
@@ -2919,6 +2971,8 @@ export type components = {
       name?: string;
       /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
       orgId: string | null;
+      /** @description 排序 */
+      rank?: number;
       /**
        * Format: date-time
        * @description 修改时间
@@ -2938,10 +2992,16 @@ export type components = {
       version: number;
     };
     SystemDictTypeUpdateData: {
+      /** @description 内置 */
+      builtin?: boolean;
+      /** @description 字典标识 */
+      code?: string;
       /** @description 启用 */
       enabled?: boolean;
       /** @description 字典名称 */
       name?: string;
+      /** @description 排序 */
+      rank?: number;
     };
     SystemFieldAddBody: {
       data: components["schemas"]["SystemFieldAddData"];
@@ -3101,6 +3161,26 @@ export type components = {
        */
       state?: "editable" | "readonly" | "masked" | "hidden";
     };
+    SystemLoginLogExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemLoginLogPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：username */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemLoginLogPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     SystemLoginLogInfoBody: {
       /** @example 1 */
       id: string;
@@ -3214,6 +3294,26 @@ export type components = {
     SystemMenuDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemMenuExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemMenuPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：title、path */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemMenuPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemMenuInfoBody: {
       /** @example 1 */
@@ -3352,6 +3452,26 @@ export type components = {
     SystemMutationResult: {
       id: string;
     };
+    SystemOperationLogExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemOperationLogPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：action、resource */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemOperationLogPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     SystemOperationLogInfoBody: {
       /** @example 1 */
       id: string;
@@ -3456,6 +3576,26 @@ export type components = {
     SystemOrgDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemOrgExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemOrgPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemOrgPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemOrgInfoBody: {
       /** @example 1 */
@@ -3576,6 +3716,26 @@ export type components = {
       /** @description 处理的行数 */
       count: number;
     };
+    SystemParameterExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemParameterPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：key */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemParameterPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     SystemParameterInfoBody: {
       /** @example 1 */
       id: string;
@@ -3688,6 +3848,26 @@ export type components = {
     SystemRoleDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemRoleExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemRolePageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemRolePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemRoleFieldAddBody: {
       data: components["schemas"]["SystemRoleFieldAddData"];
@@ -3948,6 +4128,26 @@ export type components = {
       /** @description 处理的行数 */
       count: number;
     };
+    SystemUserExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemUserPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：username、nickname */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemUserPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     SystemUserInfoBody: {
       /** @example 1 */
       id: string;
@@ -4003,6 +4203,26 @@ export type components = {
     SystemUserRoleDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemUserRoleExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemUserRolePageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemUserRolePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemUserRoleInfoBody: {
       /** @example 1 */
@@ -4157,6 +4377,26 @@ export type components = {
     SystemUserSupervisorDeleteResult: {
       /** @description 处理的行数 */
       count: number;
+    };
+    SystemUserSupervisorExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemUserSupervisorPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemUserSupervisorPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
     };
     SystemUserSupervisorInfoBody: {
       /** @example 1 */
@@ -5628,16 +5868,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemDictItemPageBody"];
+        "application/json": components["schemas"]["SystemDictItemExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -5948,16 +6189,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemDictTypePageBody"];
+        "application/json": components["schemas"]["SystemDictTypeExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -6558,16 +6800,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemLoginLogPageBody"];
+        "application/json": components["schemas"]["SystemLoginLogExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -6795,16 +7038,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemMenuPageBody"];
+        "application/json": components["schemas"]["SystemMenuExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -7037,16 +7281,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemOperationLogPageBody"];
+        "application/json": components["schemas"]["SystemOperationLogExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -7274,16 +7519,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemOrgPageBody"];
+        "application/json": components["schemas"]["SystemOrgExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -7963,16 +8209,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemParameterPageBody"];
+        "application/json": components["schemas"]["SystemParameterExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -8642,16 +8889,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemRolePageBody"];
+        "application/json": components["schemas"]["SystemRoleExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -8935,16 +9183,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemUserRolePageBody"];
+        "application/json": components["schemas"]["SystemUserRoleExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -9228,16 +9477,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemUserSupervisorPageBody"];
+        "application/json": components["schemas"]["SystemUserSupervisorExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };
@@ -9586,16 +9836,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SystemUserPageBody"];
+        "application/json": components["schemas"]["SystemUserExportBody"];
       };
     };
     responses: {
-      /** @description CSV 文件（UTF-8 带 BOM） */
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
           "text/csv": Blob;
         };
       };

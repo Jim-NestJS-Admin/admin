@@ -415,6 +415,10 @@ export const ENUMS = {
     "notNull"
   ],
   "components.schemas.QueryGroupDto.properties.op": ["and", "or"],
+  "components.schemas.SystemDictItemExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemDictItemPageSort.properties.field": [
     "id",
     "createdAt",
@@ -424,10 +428,15 @@ export const ENUMS = {
   "components.schemas.SystemDictItemPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemDictItemRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemDictTypeExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemDictTypePageSort.properties.field": [
     "id",
     "createdAt",
-    "updatedAt"
+    "updatedAt",
+    "rank"
   ],
   "components.schemas.SystemDictTypePageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemDictTypeRow.properties._fieldState.additionalProperties":
@@ -497,6 +506,10 @@ export const ENUMS = {
     "masked",
     "hidden"
   ],
+  "components.schemas.SystemLoginLogExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemLoginLogPageSort.properties.field": [
     "id",
     "createdAt",
@@ -510,6 +523,7 @@ export const ENUMS = {
     "page",
     "button"
   ],
+  "components.schemas.SystemMenuExportBody.properties.format": ["csv", "xlsx"],
   "components.schemas.SystemMenuPageEq.properties.type": [
     "directory",
     "page",
@@ -534,6 +548,10 @@ export const ENUMS = {
     "page",
     "button"
   ],
+  "components.schemas.SystemOperationLogExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemOperationLogPageSort.properties.field": [
     "id",
     "createdAt",
@@ -545,6 +563,7 @@ export const ENUMS = {
   ],
   "components.schemas.SystemOperationLogRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemOrgExportBody.properties.format": ["csv", "xlsx"],
   "components.schemas.SystemOrgPageSort.properties.field": [
     "id",
     "createdAt",
@@ -554,6 +573,10 @@ export const ENUMS = {
   "components.schemas.SystemOrgPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemOrgRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemParameterExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemParameterPageSort.properties.field": [
     "id",
     "createdAt",
@@ -572,6 +595,7 @@ export const ENUMS = {
     "self",
     "custom"
   ],
+  "components.schemas.SystemRoleExportBody.properties.format": ["csv", "xlsx"],
   "components.schemas.SystemRoleFieldAddData.properties.mask": [
     "phone",
     "email",
@@ -644,6 +668,7 @@ export const ENUMS = {
     "self",
     "custom"
   ],
+  "components.schemas.SystemUserExportBody.properties.format": ["csv", "xlsx"],
   "components.schemas.SystemUserPageSort.properties.field": [
     "id",
     "createdAt",
@@ -651,6 +676,10 @@ export const ENUMS = {
     "username"
   ],
   "components.schemas.SystemUserPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemUserRoleExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemUserRolePageSort.properties.field": [
     "id",
     "createdAt",
@@ -661,6 +690,10 @@ export const ENUMS = {
     ["readonly", "masked", "hidden"],
   "components.schemas.SystemUserRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemUserSupervisorExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
   "components.schemas.SystemUserSupervisorPageSort.properties.field": [
     "id",
     "createdAt",
