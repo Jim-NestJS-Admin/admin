@@ -492,6 +492,10 @@ onMounted(load);
   overflow: hidden;
 }
 
+.dict-page :deep(.el-splitter-panel) {
+  overflow: hidden;
+}
+
 .dict-page :deep(.el-splitter-bar) {
   width: 8px !important;
 }

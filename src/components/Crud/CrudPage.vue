@@ -8,7 +8,7 @@ import {
   watch
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useMediaQuery, useNow } from "@vueuse/core";
+import { useElementSize, useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
 import {
   ElMessageBox,
@@ -78,6 +78,12 @@ const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
 const mobile = useMediaQuery("(max-width: 760px)");
+/** 列表区本身变窄（窗口窄、左侧面板拉宽）时按紧凑排版：搜索整行、分页精简 */
+const mainEl = ref<HTMLElement>();
+const { width: mainWidth } = useElementSize(mainEl);
+const compact = computed(
+  () => mobile.value || (mainWidth.value > 0 && mainWidth.value < 640)
+);
 const treeOpen = ref(false);
 const activeChild = ref("");
 const stopReset = onSessionReset(() => {
@@ -329,7 +335,11 @@ defineExpose({ reload: view.initialize });
         </aside>
       </el-splitter-panel>
       <el-splitter-panel>
-        <div class="crud-main crud-card">
+        <div
+          ref="mainEl"
+          class="crud-main crud-card"
+          :class="{ 'is-compact': compact }"
+        >
           <!-- 工具栏（cool 结构）：左边操作按钮，右边关键字搜索、高级搜索、列设置 -->
           <div class="crud-toolbar">
             <div class="crud-actions">
@@ -659,7 +669,9 @@ defineExpose({ reload: view.initialize });
               :layout="
                 mobile
                   ? 'prev, pager, next'
-                  : 'total, sizes, prev, pager, next, jumper'
+                  : compact
+                    ? 'total, prev, pager, next'
+                    : 'total, sizes, prev, pager, next, jumper'
               "
               @size-change="view.search"
               @current-change="view.load"
@@ -941,6 +953,22 @@ defineExpose({ reload: view.initialize });
 
 .crud-splitter {
   height: 100%;
+}
+
+/* 面板内容不整体横向滚动：表格自己有横向滚动条 */
+.crud-splitter :deep(.el-splitter-panel) {
+  overflow: hidden;
+}
+
+/* 紧凑排版：搜索组独占一行并撑满，输入框随宽度伸缩 */
+.crud-main.is-compact .crud-search {
+  width: 100%;
+}
+
+.crud-main.is-compact .crud-keyword {
+  flex: 1;
+  width: auto;
+  min-width: 0;
 }
 
 .crud-splitter :deep(.el-splitter-bar) {
