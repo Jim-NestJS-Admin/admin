@@ -659,7 +659,8 @@ function cell(row: CrudRecord, field: string): CrudCell {
 }
 
 .side-title {
-  font-weight: 600;
+  font-size: var(--el-font-size-base);
+  font-weight: normal;
   color: var(--el-text-color-primary);
 }
 
