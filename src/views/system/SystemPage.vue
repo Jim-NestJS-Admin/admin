@@ -668,7 +668,7 @@ function cell(row: CrudRecord, field: string): CrudCell {
   gap: 8px;
   align-items: center;
   justify-content: space-between;
-  height: 48px;
+  height: var(--crud-head-height, 49px);
   padding: 0 10px;
   border-bottom: 1px solid var(--el-border-color-extra-light);
 }

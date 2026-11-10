@@ -260,6 +260,9 @@ query:
   false: 否
   listHint: 多个值用逗号分隔，最多100项
   saved: 常用查询
+  pickSaved: 选择常用查询
+  conditions: 查询条件
+  empty: 还没有条件，点右上角“添加条件”开始
   name: 查询名称
   save: 保存常用查询
   apply: 应用查询

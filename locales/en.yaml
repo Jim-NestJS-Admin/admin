@@ -260,6 +260,9 @@ query:
   false: No
   listHint: Comma-separated values (up to 100)
   saved: Saved queries
+  pickSaved: Choose a saved query
+  conditions: Conditions
+  empty: No conditions yet. Click "Add condition" to start.
   name: Query name
   save: Save query
   apply: Apply query

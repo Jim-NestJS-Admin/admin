@@ -15,7 +15,8 @@ import {
   ElDrawer,
   ElDialog,
   ElSplitter,
-  ElSplitterPanel
+  ElSplitterPanel,
+  useGlobalSize
 } from "element-plus";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import SearchIcon from "~icons/ri/search-line";
@@ -68,6 +69,16 @@ const slots = useSlots();
 const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
+/** 标题栏高度跟随全局组件尺寸：左侧树标题栏和右侧工具栏共用，底边线才能对齐 */
+const globalSize = useGlobalSize();
+const headStyle = computed(() => {
+  const control = { large: 40, default: 32, small: 24 }[globalSize.value] ?? 32;
+  return {
+    "--crud-control-height": `${control}px`,
+    // 上下各留 8px，再加 1px 底边线；保证控件落在整数像素上，边线不发虚
+    "--crud-head-height": `${control + 17}px`
+  };
+});
 const mobile = useMediaQuery("(max-width: 760px)");
 const treeOpen = ref(false);
 const activeChild = ref("");
@@ -290,7 +301,7 @@ defineExpose({ reload: view.initialize });
   <section
     ref="pageEl"
     class="crud-page"
-    :style="fill ? { height: `${fillHeight}px` } : undefined"
+    :style="[headStyle, fill ? { height: `${fillHeight}px` } : {}]"
     :aria-label="schema?.label ?? t('crud.title')"
   >
     <el-splitter v-if="schema" class="crud-splitter" lazy>
@@ -316,14 +327,6 @@ defineExpose({ reload: view.initialize });
                 @click="treeOpen = true"
                 >{{ t("crud.filter") }}</el-button
               >
-              <el-tooltip :content="t('crud.refresh')" placement="top">
-                <el-button
-                  :icon="useRenderIcon(RefreshIcon)"
-                  :loading="loading"
-                  :aria-label="t('crud.refresh')"
-                  @click="view.load"
-                />
-              </el-tooltip>
               <el-button
                 v-if="
                   port.create && schema.api.includes('add') && !recycledView
@@ -394,7 +397,7 @@ defineExpose({ reload: view.initialize });
               }}</el-tag>
             </div>
             <div class="crud-flex1" />
-            <!-- 搜索（参考 xinliwei）：输入框右侧是清空、搜索；后面是高级查询、列设置 -->
+            <!-- 右侧（参考 xinliwei）：关键字搜索 + 刷新、高级查询、列设置，拼成一组 -->
             <form class="crud-search" @submit.prevent="view.search">
               <el-input
                 v-if="schema.actions.page?.keyWords.length"
@@ -427,38 +430,40 @@ defineExpose({ reload: view.initialize });
                     <component :is="SearchIcon" />
                   </button>
                 </template>
-                <template #append>
-                  <div class="crud-addons">
-                    <slot
-                      v-if="!recycledView"
-                      name="advanced"
-                      :apply="
-                        (value: unknown) => {
-                          query.advanced = value;
-                          view.search();
-                        }
-                      "
-                    >
-                      <AdvancedQuery
-                        :schema="schema"
-                        @apply="
-                          value => {
-                            query.advanced = value;
-                            view.search();
-                          }
-                        "
-                      />
-                    </slot>
-                    <ColumnSettings
-                      :schema="schema"
-                      :choices="choices"
-                      :disabled="saving"
-                      @save="value => view.saveChoices(value)"
-                    />
-                  </div>
-                </template>
               </el-input>
-              <div v-else class="crud-addons is-standalone">
+              <div class="crud-addons">
+                <el-tooltip :content="t('crud.refresh')" placement="top">
+                  <button
+                    type="button"
+                    class="crud-addon"
+                    :class="{ 'is-loading': loading }"
+                    :disabled="loading"
+                    :aria-label="t('crud.refresh')"
+                    @click="view.load"
+                  >
+                    <component :is="RefreshIcon" class="crud-addon-icon" />
+                  </button>
+                </el-tooltip>
+                <slot
+                  v-if="!recycledView"
+                  name="advanced"
+                  :apply="
+                    (value: unknown) => {
+                      query.advanced = value;
+                      view.search();
+                    }
+                  "
+                >
+                  <AdvancedQuery
+                    :schema="schema"
+                    @apply="
+                      value => {
+                        query.advanced = value;
+                        view.search();
+                      }
+                    "
+                  />
+                </slot>
                 <ColumnSettings
                   :schema="schema"
                   :choices="choices"
@@ -852,6 +857,12 @@ defineExpose({ reload: view.initialize });
 </template>
 
 <style scoped lang="scss">
+@keyframes crud-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (width <= 760px) {
   .crud-editor-form :deep(.el-form-item.half-field) {
     grid-column: 1 / -1;
@@ -868,7 +879,8 @@ defineExpose({ reload: view.initialize });
   }
 
   .crud-keyword {
-    width: 100%;
+    flex: 1;
+    width: auto;
   }
 }
 
@@ -923,47 +935,61 @@ defineExpose({ reload: view.initialize });
   min-width: 0;
   height: 100%;
   min-height: 0;
-  padding: 12px 16px;
+  padding: 0 16px 12px;
 }
 
-/* 工具栏：左按钮、中间撑开、右搜索，一行放下，放不下时右侧整体换行 */
+/* 工具栏：左按钮、中间撑开、右搜索，一行放下，放不下时右侧整体换行。
+   高度和底边线与左侧树的标题栏一致（--crud-head-height） */
 .crud-toolbar {
   display: flex;
   flex-shrink: 0;
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  margin-bottom: 12px;
+  min-height: var(--crud-head-height, 49px);
+  padding: 8px 16px;
+  margin: 0 -16px 12px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
 }
 
-.crud-actions,
-.crud-search {
+.crud-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }
 
+/* 搜索框和右侧按钮拼成一组：两边都用 1px 内阴影画边框、同一个高度，边线才不会错位 */
+.crud-search {
+  display: flex;
+  align-items: stretch;
+  height: var(--crud-control-height, 32px);
+}
+
 .crud-flex1 {
   flex: 1;
 }
 
-.crud-actions :deep(.el-button + .el-button),
-.crud-search :deep(.el-button + .el-button) {
+.crud-actions :deep(.el-button + .el-button) {
   margin-left: 0;
 }
 
 .crud-keyword {
-  width: 300px;
-}
-
-.crud-keyword :deep(.el-input-group__append) {
-  padding: 0;
-  background: var(--el-fill-color-blank);
+  width: 220px;
+  height: 100%;
 }
 
 .crud-keyword :deep(.el-input__wrapper) {
   padding-right: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* 获得焦点或悬停时输入框的边框盖在按钮组左边线上面 */
+.crud-keyword :deep(.el-input__wrapper.is-focus),
+.crud-keyword :deep(.el-input__wrapper:hover) {
+  position: relative;
+  z-index: 1;
 }
 
 /* 输入框里的清空、搜索小按钮 */
@@ -992,18 +1018,30 @@ defineExpose({ reload: view.initialize });
   color: var(--el-text-color-placeholder);
 }
 
-/* 高级查询、列设置：输入框右侧附加按钮 */
+/* 刷新、高级查询、列设置：一组图标按钮，有搜索框时接在它右边。
+   外框画在 ::after 上并盖住按钮，悬停底色不会把边线遮掉 */
 .crud-addons {
+  position: relative;
   display: flex;
-  align-self: stretch;
   height: 100%;
+  overflow: hidden;
+  background: var(--el-fill-color-blank);
+  border-radius: var(--el-border-radius-base);
 }
 
-.crud-addons.is-standalone {
-  height: var(--el-component-size);
-  overflow: hidden;
-  border: 1px solid var(--el-border-color);
-  border-radius: var(--el-border-radius-base);
+.crud-addons::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px var(--el-border-color) inset;
+}
+
+.crud-keyword + .crud-addons {
+  margin-left: -1px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .crud-addons :deep(.crud-addon) {
@@ -1021,9 +1059,16 @@ defineExpose({ reload: view.initialize });
   border: none;
 }
 
-.crud-addons :deep(.crud-addon + .crud-addon),
-.crud-addons :deep(.el-only-child__content + .crud-addon) {
+.crud-addons :deep(.crud-addon:not(:first-child)) {
   border-left: 1px solid var(--el-border-color);
+}
+
+.crud-addons :deep(.crud-addon:disabled) {
+  cursor: default;
+}
+
+.crud-addons :deep(.crud-addon.is-loading .crud-addon-icon) {
+  animation: crud-spin 1s linear infinite;
 }
 
 .crud-addons :deep(.crud-addon:hover) {

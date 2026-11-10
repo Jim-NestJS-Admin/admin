@@ -5,6 +5,10 @@ import { api, type OperationBody } from "@/api/client";
 import type { CrudSchema } from "./types";
 import QueryGroupEditor from "./QueryGroupEditor.vue";
 import FilterIcon from "~icons/ri/filter-3-line";
+import DeleteIcon from "~icons/ri/delete-bin-line";
+import SaveIcon from "~icons/ri/save-3-line";
+import ResetIcon from "~icons/ri/refresh-line";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import {
   countConditions,
   newGroup,
@@ -173,60 +177,142 @@ onBeforeUnmount(() => {
       >
     </button>
   </el-tooltip>
-  <el-drawer v-model="open" :title="t('query.title')" size="min(960px, 100vw)">
-    <el-alert v-if="error" :title="error" type="error" :closable="false" />
-    <div class="query-saved">
-      <el-select
-        v-model="selected"
-        :aria-label="t('query.saved')"
-        :placeholder="t('query.saved')"
-        :disabled="busy"
-        @change="loadSaved"
-        ><el-option
-          v-for="item in saved"
-          :key="item.name"
-          :value="item.name"
-          :label="item.name"
-      /></el-select>
-      <el-button :disabled="!selected || busy" @click="persist(true)">{{
-        t("crud.remove")
-      }}</el-button>
-      <el-input
-        v-model="name"
-        maxlength="60"
-        :placeholder="t('query.name')"
-        :aria-label="t('query.name')"
-        :disabled="busy"
-      />
-      <el-button :disabled="!count || busy" @click="persist()">{{
-        t("query.save")
-      }}</el-button>
-    </div>
-    <QueryGroupEditor
-      v-model:group="draft"
-      :fields="fields"
-      :depth="1"
-      :count="count"
+  <el-drawer
+    v-model="open"
+    :title="t('query.title')"
+    size="min(760px, 100vw)"
+    append-to-body
+    class="query-drawer"
+  >
+    <el-alert
+      v-if="error"
+      :title="error"
+      type="error"
+      show-icon
+      :closable="false"
+      class="query-error"
     />
-    <template #footer
-      ><el-button @click="draft = newGroup()">{{ t("crud.reset") }}</el-button
-      ><el-button @click="open = false">{{ t("crud.cancel") }}</el-button
-      ><el-button type="primary" @click="apply">{{
-        t("query.apply")
-      }}</el-button></template
-    >
+    <!-- 常用查询：左边选用 / 删除，右边把当前条件存成常用查询 -->
+    <section class="query-section">
+      <h4 class="query-section-title">{{ t("query.saved") }}</h4>
+      <div class="query-saved">
+        <div class="query-saved-group">
+          <el-select
+            v-model="selected"
+            class="query-saved-select"
+            :aria-label="t('query.saved')"
+            :placeholder="t('query.pickSaved')"
+            :disabled="busy"
+            @change="loadSaved"
+            ><el-option
+              v-for="item in saved"
+              :key="item.name"
+              :value="item.name"
+              :label="item.name"
+          /></el-select>
+          <el-button
+            :icon="useRenderIcon(DeleteIcon)"
+            :disabled="!selected || busy"
+            @click="persist(true)"
+            >{{ t("crud.remove") }}</el-button
+          >
+        </div>
+        <div class="query-saved-group">
+          <el-input
+            v-model="name"
+            class="query-saved-name"
+            maxlength="60"
+            :placeholder="t('query.name')"
+            :aria-label="t('query.name')"
+            :disabled="busy"
+          />
+          <el-button
+            :icon="useRenderIcon(SaveIcon)"
+            :disabled="!count || busy"
+            @click="persist()"
+            >{{ t("query.save") }}</el-button
+          >
+        </div>
+      </div>
+    </section>
+    <section class="query-section">
+      <h4 class="query-section-title">
+        {{ t("query.conditions") }}
+        <span class="query-section-hint">{{ t("query.limit") }}</span>
+      </h4>
+      <QueryGroupEditor
+        v-model:group="draft"
+        :fields="fields"
+        :depth="1"
+        :count="count"
+      />
+    </section>
+    <template #footer>
+      <div class="query-footer">
+        <el-button
+          :icon="useRenderIcon(ResetIcon)"
+          @click="draft = newGroup()"
+          >{{ t("crud.reset") }}</el-button
+        >
+        <div class="query-footer-actions">
+          <el-button @click="open = false">{{ t("crud.cancel") }}</el-button
+          ><el-button type="primary" @click="apply">{{
+            t("query.apply")
+          }}</el-button>
+        </div>
+      </div>
+    </template>
   </el-drawer>
 </template>
 <style scoped>
-.query-saved {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.query-error {
   margin-bottom: 16px;
 }
 
-.query-saved :deep(.el-select),
-.query-saved :deep(.el-input) {
+.query-section + .query-section {
+  margin-top: 20px;
+}
+
+.query-section-title {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 0 10px;
+  font-size: var(--el-font-size-base);
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.query-section-hint {
+  font-size: var(--el-font-size-extra-small);
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+}
+
+.query-saved {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.query-saved-group {
+  display: flex;
+  gap: 8px;
+}
+
+.query-saved-group :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.query-saved-select,
+.query-saved-name {
   width: 200px;
+}
+
+.query-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
 }
 </style>
