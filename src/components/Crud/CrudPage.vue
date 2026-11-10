@@ -34,6 +34,7 @@ import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
 import ClearIcon from "~icons/ri/close-circle-line";
+import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import {
   cellText,
   columnChoices,
@@ -42,7 +43,13 @@ import {
   formPresentation
 } from "./model.mjs";
 import { useCrud } from "./useCrud";
-import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
+import type {
+  CrudPort,
+  CrudCell,
+  CrudRecord,
+  CrudChoices,
+  CrudExportFormat
+} from "./types";
 const props = withDefaults(
   defineProps<{
     port: CrudPort;
@@ -110,7 +117,8 @@ onBeforeUnmount(() => {
   stopExport();
   exportRequest?.abort();
 });
-async function exportRows() {
+/** 按当前查询条件和可见列（显示顺序）导出；文件名用「页面名_年月日_时分」 */
+async function exportRows(format: CrudExportFormat) {
   if (!props.port.export || exporting.value) return;
   exportRequest = new AbortController();
   const request = exportRequest;
@@ -118,13 +126,26 @@ async function exportRows() {
   try {
     const file = await props.port.export(
       JSON.parse(JSON.stringify(query)),
-      request.signal
+      request.signal,
+      {
+        format,
+        columns: visibleColumns.value
+          .map(column => column.field)
+          .filter((field): field is string => typeof field === "string")
+      }
     );
     if (request.signal.aborted) return;
     const url = URL.createObjectURL(file),
       link = document.createElement("a");
     link.href = url;
-    link.download = `${schema.value.resource.replaceAll("/", "-")}.csv`;
+    const title = (schema.value.label || schema.value.resource).replace(
+      /[\\/:*?"<>|\s]+/g,
+      "-"
+    );
+    const now = new Date(),
+      pad = (value: number) => String(value).padStart(2, "0");
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    link.download = `${title}_${stamp}.${format}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (reason) {
@@ -361,14 +382,30 @@ defineExpose({ reload: view.initialize });
                 @click="confirmRecycle('purge')"
                 >{{ t("crud.purge") }}</el-button
               >
-              <el-button
+              <el-dropdown
                 v-if="port.export && !recycledView"
                 v-perm="permissions?.export ?? []"
-                :icon="useRenderIcon(DownloadIcon)"
-                :loading="exporting"
-                @click="exportRows"
-                >{{ t("query.export") }}</el-button
+                trigger="click"
+                :disabled="exporting"
+                @command="exportRows"
               >
+                <el-button
+                  :icon="useRenderIcon(DownloadIcon)"
+                  :loading="exporting"
+                  >{{ t("query.export")
+                  }}<component :is="ArrowDownIcon" class="crud-caret"
+                /></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="xlsx">{{
+                      t("query.exportExcel")
+                    }}</el-dropdown-item>
+                    <el-dropdown-item command="csv">{{
+                      t("query.exportCsv")
+                    }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
               <el-button
                 v-if="
                   port.recycled &&
@@ -963,6 +1000,13 @@ defineExpose({ reload: view.initialize });
 
 .crud-actions :deep(.el-button + .el-button) {
   margin-left: 0;
+}
+
+/* 导出按钮右侧的下拉箭头 */
+.crud-caret {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
 }
 
 .crud-keyword {

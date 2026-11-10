@@ -37,6 +37,8 @@ const props = withDefaults(
     resource: SystemResource;
     fixed?: Record<string, string>;
     fill?: boolean;
+    /** 不显示删除（如系统字典的字典项：后端不允许删除） */
+    noRemove?: boolean;
   }>(),
   { fill: true }
 );
@@ -351,7 +353,11 @@ function cell(row: CrudRecord, field: string): CrudCell {
       :port="port"
       :fill="fill"
       :page-key="`system/${resource}`"
-      :permissions="definition.permissions"
+      :permissions="
+        noRemove
+          ? { ...definition.permissions, remove: '' }
+          : definition.permissions
+      "
       :cell="cell"
     >
       <template v-if="treeField && !fixed" #tree="{ filter }">

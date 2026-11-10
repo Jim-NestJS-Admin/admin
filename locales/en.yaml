@@ -181,7 +181,9 @@ system:
   dictionaries: Dictionaries
   dictCode: Code
   dictName: Name
-  dictCodeHint: Starts with a lowercase letter; lowercase letters, digits, _ . - allowed; 2-64 characters
+  dictCodeHint: Starts with a lowercase letter; lowercase letters, digits, _ . - allowed; 2-64 characters; must not start with sys.
+  dictCodeHintSystem: System dictionary codes start with sys., e.g. sys.order_status
+  dictRank: Order
   addDictionary: New dictionary
   editDictionary: Edit dictionary
   noDictionary: No dictionaries yet
@@ -284,6 +286,8 @@ query:
   save: Save query
   apply: Apply query
   export: Export
+  exportExcel: Excel (.xlsx)
+  exportCsv: CSV (.csv)
   invalidNumber: Enter a valid number
   invalidBoolean: Choose yes or no
   invalidDate: Enter a valid date

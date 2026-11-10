@@ -119,10 +119,16 @@ export function generatedCrud(prefix: string, resource = "") {
       : {}),
     ...(available("Export")
       ? {
-          export: async (query, signal) => {
+          export: async (query, signal, options) => {
             const response = await call(
               "Export",
-              { body: body(query) },
+              {
+                body: {
+                  ...body(query),
+                  format: options?.format ?? "csv",
+                  ...(options?.columns ? { columns: options.columns } : {})
+                }
+              },
               { signal }
             );
             if (!(response instanceof Blob)) throw Error("crud.requestFailed");

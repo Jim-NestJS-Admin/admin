@@ -94,8 +94,7 @@ export function createBackendGateway(
       accessToken: token.accessToken,
       expiresAt,
       user: data.user,
-      // 会话资料接口返回 superAdmin 后生效；字段出现前一律按非超级管理员处理
-      superAdmin: (data as { superAdmin?: unknown }).superAdmin === true,
+      superAdmin: data.superAdmin === true,
       organizationId: data.currentOrg?.id ?? "",
       authVersion: access.authVersion,
       organizations: data.orgs,

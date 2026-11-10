@@ -181,7 +181,9 @@ system:
   dictionaries: 字典
   dictCode: 字典标识
   dictName: 字典名称
-  dictCodeHint: 小写字母开头，可用小写字母、数字、下划线、点、短横线，2～64位
+  dictCodeHint: 小写字母开头，可用小写字母、数字、下划线、点、短横线，2～64位，不能以 sys. 开头
+  dictCodeHintSystem: 系统字典标识以 sys. 开头，如 sys.order_status
+  dictRank: 排序
   addDictionary: 新增字典
   editDictionary: 编辑字典
   noDictionary: 还没有字典
@@ -284,6 +286,8 @@ query:
   save: 保存常用查询
   apply: 应用查询
   export: 导出
+  exportExcel: Excel（.xlsx）
+  exportCsv: CSV（.csv）
   invalidNumber: 请输入有效数字
   invalidBoolean: 请选择是或否
   invalidDate: 请输入有效日期
