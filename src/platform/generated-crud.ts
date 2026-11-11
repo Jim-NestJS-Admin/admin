@@ -67,7 +67,7 @@ export function generatedCrud(prefix: string, resource = "") {
       info: "Info",
       update: "Update",
       remove: "Delete",
-      recycle: "Recycle",
+      recycle: "RecyclePage",
       restore: "Restore",
       purge: "Purge",
       export: "Export"
@@ -146,11 +146,11 @@ export function generatedCrud(prefix: string, resource = "") {
           }
         }
       : {}),
-    ...(available("Recycle")
+    ...(available("RecyclePage")
       ? {
           recycled: async (query, signal) => {
             const result = await data<{ list: CrudRecord[]; total: number }>(
-              "Recycle",
+              "RecyclePage",
               {
                 body: {
                   page: query.pageNumber,

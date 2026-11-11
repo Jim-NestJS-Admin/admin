@@ -966,6 +966,7 @@ defineExpose({ reload: view.initialize });
             "
             :dictionaries="schema.dictionaries"
             :disabled="saving || editor.readOnly"
+            :readonly="editor.readOnly"
             :issues="rowIssues"
             :cell="
               (row, field) =>

@@ -23,6 +23,8 @@ const props = defineProps<{
   draft: CrudChildDraft;
   dictionaries: CrudSchema["dictionaries"];
   disabled: boolean;
+  /** 详情查看：只显示文字，不显示增行、排序和行操作 */
+  readonly?: boolean;
   issues: CrudRowIssue[];
   cell?: (row: CrudRecord, field: string) => CrudCell;
 }>();
@@ -30,13 +32,17 @@ const { t } = useI18n();
 const dragKey = ref("");
 const cell = (row: CrudRecord, field: string) =>
   (props.cell ?? defaultCell)(row, field);
+/** 子表编辑只显示业务列；编号、创建人等系统列后端标了 hidden，和主表列表一样默认不显示 */
 const columns = computed<{ field: string; label: string; width?: number }[]>(
-  () => [
-    ...props.child.columns,
-    ...props.child.form.filter(
-      item => !props.child.columns.some(column => column.field === item.field)
-    )
-  ]
+  () => {
+    const shownColumns = props.child.columns.filter(column => !column.hidden);
+    return [
+      ...shownColumns,
+      ...props.child.form.filter(
+        item => !shownColumns.some(column => column.field === item.field)
+      )
+    ];
+  }
 );
 const sortable = computed(() => canReorder(props.child, props.draft, cell));
 function item(field: string) {
@@ -96,7 +102,7 @@ function drop(key: string) {
       :closable="false"
     />
     <template v-else>
-      <div class="crud-child-toolbar">
+      <div v-if="!readonly" class="crud-child-toolbar">
         <el-button
           :disabled="
             disabled ||
@@ -130,7 +136,7 @@ function drop(key: string) {
         border
       >
         <el-table-column
-          v-if="sortable"
+          v-if="sortable && !readonly"
           :label="t('crud.rowOrder')"
           width="120"
           fixed="left"
@@ -172,10 +178,12 @@ function drop(key: string) {
           v-for="column in columns"
           :key="column.field"
           :label="column.label"
-          :width="Math.max(column.width ?? 160, 150)"
+          :min-width="Math.max(column.width ?? 160, 150)"
         >
           <template #default="{ row }">
-            <template v-if="childWritable(child, row, column.field, cell)">
+            <template
+              v-if="!readonly && childWritable(child, row, column.field, cell)"
+            >
               <el-input-number
                 v-if="item(column.field)?.component === 'number'"
                 :model-value="childValue(row, column.field, cell) as number"
@@ -240,7 +248,11 @@ function drop(key: string) {
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="t('crud.actions')" fixed="right" width="130"
+        <el-table-column
+          v-if="!readonly"
+          :label="t('crud.actions')"
+          fixed="right"
+          width="130"
           ><template #default="{ row }"
             ><el-button
               link
