@@ -78,6 +78,8 @@ const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
 const mobile = useMediaQuery("(max-width: 760px)");
+/** 平板及更窄时左侧树收进「分类筛选」抽屉，让表格占满宽度 */
+const treeInDrawer = useMediaQuery("(max-width: 1024px)");
 /** 列表区本身变窄（窗口窄、左侧面板拉宽）时按紧凑排版：搜索整行、分页精简 */
 const mainEl = ref<HTMLElement>();
 const { width: mainWidth } = useElementSize(mainEl);
@@ -111,6 +113,7 @@ const {
   rowIssues,
   recycledView,
   choices,
+  baselineChoices,
   query,
   editor,
   visibleColumns,
@@ -380,7 +383,7 @@ defineExpose({ reload: view.initialize });
   >
     <el-splitter v-if="schema" class="crud-splitter" lazy>
       <el-splitter-panel
-        v-if="slots.tree && !mobile && !recycledView"
+        v-if="slots.tree && !treeInDrawer && !recycledView"
         size="220px"
         min="180px"
         max="400px"
@@ -400,7 +403,7 @@ defineExpose({ reload: view.initialize });
           <div class="crud-toolbar">
             <div class="crud-actions">
               <el-button
-                v-if="slots.tree && mobile && !recycledView"
+                v-if="slots.tree && treeInDrawer && !recycledView"
                 :icon="useRenderIcon(FilterIcon)"
                 @click="treeOpen = true"
                 >{{ t("crud.filter") }}</el-button
@@ -561,6 +564,7 @@ defineExpose({ reload: view.initialize });
                 <ColumnSettings
                   :schema="schema"
                   :choices="choices"
+                  :baseline="baselineChoices"
                   :disabled="saving"
                   @save="value => view.saveChoices(value)"
                 />
@@ -752,7 +756,7 @@ defineExpose({ reload: view.initialize });
       v-model="treeOpen"
       :title="t('crud.filter')"
       direction="ltr"
-      size="85%"
+      :size="mobile ? '85%' : '320px'"
       ><slot name="tree" :filter="view.filter"
     /></el-drawer>
     <component
@@ -984,7 +988,7 @@ defineExpose({ reload: view.initialize });
       />
       <template #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
-          t("crud.cancel")
+          t(editor.readOnly ? "crud.close" : "crud.cancel")
         }}</el-button
         ><el-button
           v-if="!editor.readOnly"

@@ -2352,6 +2352,8 @@ export type components = {
       form: components["schemas"]["CrudSchemaFormItem"][];
       label: string;
       maxSize: number;
+      /** @description 不含用户列设置的显示配置（代码默认 → 模块配置，按字段权限裁剪后）；结构同 view，前端列设置以它为基准只保存用户改过的部分 */
+      moduleView?: Record<string, never>;
       /**
        * @description 权限码前缀
        * @example system:user

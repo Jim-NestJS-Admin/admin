@@ -126,6 +126,7 @@ crud:
   confirmRemove: 确定删除选中的 {count} 条记录吗？
   confirm: 确定
   cancel: 取消
+  close: 关闭
   save: 保存
   apply: 应用
   filter: 分类筛选

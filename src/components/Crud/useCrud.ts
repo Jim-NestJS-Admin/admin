@@ -6,6 +6,7 @@ import { childDraft, childIssues, relatedChanges } from "./children.mjs";
 import { treeRows } from "./tree.mjs";
 import {
   columnChoices,
+  choiceDifference,
   applyPageView,
   pageSize,
   constrainFieldSchema,
@@ -51,6 +52,11 @@ export function useCrud(
     relatedCell(resource, row, field);
   const retryUntil = ref(0);
   const choices = ref<CrudChoices>({ columns: [], density: "default" });
+  /** 模块配置下的列（不含用户列设置），列设置以它为基准只保存差异、恢复默认 */
+  const baselineChoices = ref<CrudChoices>({
+    columns: [],
+    density: "default"
+  });
   const query = reactive<CrudQuery>({
     pageNumber: 1,
     pageSize: 20,
@@ -87,6 +93,7 @@ export function useCrud(
     treeOptions.value = [];
     selected.value = [];
     choices.value = { columns: [], density: "default" };
+    baselineChoices.value = { columns: [], density: "default" };
     total.value = 0;
     editor.open = false;
     editor.values = {};
@@ -236,9 +243,11 @@ export function useCrud(
       request = start();
     loading.value = true;
     try {
-      const description: CrudSchema = constrainFieldSchema(
-        applyPageView(await port.describe(request.signal))
-      );
+      const raw = await port.describe(request.signal);
+      const description: CrudSchema = constrainFieldSchema(applyPageView(raw));
+      const moduleSchema: CrudSchema = raw.moduleView
+        ? constrainFieldSchema(applyPageView({ ...raw, view: raw.moduleView }))
+        : description;
       if (context !== generation) return;
       schema.value = description;
       query.pageNumber = 1;
@@ -247,6 +256,7 @@ export function useCrud(
         .filter(sort => description.actions.page?.sortable.includes(sort.field))
         .map(sort => ({ field: sort.field, direction: sort.order }));
       choices.value = columnChoices(description);
+      baselineChoices.value = columnChoices(moduleSchema);
       let preferenceFailed = false,
         preferenceFailure: unknown;
       // 偏好失败不妨碍读列表，但必须提示；偏好不能增加后端未开放的列。
@@ -517,7 +527,11 @@ export function useCrud(
       request = start();
     try {
       if (port.preferences)
-        await port.preferences.save(pageKey, sanitized, request.signal);
+        await port.preferences.save(
+          pageKey,
+          choiceDifference(sanitized, baselineChoices.value),
+          request.signal
+        );
       if (context !== generation) return false;
       choices.value = sanitized;
       return true;
@@ -550,6 +564,7 @@ export function useCrud(
     recycledView,
     retryUntil,
     choices,
+    baselineChoices,
     query,
     editor,
     visibleColumns,

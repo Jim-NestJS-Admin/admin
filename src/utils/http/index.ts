@@ -88,6 +88,7 @@ export class PureHttp {
       try {
         response = await send();
       } catch (error) {
+        await decodeBlobFailure(error);
         check();
         const failure = normalizeFailure(error);
         if (
@@ -110,6 +111,7 @@ export class PureHttp {
         throw { response };
       return response.data as T;
     } catch (error) {
+      if (!(error instanceof RequestFailure)) await decodeBlobFailure(error);
       const failure =
         error instanceof RequestFailure
           ? error.failure
@@ -135,6 +137,31 @@ export class PureHttp {
     config?: PureHttpRequestConfig
   ) {
     return this.request<T>("post", url, params, config);
+  }
+}
+/**
+ * 下载类请求（导出、文件下载）按二进制接收，出错时后端仍返回统一 JSON；
+ * 先把它解析回对象，提示才能显示后端的原因（如「数据不存在或无权访问」），而不是「服务不可用」。
+ */
+async function decodeBlobFailure(error: unknown) {
+  const response = (
+    error as {
+      response?: { data?: unknown; headers?: Record<string, unknown> };
+    }
+  )?.response;
+  const data = response?.data;
+  // 浏览器里是 Blob，Node 环境下 axios 给的是字符串
+  const blob =
+    typeof Blob !== "undefined" && data instanceof Blob ? data : null;
+  if (!blob && typeof data !== "string") return;
+  const type = `${blob?.type ?? ""} ${String(response.headers?.["content-type"] ?? "")}`;
+  const size = blob ? blob.size : (data as string).length;
+  // 错误体很小；只解析声明为 JSON 的，过大的不读
+  if (!/json/i.test(type) || size > 64 * 1024) return;
+  try {
+    response.data = JSON.parse(blob ? await blob.text() : (data as string));
+  } catch {
+    // 不是合法 JSON 就保持原样，按通用失败处理
   }
 }
 export const http = new PureHttp();

@@ -7,7 +7,7 @@ import type {
   CrudRecord,
   CrudMutation,
   CrudSchema,
-  CrudChoices
+  CrudSavedChoices
 } from "@/components/Crud/types";
 
 type Operation = keyof typeof api;
@@ -196,22 +196,29 @@ export function generatedCrud(prefix: string, resource = "") {
           columns: Array.isArray(value?.columns)
             ? value.columns.map(column => ({
                 ...column,
-                visible: column.hidden !== true
+                ...(typeof column.hidden === "boolean"
+                  ? { visible: !column.hidden }
+                  : {})
               }))
             : []
         };
       },
-      save: async (_page, choices: CrudChoices, signal) => {
+      save: async (_page, choices: CrudSavedChoices, signal) => {
         await api.sessionPreferenceSave(
           {
             body: {
               key: `columns:${resource}`,
               value: {
                 density: choices.density,
+                // 只写用户改过的属性，没写的跟随模块配置
                 columns: choices.columns.map(column => ({
                   field: column.field,
-                  width: column.width,
-                  hidden: !column.visible,
+                  ...(typeof column.width === "number"
+                    ? { width: column.width }
+                    : {}),
+                  ...(typeof column.visible === "boolean"
+                    ? { hidden: !column.visible }
+                    : {}),
                   ...(column.fixed ? { fixed: column.fixed } : {})
                 }))
               }

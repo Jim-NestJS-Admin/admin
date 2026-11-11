@@ -10,6 +10,11 @@ import { notifyPageConfigChanged } from "@/platform/page-config-events";
 import { RequestFailure } from "@/utils/http";
 import type { CrudSchema } from "@/components/Crud/types";
 import FieldPermissions from "./FieldPermissions.vue";
+import {
+  DEFAULT_FORM_MODE,
+  DEFAULT_PAGE_SIZE,
+  minimalPageConfig
+} from "./page-config-diff.mjs";
 
 const { t } = useI18n();
 const modules = ref<
@@ -45,7 +50,7 @@ const items = ref<
 const options = reactive({
   pageSize: 20,
   tree: true,
-  mode: "drawer",
+  mode: DEFAULT_FORM_MODE as string,
   keyWords: [] as string[],
   filterable: [] as string[],
   sorting: [] as { field: string; order: string }[]
@@ -66,26 +71,20 @@ const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
-const config = () => ({
-  list: {
-    columns: columns.value.map(
-      ({ label: _label, fixed, width, ...column }) => ({
-        ...column,
-        ...(typeof width === "number" ? { width } : {}),
-        ...(fixed ? { fixed } : {})
-      })
-    ),
-    keyWords: options.keyWords,
-    filterable: options.filterable,
-    defaultSort: options.sorting,
-    pageSize: options.pageSize,
-    tree: options.tree
-  },
-  form: {
-    mode: options.mode,
-    items: items.value.map(({ label: _label, ...item }) => item)
-  }
-});
+// 只保存和代码默认不同的部分；默认取自原始页面描述（schema 本身不含任何配置）
+const config = () =>
+  schema.value
+    ? minimalPageConfig(
+        { columns: columns.value, items: items.value, options },
+        {
+          columns: schema.value.columns,
+          items: schema.value.form,
+          keyWords: schema.value.actions.page?.keyWords ?? [],
+          filterable: schema.value.actions.page?.filterable ?? [],
+          sorting: schema.value.defaultSort
+        }
+      )
+    : {};
 const dirty = computed(
   () => !!schema.value && JSON.stringify(config()) !== baseline
 );
@@ -122,7 +121,11 @@ function fill(value: unknown) {
           typeof saved.width === "number" && saved.width !== 160
             ? saved.width
             : original.width,
-        hidden: saved.hidden === true,
+        // 没配置过的列沿用代码默认（系统字段默认隐藏）
+        hidden:
+          typeof saved.hidden === "boolean"
+            ? saved.hidden
+            : original.hidden === true,
         fixed: ["left", "right"].includes(String(saved.fixed))
           ? String(saved.fixed)
           : ""
@@ -157,9 +160,13 @@ function fill(value: unknown) {
       }
     ];
   });
-  options.pageSize = typeof list.pageSize === "number" ? list.pageSize : 20;
+  options.pageSize =
+    typeof list.pageSize === "number" ? list.pageSize : DEFAULT_PAGE_SIZE;
   options.tree = list.tree !== false;
-  options.mode = form.mode === "dialog" ? "dialog" : "drawer";
+  options.mode =
+    form.mode === "dialog" || form.mode === "drawer"
+      ? form.mode
+      : DEFAULT_FORM_MODE;
   options.keyWords = Array.isArray(list.keyWords)
     ? list.keyWords.filter(
         (value): value is string => typeof value === "string"
