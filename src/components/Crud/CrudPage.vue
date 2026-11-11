@@ -8,7 +8,7 @@ import {
   watch
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useMediaQuery, useNow } from "@vueuse/core";
+import { useElementSize, useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
 import {
   ElMessageBox,
@@ -34,6 +34,7 @@ import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
 import ClearIcon from "~icons/ri/close-circle-line";
+import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import {
   cellText,
   columnChoices,
@@ -42,7 +43,13 @@ import {
   formPresentation
 } from "./model.mjs";
 import { useCrud } from "./useCrud";
-import type { CrudPort, CrudCell, CrudRecord, CrudChoices } from "./types";
+import type {
+  CrudPort,
+  CrudCell,
+  CrudRecord,
+  CrudChoices,
+  CrudExportFormat
+} from "./types";
 const props = withDefaults(
   defineProps<{
     port: CrudPort;
@@ -71,6 +78,12 @@ const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
 const mobile = useMediaQuery("(max-width: 760px)");
+/** 列表区本身变窄（窗口窄、左侧面板拉宽）时按紧凑排版：搜索整行、分页精简 */
+const mainEl = ref<HTMLElement>();
+const { width: mainWidth } = useElementSize(mainEl);
+const compact = computed(
+  () => mobile.value || (mainWidth.value > 0 && mainWidth.value < 640)
+);
 const treeOpen = ref(false);
 const activeChild = ref("");
 const stopReset = onSessionReset(() => {
@@ -110,7 +123,8 @@ onBeforeUnmount(() => {
   stopExport();
   exportRequest?.abort();
 });
-async function exportRows() {
+/** 按当前查询条件和可见列（显示顺序）导出；文件名用「页面名_年月日_时分」 */
+async function exportRows(format: CrudExportFormat) {
   if (!props.port.export || exporting.value) return;
   exportRequest = new AbortController();
   const request = exportRequest;
@@ -118,13 +132,26 @@ async function exportRows() {
   try {
     const file = await props.port.export(
       JSON.parse(JSON.stringify(query)),
-      request.signal
+      request.signal,
+      {
+        format,
+        columns: visibleColumns.value
+          .map(column => column.field)
+          .filter((field): field is string => typeof field === "string")
+      }
     );
     if (request.signal.aborted) return;
     const url = URL.createObjectURL(file),
       link = document.createElement("a");
     link.href = url;
-    link.download = `${schema.value.resource.replaceAll("/", "-")}.csv`;
+    const title = (schema.value.label || schema.value.resource).replace(
+      /[\\/:*?"<>|\s]+/g,
+      "-"
+    );
+    const now = new Date(),
+      pad = (value: number) => String(value).padStart(2, "0");
+    const stamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+    link.download = `${title}_${stamp}.${format}`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (reason) {
@@ -162,6 +189,62 @@ const formItems = computed(
           readCell(editor.record, item.field).state !== "hidden"
     ) ?? []
 );
+/**
+ * 详情：表单里的字段 + 列表里有、表单里没有的字段（如创建时间），
+ * 类型取列表列的类型（没有列时按表单组件推断），和列表显示一致。
+ */
+const infoItems = computed(() => {
+  const record = editor.record,
+    current = schema.value;
+  if (!editor.readOnly || !record || !current) return [];
+  const typeOf = (field: string, component?: string) =>
+    current.columns.find(column => column.field === field)?.type ??
+    (component === "switch"
+      ? "boolean"
+      : component === "date" || component === "datetime"
+        ? component
+        : undefined);
+  const items: {
+    field: string;
+    label: string;
+    dict?: string;
+    type?: string;
+    wide: boolean;
+  }[] = [];
+  const seen = new Set<string>();
+  for (const item of current.form) {
+    if (readCell(record, item.field).state === "hidden") continue;
+    seen.add(item.field);
+    items.push({
+      field: item.field,
+      label: item.label,
+      dict: item.dict,
+      type: typeOf(item.field, item.component),
+      wide: item.component === "textarea"
+    });
+  }
+  for (const column of current.columns)
+    if (
+      !seen.has(column.field) &&
+      readCell(record, column.field).state !== "hidden"
+    )
+      items.push({
+        field: column.field,
+        label: column.label,
+        dict: column.dict,
+        type: column.type,
+        wide: false
+      });
+  return items;
+});
+/** 头像等图片地址在详情里直接显示图片 */
+function imageUrl(value: unknown) {
+  return typeof value === "string" &&
+    /^(https?:\/\/|\/|data:image\/)/.test(value) &&
+    /(^data:image\/|\.(png|jpe?g|gif|webp|svg)(\?.*)?$)/i.test(value)
+    ? value
+    : "";
+}
 function readCell(row: CrudRecord, field: string) {
   return (props.cell ?? defaultCell)(row, field);
 }
@@ -308,7 +391,11 @@ defineExpose({ reload: view.initialize });
         </aside>
       </el-splitter-panel>
       <el-splitter-panel>
-        <div class="crud-main crud-card">
+        <div
+          ref="mainEl"
+          class="crud-main crud-card"
+          :class="{ 'is-compact': compact }"
+        >
           <!-- 工具栏（cool 结构）：左边操作按钮，右边关键字搜索、高级搜索、列设置 -->
           <div class="crud-toolbar">
             <div class="crud-actions">
@@ -361,14 +448,30 @@ defineExpose({ reload: view.initialize });
                 @click="confirmRecycle('purge')"
                 >{{ t("crud.purge") }}</el-button
               >
-              <el-button
+              <el-dropdown
                 v-if="port.export && !recycledView"
                 v-perm="permissions?.export ?? []"
-                :icon="useRenderIcon(DownloadIcon)"
-                :loading="exporting"
-                @click="exportRows"
-                >{{ t("query.export") }}</el-button
+                trigger="click"
+                :disabled="exporting"
+                @command="exportRows"
               >
+                <el-button
+                  :icon="useRenderIcon(DownloadIcon)"
+                  :loading="exporting"
+                  >{{ t("query.export")
+                  }}<component :is="ArrowDownIcon" class="crud-caret"
+                /></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="xlsx">{{
+                      t("query.exportExcel")
+                    }}</el-dropdown-item>
+                    <el-dropdown-item command="csv">{{
+                      t("query.exportCsv")
+                    }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
               <el-button
                 v-if="
                   port.recycled &&
@@ -615,14 +718,18 @@ defineExpose({ reload: view.initialize });
               v-model:page-size="query.pageSize"
               background
               :page-sizes="
-                [10, 20, 50, 100].filter(size => size <= schema.maxSize)
+                [...new Set([10, 20, 50, 100, query.pageSize])]
+                  .filter(size => size <= schema.maxSize)
+                  .sort((a, b) => a - b)
               "
               :total="total"
               :size="choices.density === 'small' ? 'small' : 'default'"
               :layout="
                 mobile
                   ? 'prev, pager, next'
-                  : 'total, sizes, prev, pager, next, jumper'
+                  : compact
+                    ? 'total, prev, pager, next'
+                    : 'total, sizes, prev, pager, next, jumper'
               "
               @size-change="view.search"
               @current-change="view.load"
@@ -660,10 +767,11 @@ defineExpose({ reload: view.initialize });
       :title="
         t(
           editor.readOnly
-            ? 'crud.info'
+            ? 'crud.infoOf'
             : editor.mode === 'add'
-              ? 'crud.add'
-              : 'crud.edit'
+              ? 'crud.addOf'
+              : 'crud.editOf',
+          { name: schema?.label ?? '' }
         )
       "
       :size="
@@ -692,7 +800,50 @@ defineExpose({ reload: view.initialize });
         type="warning"
         :closable="false"
       />
+      <!-- 详情：两列描述列表（Pure / Element 的 Descriptions），值和列表显示一致 -->
+      <el-descriptions
+        v-if="editor.readOnly && editor.record"
+        class="crud-info"
+        :column="mobile ? 1 : 2"
+        border
+      >
+        <el-descriptions-item
+          v-for="item in infoItems"
+          :key="item.field"
+          :label="item.label"
+          :span="item.wide && !mobile ? 2 : 1"
+          label-class-name="crud-info-label"
+        >
+          <el-tag
+            v-if="
+              item.type === 'boolean' &&
+              readCell(editor.record, item.field).state === 'visible' &&
+              typeof readCell(editor.record, item.field).display === 'boolean'
+            "
+            size="small"
+            effect="light"
+            :type="
+              readCell(editor.record, item.field).display ? 'success' : 'info'
+            "
+            >{{ display(editor.record, item) }}</el-tag
+          >
+          <el-avatar
+            v-else-if="imageUrl(readCell(editor.record, item.field).display)"
+            :size="40"
+            :src="imageUrl(readCell(editor.record, item.field).display)"
+          />
+          <span
+            v-else
+            :class="{
+              'crud-muted':
+                readCell(editor.record, item.field).state !== 'visible'
+            }"
+            >{{ display(editor.record, item) }}</span
+          >
+        </el-descriptions-item>
+      </el-descriptions>
       <el-form
+        v-else
         class="crud-editor-form"
         :label-position="mobile ? 'top' : 'right'"
         label-width="110px"
@@ -815,6 +966,7 @@ defineExpose({ reload: view.initialize });
             "
             :dictionaries="schema.dictionaries"
             :disabled="saving || editor.readOnly"
+            :readonly="editor.readOnly"
             :issues="rowIssues"
             :cell="
               (row, field) =>
@@ -875,6 +1027,22 @@ defineExpose({ reload: view.initialize });
   }
 }
 
+/* 详情：标签列固定宽度、浅灰底，值列铺满；下面的页签（关联数据）留出间距 */
+.crud-info {
+  margin-bottom: 20px;
+}
+
+.crud-info :deep(.crud-info-label) {
+  width: 120px;
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
+}
+
+.crud-info :deep(.el-descriptions__content) {
+  word-break: break-all;
+}
+
 .crud-editor-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -904,6 +1072,22 @@ defineExpose({ reload: view.initialize });
 
 .crud-splitter {
   height: 100%;
+}
+
+/* 面板内容不整体横向滚动：表格自己有横向滚动条 */
+.crud-splitter :deep(.el-splitter-panel) {
+  overflow: hidden;
+}
+
+/* 紧凑排版：搜索组独占一行并撑满，输入框随宽度伸缩 */
+.crud-main.is-compact .crud-search {
+  width: 100%;
+}
+
+.crud-main.is-compact .crud-keyword {
+  flex: 1;
+  width: auto;
+  min-width: 0;
 }
 
 .crud-splitter :deep(.el-splitter-bar) {
@@ -963,6 +1147,13 @@ defineExpose({ reload: view.initialize });
 
 .crud-actions :deep(.el-button + .el-button) {
   margin-left: 0;
+}
+
+/* 导出按钮右侧的下拉箭头 */
+.crud-caret {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
 }
 
 .crud-keyword {

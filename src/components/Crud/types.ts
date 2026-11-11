@@ -48,9 +48,19 @@ export interface CrudMutation {
   idempotencyKey: string;
   relatedChanges?: CrudRelatedChange[];
 }
+export type CrudExportFormat = "csv" | "xlsx";
+export interface CrudExportOptions {
+  format: CrudExportFormat;
+  columns?: string[];
+}
 export interface CrudPort {
   tree?(signal: AbortSignal): Promise<CrudRecord[]>;
-  export?(query: CrudQuery, signal: AbortSignal): Promise<Blob>;
+  /** format 默认 csv；columns 为当前可见列（按显示顺序），服务端仍按字段权限裁剪 */
+  export?(
+    query: CrudQuery,
+    signal: AbortSignal,
+    options?: CrudExportOptions
+  ): Promise<Blob>;
   describe(signal: AbortSignal): Promise<CrudSchema>;
   list(
     query: CrudQuery,

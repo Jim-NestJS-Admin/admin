@@ -37,6 +37,7 @@ type Dictionary = {
   name: string;
   enabled: boolean;
   builtin: boolean;
+  rank: number;
 };
 type Kind = "system" | "business";
 
@@ -80,7 +81,9 @@ function switchKind(next: Kind) {
   if (kind.value === next) return;
   kind.value = next;
   keyword.value = "";
-  selectedId.value = ofKind.value[0]?.id ?? "";
+  selectedId.value = "";
+  list.value = [];
+  void load();
 }
 /** 字典项列表固定归属当前字典；对象要稳定，否则右侧列表会反复重建 */
 const fixed = computed(() =>
@@ -108,7 +111,8 @@ function toDictionary(row: CrudRecord): Dictionary[] {
           code: String(row.code ?? ""),
           name: String(row.name ?? row.code ?? row.id),
           enabled: row.enabled !== false,
-          builtin: row.builtin === true
+          builtin: row.builtin === true,
+          rank: typeof row.rank === "number" ? row.rank : 0
         }
       ]
     : [];
@@ -128,7 +132,8 @@ async function load() {
           pageSize: 500,
           search: "",
           sorting: [],
-          equality: {}
+          // 系统字典和业务字典分开查；非超级管理员只能查业务字典
+          equality: { builtin: activeKind.value === "system" }
         },
         controller.signal
       );
@@ -136,7 +141,9 @@ async function load() {
       if (rows.length >= result.totalRows || !result.rows.length) break;
     }
     if (controller.signal.aborted || epoch !== user.epoch) return;
-    list.value = rows.flatMap(toDictionary);
+    list.value = rows
+      .flatMap(toDictionary)
+      .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
     if (!ofKind.value.some(item => item.id === selectedId.value))
       selectedId.value = ofKind.value[0]?.id ?? "";
   } catch (reason) {
@@ -155,7 +162,8 @@ const dialog = reactive({
   editing: undefined as Dictionary | undefined,
   code: "",
   name: "",
-  enabled: true
+  enabled: true,
+  rank: 0
 });
 function openDialog(item?: Dictionary) {
   Object.assign(dialog, {
@@ -163,18 +171,28 @@ function openDialog(item?: Dictionary) {
     busy: false,
     error: "",
     editing: item,
-    code: item?.code ?? "",
+    code: item?.code ?? (activeKind.value === "system" ? "sys." : ""),
     name: item?.name ?? "",
-    enabled: item?.enabled ?? true
+    enabled: item?.enabled ?? true,
+    rank: item?.rank ?? 0
   });
 }
 async function submit() {
   if (dialog.busy) return;
   const code = dialog.code.trim(),
     name = dialog.name.trim();
-  if (!dialog.editing && !/^[a-z][a-z0-9_.-]{1,63}$/.test(code)) {
-    dialog.error = t("system.dictCodeHint");
-    return;
+  if (!dialog.editing) {
+    // 系统字典编码统一 sys. 开头，业务字典不能占用这个前缀；后端同样校验
+    const system = activeKind.value === "system";
+    if (
+      !/^[a-z][a-z0-9_.-]{1,63}$/.test(code) ||
+      code.startsWith("sys.") !== system
+    ) {
+      dialog.error = t(
+        system ? "system.dictCodeHintSystem" : "system.dictCodeHint"
+      );
+      return;
+    }
   }
   if (!name) {
     dialog.error = t("system.dictName");
@@ -192,7 +210,7 @@ async function submit() {
     const saved = dialog.editing
       ? await port.update!(
           { id: dialog.editing.id, version: dialog.editing.version },
-          { name, enabled: dialog.enabled },
+          { name, enabled: dialog.enabled, rank: dialog.rank },
           context
         )
       : await port.create!(
@@ -200,6 +218,7 @@ async function submit() {
             code,
             name,
             enabled: dialog.enabled,
+            rank: dialog.rank,
             // 只在系统字典页签下新增时带上，后端只允许超级管理员这样做
             ...(activeKind.value === "system" ? { builtin: true } : {})
           },
@@ -371,7 +390,7 @@ onMounted(load);
                   @click="openDialog(item)"
                 />
                 <el-button
-                  v-if="can('systemDictTypeDelete')"
+                  v-if="can('systemDictTypeDelete') && !item.builtin"
                   link
                   type="danger"
                   :icon="useRenderIcon(DeleteIcon)"
@@ -389,6 +408,7 @@ onMounted(load);
           :key="selectedId"
           resource="dict-item"
           :fixed="fixed"
+          :no-remove="selected?.builtin"
         />
         <div v-else class="dict-card dict-blank">
           <el-empty
@@ -425,13 +445,28 @@ onMounted(load);
             v-model="dialog.code"
             maxlength="64"
             :disabled="!!dialog.editing || dialog.busy"
-            :placeholder="t('system.dictCodeHint')"
+            :placeholder="
+              t(
+                activeKind === 'system'
+                  ? 'system.dictCodeHintSystem'
+                  : 'system.dictCodeHint'
+              )
+            "
           />
         </el-form-item>
         <el-form-item :label="t('system.dictName')" required>
           <el-input
             v-model="dialog.name"
             maxlength="100"
+            :disabled="dialog.busy"
+          />
+        </el-form-item>
+        <el-form-item :label="t('system.dictRank')">
+          <el-input-number
+            v-model="dialog.rank"
+            :min="0"
+            :max="1000000"
+            controls-position="right"
             :disabled="dialog.busy"
           />
         </el-form-item>
@@ -454,6 +489,10 @@ onMounted(load);
 <style scoped lang="scss">
 .dict-page {
   min-height: 0;
+  overflow: hidden;
+}
+
+.dict-page :deep(.el-splitter-panel) {
   overflow: hidden;
 }
 

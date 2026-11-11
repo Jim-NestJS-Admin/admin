@@ -13,17 +13,34 @@ import Illustration from "@/assets/login/illustration.svg?component";
 import User from "~icons/ri/user-3-fill";
 import Lock from "~icons/ri/lock-fill";
 import { getConfig } from "@/config";
+import { message } from "@/utils/message";
 const TITLE = getConfig("Title");
+/** 记住账号：只在本机保存账号，不保存密码（密码交给浏览器自带的密码管理） */
+const REMEMBER_KEY = "jna-remember-account";
+function readRemembered() {
+  try {
+    return localStorage.getItem(REMEMBER_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+function writeRemembered(value: string) {
+  try {
+    if (value) localStorage.setItem(REMEMBER_KEY, value);
+    else localStorage.removeItem(REMEMBER_KEY);
+  } catch {
+    // 浏览器禁用本地存储时忽略
+  }
+}
 const { t, locale } = useI18n();
 const router = useRouter();
-const account = ref("");
+const account = ref(readRemembered());
+const remember = ref(!!account.value);
 const password = ref("");
 const proof = ref("");
 const captchaId = ref("");
 const revision = ref(0);
 const busy = ref(false);
-const error = ref("");
-const fields = ref<string[]>([]);
 const retry = ref(0);
 const timer = setInterval(() => {
   if (retry.value > 0) retry.value--;
@@ -33,21 +50,11 @@ watch([account, locale], () => {
   proof.value = "";
   captchaId.value = "";
   revision.value++;
-  error.value = "";
-  fields.value = [];
-});
-// 重新输入验证码时清掉上一次的错误提示
-watch(proof, value => {
-  if (!value) return;
-  error.value = "";
-  fields.value = [];
 });
 async function signIn() {
   if (busy.value || retry.value > 0) return;
-  error.value = "";
-  fields.value = [];
   if (!gatewayReady()) {
-    error.value = t("admin.serviceUnavailable");
+    message(t("admin.serviceUnavailable"), { type: "error" });
     return;
   }
   if (
@@ -56,10 +63,11 @@ async function signIn() {
     !proof.value ||
     !captchaId.value
   ) {
-    error.value = t("admin.verificationRequired");
+    message(t("admin.verificationRequired"), { type: "warning" });
     return;
   }
   busy.value = true;
+  let keepPassword = false;
   try {
     await useUserStoreHook().loginByUsername({
       account: account.value.trim(),
@@ -67,19 +75,32 @@ async function signIn() {
       captchaId: captchaId.value,
       captchaCode: proof.value
     });
+    writeRemembered(remember.value ? account.value.trim() : "");
     await router.replace("/welcome");
   } catch (reason) {
     const view = failureView(
       reason instanceof RequestFailure ? reason.failure : null
     );
-    error.value = view.message.startsWith("admin.")
+    // 和 Pure 一样用顶部消息提示，不在表单里堆红字
+    const text = view.message.startsWith("admin.")
       ? t(view.message)
       : view.message;
-    fields.value = view.fields;
+    message([text, ...view.fields].join("；"), {
+      type: "error",
+      duration: 3000
+    });
     retry.value = view.retrySeconds;
+    // 只是验证码错了：保留密码，只重新输入验证码
+    const data: { errors?: unknown } | null =
+      reason instanceof RequestFailure ? reason.failure.data : null;
+    const errors = Array.isArray(data?.errors)
+      ? (data.errors as { field?: unknown }[])
+      : [];
+    keepPassword =
+      errors.length > 0 && errors.every(item => item?.field === "captchaCode");
   } finally {
     busy.value = false;
-    password.value = "";
+    if (!keepPassword) password.value = "";
     proof.value = "";
     captchaId.value = "";
     revision.value++;
@@ -142,13 +163,14 @@ async function signIn() {
               @proof="proof = $event"
               @challenge="captchaId = $event"
             />
-            <div v-if="error" class="login-error" role="alert">
-              <p>{{ error }}</p>
-              <p v-for="(field, index) in fields" :key="index">{{ field }}</p>
+            <div class="login-options">
+              <el-checkbox v-model="remember">{{
+                t("admin.rememberAccount")
+              }}</el-checkbox>
+              <span v-if="retry > 0" class="login-retry" role="status">{{
+                t("admin.retryAfter", { seconds: retry })
+              }}</span>
             </div>
-            <p v-if="retry > 0" role="status">
-              {{ t("admin.retryAfter", { seconds: retry }) }}
-            </p>
             <el-button
               class="login-submit"
               native-type="submit"
@@ -176,6 +198,12 @@ async function signIn() {
 </style>
 
 <style scoped lang="scss">
+@media screen and (height <= 600px) {
+  .login-container {
+    min-height: 600px;
+  }
+}
+
 .pure-login {
   position: relative;
   min-height: 100dvh;
@@ -204,14 +232,17 @@ form {
   width: 100%;
 }
 
-.login-error {
-  color: var(--el-color-danger);
-  text-align: left;
+/* 记住账号一行（参考 Pure 的「记住密码 / 忘记密码」行）：贴近上方输入框 */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 20px;
+  margin-top: -8px;
 }
 
-@media screen and (height <= 600px) {
-  .login-container {
-    min-height: 600px;
-  }
+.login-retry {
+  font-size: var(--el-font-size-small);
+  color: var(--el-text-color-secondary);
 }
 </style>

@@ -140,6 +140,17 @@ export function createApiClient(
         { ...config, responseType: "blob", responseMode: "raw" }
       );
     },
+    devCodegenFieldTypes(
+      input: OperationInput<"devCodegenFieldTypes"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenFieldTypes">>(
+        "post",
+        interpolate("/admin/dev/codegen/field-types", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     devCodegenImport(
       input: OperationInput<"devCodegenImport"> & {
         body: OperationBody<"devCodegenImport">;
@@ -149,6 +160,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"devCodegenImport">>(
         "post",
         interpolate("/admin/dev/codegen/import", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenImportSpec(
+      input: OperationInput<"devCodegenImportSpec"> & {
+        body: OperationBody<"devCodegenImportSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenImportSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/import-spec", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -190,6 +214,19 @@ export function createApiClient(
         config
       );
     },
+    devCodegenPreviewSpec(
+      input: OperationInput<"devCodegenPreviewSpec"> & {
+        body: OperationBody<"devCodegenPreviewSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenPreviewSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/preview-spec", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     devCodegenSave(
       input: OperationInput<"devCodegenSave"> & {
         body: OperationBody<"devCodegenSave">;
@@ -199,6 +236,32 @@ export function createApiClient(
       return transport.request<OperationResponse<"devCodegenSave">>(
         "post",
         interpolate("/admin/dev/codegen/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenSaveSpec(
+      input: OperationInput<"devCodegenSaveSpec"> & {
+        body: OperationBody<"devCodegenSaveSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenSaveSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/save-spec", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenSchemaSpec(
+      input: OperationInput<"devCodegenSchemaSpec"> & {
+        body: OperationBody<"devCodegenSchemaSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenSchemaSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/schema-spec", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -227,6 +290,19 @@ export function createApiClient(
         config
       );
     },
+    devCodegenValidateSpec(
+      input: OperationInput<"devCodegenValidateSpec"> & {
+        body: OperationBody<"devCodegenValidateSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenValidateSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/validate-spec", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     devCodegenWrite(
       input: OperationInput<"devCodegenWrite"> & {
         body: OperationBody<"devCodegenWrite">;
@@ -236,6 +312,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"devCodegenWrite">>(
         "post",
         interpolate("/admin/dev/codegen/write", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    devCodegenWriteSpec(
+      input: OperationInput<"devCodegenWriteSpec"> & {
+        body: OperationBody<"devCodegenWriteSpec">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"devCodegenWriteSpec">>(
+        "post",
+        interpolate("/admin/dev/codegen/write-spec", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

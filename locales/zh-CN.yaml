@@ -111,6 +111,7 @@ admin:
   signOut: 退出
   confirmSignOut: 确定要退出登录吗？
   captchaAfterAccount: 输入账号后显示
+  rememberAccount: 记住账号
   requiredAccount: 请输入账号
   requiredPassword: 请输入密码
   retry: 重试
@@ -173,6 +174,9 @@ crud:
   confirmPurge: 确定彻底删除选中的 {count} 条记录及其全部明细吗？此操作无法撤销。
   duplicateRow: 同组明细的唯一字段不能重复
   info: 详情
+  infoOf: "{name}详情"
+  addOf: "新增{name}"
+  editOf: "编辑{name}"
 
 system:
   roleAssignments: 角色分配
@@ -181,7 +185,9 @@ system:
   dictionaries: 字典
   dictCode: 字典标识
   dictName: 字典名称
-  dictCodeHint: 小写字母开头，可用小写字母、数字、下划线、点、短横线，2～64位
+  dictCodeHint: 小写字母开头，可用小写字母、数字、下划线、点、短横线，2～64位，不能以 sys. 开头
+  dictCodeHintSystem: 系统字典标识以 sys. 开头，如 sys.order_status
+  dictRank: 排序
   addDictionary: 新增字典
   editDictionary: 编辑字典
   noDictionary: 还没有字典
@@ -284,6 +290,8 @@ query:
   save: 保存常用查询
   apply: 应用查询
   export: 导出
+  exportExcel: Excel（.xlsx）
+  exportCsv: CSV（.csv）
   invalidNumber: 请输入有效数字
   invalidBoolean: 请选择是或否
   invalidDate: 请输入有效日期
@@ -311,63 +319,201 @@ query:
     notNull: 不为空
 
 codegen:
-  manualStepsPreview: 生成后还需人工完成以下步骤；预览和写入均不会自动执行。
-  manualStepsAfterWrite: 文件已写入，功能尚未接通。还需人工完成以下步骤。
   title: 代码生成
-  choose: 选择已保存配置
-  developmentOnly: 仅开发环境可用。只生成文件，不自动执行建表、安装或发布。
-  configuration: 生成配置
-  readTables: 读取可导入表
-  importTable: 导入已有表
+  developmentOnly: 仅开发环境可用。只生成文件，不会自动建表、安装依赖或发布。
+  newModule: 新建模块
+  editModule: 编辑模块
+  searchHint: 搜索名称、模块、表名
+  emptyList: 还没有生成记录，点「新建模块」开始
+  confirmDelete: 只删除「{name}」的生成配置，已生成的代码不会删除。确定继续？
+  deleted: 已删除
+  titleLabel: 显示名称
+  moduleKey: 模块标识
+  tableName: 数据库表名
+  template: 模板
+  fieldCount: 字段数
+  status: 状态
+  updatedAt: 更新时间
+  templates:
+    single: 单表
+    tree: 树表
+    masterDetail: 主子表
+  templateTips:
+    single: 一张表一个列表页，最常用
+    tree: 带父级的层级数据，如分类、部门
+    masterDetail: 一张单据带若干明细，如订单和订单行
+  statuses:
+    notGenerated: 未生成
+    generated: 已生成
+    modified: 配置有改动
+    invalid: 配置无效
+  steps:
+    source: 选来源
+    table: 表信息
+    fields: 字段
+    relations: 关系
+    options: 选项
+    generate: 预览生成
+  invalidRecord: 这条生成配置读不出来，可以重新导入或新建填写，保存后会覆盖它；也可以回到列表删除。
+  modifiedChoose: 下面这些文件上次生成后被手改过，默认跳过；勾选的会被覆盖：
+  overwriteThis: 覆盖这个文件
+  overwriteChosenTip: 已勾选覆盖：写入时会用生成内容替换手改过的文件。下面是两者的差异。
+  backToList: 返回列表
+  unsaved: 未保存
+  pagePreview: 页面预览
+  sourceNew: 新建表
+  sourceNewTip: 在页面上逐行填写字段，生成时同时生成建表迁移
+  sourceImport: 从已有表导入
+  sourceImportTip: 读取数据库里已有的表，按注释和类型推断字段；可多选，第一张是主表，其余作为子表
+  sourceLocked: 这是已保存的配置，来源不能再改；可以直接到后面的步骤修改。
+  searchTable: 搜索表名或注释
+  importTip: 最多选 6 张；点选顺序决定主表和子表
+  noTables: 没有可导入的表（系统表和已有配置的表不显示）
+  tableComment: 表注释
+  importAs: 导入为
+  mainTable: 主表
+  childTable: 子表
+  detail: 明细
+  pickLimit: 最多选 6 张表
+  importAndNext: 导入 {count} 张表并继续
+  sectionTable: 表和模块
+  tableNameTip: 小写字母开头，只能用小写字母、数字、下划线；不能以 sys_ 开头。模块、业务标识、权限前缀按表名自动推导。
+  titlePlaceholder: 例如：客户管理
   moduleName: 模块标识
   businessName: 业务标识
-  titleLabel: 显示名称
   permissionPrefix: 权限前缀
-  tableName: 数据库表名
-  single: 单表
-  tree: 树表
-  masterDetail: 主子表
-  soft: 软删除
-  hard: 物理删除
-  dialog: 弹窗表单
-  drawer: 抽屉表单
-  scope: 启用组织数据权限
-  parent: 父级字段
-  nodeName: 节点名称字段
-  sort: 顺序字段（可选）
-  fieldHelp: 类型可填string/int/decimal/money/date/datetime/boolean/json；组件按后端契约填写；字段安全设置为JSON。保存时由后端再次校验。
+  namesTip: 权限码为「权限前缀:操作」，例如 crm:customer:add。
+  resetNames: 恢复按表名推导
   addField: 添加字段
+  insertField: 插入
+  removeField: 删除
+  moveUp: 上移
+  moveDown: 下移
+  dragHint: 拖动调整顺序
+  fieldTotal: 共 {count} 个字段
+  foreignKeyHint: 关联主表的外键 {name} 由框架维护，不用在这里添加
+  column: 列名
+  columnPlaceholder: 例如 customer_name
+  kind: 类型
+  length: 长度
+  nullable: 可空
+  defaultValue: 默认值
+  noDefault: 无
+  boolYes: 是
+  boolNo: 否
+  comment: 注释
+  noFields: 还没有字段
+  fieldProperties: 字段属性
+  unnamed: 未命名
+  pickField: 选中左边一行查看属性
   property: 属性名
-  column: 数据库列名
+  propertyTip: 代码里的字段名（小驼峰），默认由列名转换
   label: 显示名称
-  kind: 数据类型
-  widget: 表单组件
-  query: 查询方式
-  dictionary: 字典标识
-  security: 字段权限JSON
-  size: 长度
-  optional: 可为空
-  listed: 列表显示
-  editable: 表单显示
-  required: 必填
+  typeHint: 数据库类型 {database}，默认表单组件「{component}」
+  components:
+    input: 输入框
+    textarea: 多行文本
+    number: 数字
+    select: 下拉
+    radio: 单选
+    checkbox: 多选
+    switch: 开关
+    date: 日期
+    datetime: 日期时间
+    image: 图片
+    file: 文件
+    rich: 富文本
+    tree-select: 树选择
+    relation: 关联选择
+  precision: 精度（总位数）
+  scale: 小数位
+  dictionary: 字典
+  dictRequired: 字典类型必须选择字典
+  dictOptional: 可选，选了以后列表显示字典名称
+  dictUnknown: 字典列表里没有这个编码，请确认已在「字典管理」中建好
   unique: 唯一
-  order: 调整顺序
+  uniqueTip: 同一租户下不能重复（已删除的数据不算）
+  fieldPerm: 默认字段权限
+  perm:
+    editable: 可编辑
+    readonly: 只读
+    masked: 脱敏
+    hidden: 隐藏
+  mask: 脱敏规则
+  masks:
+    phone: 手机号
+    email: 邮箱
+    idcard: 身份证号
+    last4: 只显示后 4 位
+    all: 全部隐藏
+  displayLater: 列表列、查询项、表单组件和布局生成时按类型给默认值，生成后到「模块配置」调整。
+  childInRelations: 子表的表名和外键在「关系」一步修改
   addChild: 添加子表
-  childTable: 子表名
-  foreignKey: 子表关联字段
-  pagePreview: 页面结构预览
-  preview: 预览代码
-  previewRequired: 保存当前配置后重新预览。覆盖已修改的文件必须逐项勾选，预览过期时需重新生成。
-  file: 文件
-  overwrite: 明确覆盖
-  sync: 比较表结构
-  syncNotice: 以下只显示结构差异，不自动修改数据库或覆盖字段配置。
-  download: 下载ZIP
-  write: 确认写入文件
-  confirmWrite: 将写入以下文件。不会执行迁移、安装依赖或提交代码，是否继续？
-  confirmDelete: 只删除生成配置，不删除已生成的代码。确定继续？
-  invalidFields: 字段配置需完整且名称唯一，最多200项；属性/列名必须符合标识符规则。
-  invalidDownload: 后端未返回有效压缩包
+  singleNoRelation: 单表不需要配置关系，直接下一步
+  treeSection: 树形字段
+  treeTip: 父级字段存上级记录的编号（根节点为空），名称字段用于树上显示，排序字段可选。
+  treeParent: 父级字段
+  treeName: 名称字段
+  treeSort: 排序字段
+  addTreeFields: 缺少的树形字段一键添加
+  childSection: 子表
+  childTip: 每张子表通过外键关联主表，外键列由框架自动生成和维护，最多 5 张子表。
+  foreignKey: 外键属性
+  childFields: "{count} 个字段，去编辑"
+  deleteMode: 删除方式
+  soft: 软删除
+  softTip: 删除后进回收站，可以恢复或彻底删除（推荐）
+  hard: 物理删除
+  hardTip: 直接从数据库删除，不能恢复
+  otherOptions: 其他
+  scope: 组织数据权限
+  scopeTip: 按组织隔离数据，角色的数据范围（本组织、本组织及下级等）生效
+  exportEnabled: 导出
+  exportTip: 列表工具栏提供导出 Excel / CSV
+  saveDraft: 保存草稿
+  draftSaved: 草稿已保存
+  checking: 正在校验…
+  checkPending: 点「下一步」时检查
+  checkPassed: 校验通过
+  problems: 有 {count} 处需要修改
+  fixFirst: 请先修改标红的地方
+  prev: 上一步
+  next: 下一步
+  leave: 离开页面
+  leaveConfirm: 有未保存的修改，离开后会丢失。
+  leaveDiscard: 放弃修改
+  leaveStay: 留在这里
+  repreview: 重新预览
+  previewStale: 预览之后规格又改过，请重新预览后再写入。
+  previewNote: 已存在且和生成内容不同的文件可以看差异；手改过的文件默认跳过不覆盖。
+  sqlFile: 建表 SQL
+  sqlTip: 只用于查看；生成的是迁移文件，确认后自己执行迁移命令建表。
+  projects:
+    server: 后端 server
+    admin: 前端 admin
+  actions:
+    create: 新建
+    overwrite: 覆盖
+    unchanged: 未变
+    skip-modified: 手改跳过
+  viewDiff: 差异
+  viewCode: 代码
+  copy: 复制
+  copied: 已复制
+  copyFailed: 复制失败，请手动选择复制
+  skipModifiedTip: 这个文件上次生成后被手改过，写入时会跳过，不会覆盖。下面是两者的差异。
+  skippedLines: "… 省略 {count} 行相同内容 …"
+  write: 写入文件
+  writeCount: 确认写入 {count} 个文件
+  confirmWrite: 将写入以下文件。只写文件，不会执行迁移、安装依赖或提交代码。
+  written: 已写入
+  writePartial: 部分文件没有写入
+  writeSummary: 写入 {written} 个，跳过 {skipped} 个，失败 {failed} 个
+  writeFailed: 写入失败
+  writeSkipped: 跳过（手改过）
+  manualSteps: 还需要人工完成
+  previewNotice: 示例数据，和生成后的列表、详情、新增编辑表单一致；这里的新增、修改、删除不会保存。
+  previewNoSave: 预览里的操作不会保存
 
 pageConfig:
   title: 模块配置

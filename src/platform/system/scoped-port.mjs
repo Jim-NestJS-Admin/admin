@@ -27,7 +27,8 @@ export function scopePort(base, fixed) {
           base.update(identity, { ...values, ...fixed }, context)
       : undefined,
     export: base.export
-      ? (query, signal) => base.export(scopedQuery(query), signal)
+      ? (query, signal, options) =>
+          base.export(scopedQuery(query), signal, options)
       : undefined
   };
 }

@@ -111,6 +111,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/dev/codegen/field-types": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 支持的字段类型与默认设置 */
+    post: operations["devCodegenFieldTypes"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/dev/codegen/import": {
     parameters: {
       query?: never;
@@ -122,6 +139,23 @@ export type paths = {
     put?: never;
     /** 按表结构生成初始配置（不保存） */
     post: operations["devCodegenImport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/import-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 从一张或多张表推断规格草稿 */
+    post: operations["devCodegenImportSpec"];
     delete?: never;
     options?: never;
     head?: never;
@@ -179,6 +213,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/dev/codegen/preview-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 预览规格的 SQL、文件、差异和指纹 */
+    post: operations["devCodegenPreviewSpec"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/dev/codegen/save": {
     parameters: {
       query?: never;
@@ -190,6 +241,40 @@ export type paths = {
     put?: never;
     /** 保存生成配置（新建或修改） */
     post: operations["devCodegenSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/save-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存规格草稿 */
+    post: operations["devCodegenSaveSpec"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/schema-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 按规格计算正式 CRUD 页面描述 */
+    post: operations["devCodegenSchemaSpec"];
     delete?: never;
     options?: never;
     head?: never;
@@ -230,6 +315,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/dev/codegen/validate-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 逐字段校验模块规格 */
+    post: operations["devCodegenValidateSpec"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/dev/codegen/write": {
     parameters: {
       query?: never;
@@ -241,6 +343,23 @@ export type paths = {
     put?: never;
     /** 确认写入本机项目（只写文件，不执行命令） */
     post: operations["devCodegenWrite"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/dev/codegen/write-spec": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 核对预览指纹后写入规格代码 */
+    post: operations["devCodegenWriteSpec"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2564,6 +2683,9 @@ export type components = {
     IdBody: {
       id: string;
     };
+    ImportSpecBody: {
+      tables: string[];
+    };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
       captchaCode?: string;
@@ -2605,6 +2727,21 @@ export type components = {
       menus: components["schemas"]["MenuItemDto"][];
       /** @description 当前组织下的权限码，明确列表，没有通配符 */
       permissions: string[];
+    };
+    ModuleSpec: {
+      businessName: string;
+      children?: components["schemas"]["SpecChild"][];
+      fields: components["schemas"]["SpecField"][];
+      moduleName: string;
+      options?: components["schemas"]["SpecOptions"];
+      permissionPrefix: string;
+      tableName: string;
+      /** @enum {string} */
+      template: "single" | "tree" | "masterDetail";
+      title: string;
+      tree?: components["schemas"]["SpecTree"];
+      /** @enum {number} */
+      version: 1;
     };
     OrgOption: {
       id: string;
@@ -2715,6 +2852,139 @@ export type components = {
       changes: components["schemas"]["FieldConfigurationChange"][];
       roleId: string;
     };
+    SaveSpecBody: {
+      id?: string;
+      spec: components["schemas"]["ModuleSpec"];
+      version?: number;
+    };
+    SpecBody: {
+      spec: components["schemas"]["ModuleSpec"];
+    };
+    SpecChild: {
+      fields: components["schemas"]["SpecField"][];
+      /** @description 由框架维护的外键属性，不得同时出现在 fields 中 */
+      foreignKey: string;
+      tableName: string;
+      title: string;
+    };
+    SpecError: {
+      message: string;
+      path: string;
+    };
+    SpecField: {
+      column: string;
+      comment?: string;
+      defaultValue?: (string | number | boolean) | null;
+      dictCode?: string;
+      fieldPerm?: components["schemas"]["SpecFieldPerm"];
+      label: string;
+      length?: number;
+      nullable?: boolean;
+      precision?: number;
+      property: string;
+      scale?: number;
+      /** @enum {string} */
+      type:
+        | "string"
+        | "text"
+        | "int"
+        | "decimal"
+        | "money"
+        | "date"
+        | "datetime"
+        | "boolean"
+        | "json"
+        | "dictionary"
+        | "reference"
+        | "image"
+        | "file";
+      unique?: boolean;
+    };
+    SpecFieldPerm: {
+      /** @enum {string} */
+      default: "editable" | "readonly" | "masked" | "hidden";
+      /** @enum {string} */
+      mask?: "phone" | "email" | "idcard" | "last4" | "all";
+    };
+    SpecFieldType: {
+      component: string;
+      databaseType: string;
+      defaultLength?: number;
+      label: string;
+      options: string[];
+      precision?: number;
+      scale?: number;
+      type: string;
+    };
+    SpecFile: {
+      /** @enum {string} */
+      action: "create" | "overwrite" | "unchanged" | "skip-modified";
+      content: string;
+      diff: string;
+      key: string;
+      path: string;
+      previous: string;
+      /** @enum {string} */
+      project: "server" | "admin";
+    };
+    SpecImportResult: {
+      errors: components["schemas"]["SpecError"][];
+      spec: components["schemas"]["ModuleSpec"];
+    };
+    SpecOptions: {
+      /** @enum {string} */
+      deleteMode?: "soft" | "hard";
+      exportEnabled?: boolean;
+      scopeEnabled?: boolean;
+    };
+    SpecPreviewResult: {
+      files: components["schemas"]["SpecFile"][];
+      fingerprint: string;
+      manualSteps: string[];
+      note: string;
+      spec: components["schemas"]["ModuleSpec"];
+      sql: string[];
+      token: string;
+    };
+    SpecRecord: {
+      error?: string;
+      id: string;
+      label: string;
+      name: string;
+      spec?: components["schemas"]["ModuleSpec"];
+      /** @enum {string} */
+      status: "notGenerated" | "generated" | "modified" | "invalid";
+      updatedAt: string;
+      version: number;
+    };
+    SpecSaveResult: {
+      id: string;
+    };
+    SpecTable: {
+      comment: string;
+      fieldCount: number;
+      table: string;
+    };
+    SpecTree: {
+      nameField: string;
+      parentField: string;
+      sortField?: string;
+    };
+    SpecValidationResult: {
+      errors: components["schemas"]["SpecError"][];
+      valid: boolean;
+    };
+    SpecWriteFailure: {
+      message: string;
+      path: string;
+    };
+    SpecWriteResult: {
+      failed: components["schemas"]["SpecWriteFailure"][];
+      manualSteps: string[];
+      recovery: string;
+      skipped: string[];
+      written: string[];
+    };
     SwitchOrgDto: {
       /** @description 要切换到的组织编号 */
       orgId: string;
@@ -2758,6 +3028,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemDictItemPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -2899,6 +3174,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemDictTypePageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3178,6 +3458,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemLoginLogPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3312,6 +3597,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemMenuPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3469,6 +3759,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemOperationLogPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3594,6 +3889,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemOrgPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3733,6 +4033,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemParameterPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -3866,6 +4171,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemRolePageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -4145,6 +4455,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -4221,6 +4536,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserRolePageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -4395,6 +4715,11 @@ export type components = {
       /** @default 20 */
       size: number;
       sort?: components["schemas"]["SystemUserSupervisorPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
       /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
       where?: components["schemas"]["QueryGroupDto"];
     };
@@ -4534,6 +4859,13 @@ export type components = {
       overwrite?: string[];
       /** @description 预览返回的 token */
       token: string;
+    };
+    WriteSpecBody: {
+      /** @description preview-spec 返回的 fingerprint */
+      fingerprint: string;
+      /** @description 显式确认覆盖的文件key（project:path）或预览路径；其他手改文件继续跳过 */
+      overwrite?: string[];
+      spec: components["schemas"]["ModuleSpec"];
     };
   };
   responses: never;
@@ -4832,6 +5164,48 @@ export interface operations {
       };
     };
   };
+  devCodegenFieldTypes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecFieldType"][];
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   devCodegenImport: {
     parameters: {
       query?: never;
@@ -4861,6 +5235,71 @@ export interface operations {
       };
       /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenImportSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ImportSpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecImportResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -4943,8 +5382,7 @@ export interface operations {
           "application/json": {
             /** @enum {integer} */
             code: 1000;
-            data: Record<string, never> | null;
-            /** @example ok */
+            data: components["schemas"]["SpecRecord"][];
             message: string;
           };
         };
@@ -5016,6 +5454,62 @@ export interface operations {
       };
     };
   };
+  devCodegenPreviewSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecPreviewResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
   devCodegenSave: {
     parameters: {
       query?: never;
@@ -5063,6 +5557,136 @@ export interface operations {
       };
       /** @description 4009：数据已被他人修改，请刷新后重试 */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenSaveSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveSpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecSaveResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenSchemaSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -5136,10 +5760,65 @@ export interface operations {
           "application/json": {
             /** @enum {integer} */
             code: 1000;
-            data: Record<string, never> | null;
+            data: components["schemas"]["SpecTable"][];
+            message: string;
+          };
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenValidateSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecValidationResult"];
             /** @example ok */
             message: string;
           };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
         };
       };
       /** @description 4001：没有登录、访问令牌无效或会话已失效 */
@@ -5200,6 +5879,71 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  devCodegenWriteSpec: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WriteSpecBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SpecWriteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4001：没有登录、访问令牌无效或会话已失效 */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
         headers: {
           [name: string]: unknown;
         };

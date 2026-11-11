@@ -31,6 +31,15 @@ const config = (context: CrudMutation) => ({
   signal: context.signal,
   headers: { "Idempotency-Key": context.idempotencyKey }
 });
+/** 导出的日期时间按浏览器时区格式化，和列表显示一致；取不到时交给服务器默认 */
+function browserTimeZone(): { timeZone?: string } {
+  try {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return zone ? { timeZone: zone } : {};
+  } catch {
+    return {};
+  }
+}
 export function generatedCrud(prefix: string, resource = "") {
   const operation = (suffix: string) => `${prefix}${suffix}` as Operation;
   const available = (suffix: string) => Object.hasOwn(api, operation(suffix));
@@ -58,7 +67,7 @@ export function generatedCrud(prefix: string, resource = "") {
       info: "Info",
       update: "Update",
       remove: "Delete",
-      recycle: "Recycle",
+      recycle: "RecyclePage",
       restore: "Restore",
       purge: "Purge",
       export: "Export"
@@ -119,10 +128,17 @@ export function generatedCrud(prefix: string, resource = "") {
       : {}),
     ...(available("Export")
       ? {
-          export: async (query, signal) => {
+          export: async (query, signal, options) => {
             const response = await call(
               "Export",
-              { body: body(query) },
+              {
+                body: {
+                  ...body(query),
+                  format: options?.format ?? "csv",
+                  ...(options?.columns ? { columns: options.columns } : {}),
+                  ...browserTimeZone()
+                }
+              },
               { signal }
             );
             if (!(response instanceof Blob)) throw Error("crud.requestFailed");
@@ -130,11 +146,11 @@ export function generatedCrud(prefix: string, resource = "") {
           }
         }
       : {}),
-    ...(available("Recycle")
+    ...(available("RecyclePage")
       ? {
           recycled: async (query, signal) => {
             const result = await data<{ list: CrudRecord[]; total: number }>(
-              "Recycle",
+              "RecyclePage",
               {
                 body: {
                   page: query.pageNumber,
