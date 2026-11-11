@@ -10,7 +10,11 @@ export function columnChoices(schema, saved) {
     const column = byName.get(choice.field);
     output.push({
       field: choice.field,
-      visible: choice.visible !== false,
+      // 没保存显示状态的列跟随模块配置
+      visible:
+        typeof choice.visible === "boolean"
+          ? choice.visible
+          : column.hidden !== true,
       width: width(choice.width ?? column.width),
       fixed: ["left", "right"].includes(choice.fixed) ? choice.fixed : false
     });
@@ -29,6 +33,55 @@ export function columnChoices(schema, saved) {
     density: ["small", "default", "large"].includes(saved?.density)
       ? saved.density
       : "default"
+  };
+}
+const sameList = (a, b) =>
+  a.length === b.length && a.every((value, index) => value === b[index]);
+/**
+ * 求要写出的最短前缀长度：desired 是想要的完整顺序，base 是默认顺序，
+ * changed 是改了属性、必须写出的字段。后端和列表都把写出的项排在前面、其余按默认顺序接上。
+ */
+export function minimalPrefix(desired, base, changed) {
+  for (let size = 0; size <= desired.length; size++) {
+    const head = desired.slice(0, size);
+    if (changed.some(field => !head.includes(field))) continue;
+    const rest = base.filter(
+      field => !head.includes(field) && desired.includes(field)
+    );
+    if (sameList([...head, ...rest], desired)) return size;
+  }
+  return desired.length;
+}
+/**
+ * 列设置只保存和模块配置不同的部分（显示、列宽、固定列、顺序），
+ * 这样管理员之后在模块配置里改的列，用户没动过的仍然跟着变。
+ */
+export function choiceDifference(choices, baseline) {
+  const base = new Map(baseline.columns.map(column => [column.field, column]));
+  const columns = choices.columns.filter(column => base.has(column.field));
+  const attributes = column => {
+    const original = base.get(column.field),
+      out = {};
+    if (column.visible !== original.visible) out.visible = column.visible;
+    if (column.width !== original.width && typeof column.width === "number")
+      out.width = column.width;
+    if (column.fixed !== original.fixed && column.fixed)
+      out.fixed = column.fixed;
+    return out;
+  };
+  const changed = columns
+    .filter(column => Object.keys(attributes(column)).length)
+    .map(column => column.field);
+  const size = minimalPrefix(
+    columns.map(column => column.field),
+    baseline.columns.map(column => column.field),
+    changed
+  );
+  return {
+    columns: columns
+      .slice(0, size)
+      .map(column => ({ field: column.field, ...attributes(column) })),
+    density: choices.density
   };
 }
 /**

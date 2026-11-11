@@ -111,6 +111,7 @@ const {
   rowIssues,
   recycledView,
   choices,
+  baselineChoices,
   query,
   editor,
   visibleColumns,
@@ -561,6 +562,7 @@ defineExpose({ reload: view.initialize });
                 <ColumnSettings
                   :schema="schema"
                   :choices="choices"
+                  :baseline="baselineChoices"
                   :disabled="saving"
                   @save="value => view.saveChoices(value)"
                 />

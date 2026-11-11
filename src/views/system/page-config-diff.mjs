@@ -9,27 +9,15 @@
  * 因此这里只保留：改了属性的列 / 表单项，以及为保持顺序必须写出的最短前缀。
  */
 
+import { minimalPrefix } from "../../components/Crud/model.mjs";
+
 export const DEFAULT_PAGE_SIZE = 20;
 export const DEFAULT_FORM_MODE = "dialog";
 
 const sameList = (a, b) =>
   a.length === b.length && a.every((value, index) => value === b[index]);
 
-/**
- * 求要写出的最短前缀长度：desired 是想要的完整顺序，base 是代码默认顺序，
- * changed 是改了属性、必须写出的字段。前缀之后的部分要能由「默认顺序去掉前缀」得到。
- */
-export function minimalPrefix(desired, base, changed) {
-  for (let size = 0; size <= desired.length; size++) {
-    const head = desired.slice(0, size);
-    if (changed.some(field => !head.includes(field))) continue;
-    const rest = base.filter(
-      field => !head.includes(field) && desired.includes(field)
-    );
-    if (sameList([...head, ...rest], desired)) return size;
-  }
-  return desired.length;
-}
+export { minimalPrefix };
 
 function trimRows(rows, base, attributes) {
   const changed = rows

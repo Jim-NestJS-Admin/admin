@@ -14,6 +14,8 @@ import type { CrudChoices, CrudSchema } from "./types";
 const props = defineProps<{
   schema: CrudSchema;
   choices: CrudChoices;
+  /** 模块配置下的列（不含用户列设置），「恢复默认」回到它 */
+  baseline?: CrudChoices;
   disabled?: boolean;
 }>();
 const emit = defineEmits<{ save: [value: CrudChoices] }>();
@@ -45,7 +47,9 @@ function toggleAll(value: unknown) {
   apply();
 }
 function reset() {
-  draft.value = columnChoices(props.schema);
+  draft.value = props.baseline?.columns.length
+    ? JSON.parse(JSON.stringify(props.baseline))
+    : columnChoices(props.schema);
   apply();
 }
 function density(value: CrudChoices["density"]) {

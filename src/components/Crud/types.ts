@@ -43,6 +43,11 @@ export interface CrudChoices {
   columns: CrudColumnChoice[];
   density: "small" | "default" | "large";
 }
+/** 保存的列设置只含用户改过的部分：没写的属性跟随模块配置 */
+export interface CrudSavedChoices {
+  columns: (Partial<Omit<CrudColumnChoice, "field">> & { field: string })[];
+  density: CrudChoices["density"];
+}
 export interface CrudMutation {
   signal: AbortSignal;
   idempotencyKey: string;
@@ -93,7 +98,7 @@ export interface CrudPort {
     load(page: string, signal: AbortSignal): Promise<unknown>;
     save(
       page: string,
-      choices: CrudChoices,
+      choices: CrudSavedChoices,
       signal: AbortSignal
     ): Promise<void>;
   };

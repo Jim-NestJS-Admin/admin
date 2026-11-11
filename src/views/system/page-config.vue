@@ -121,7 +121,11 @@ function fill(value: unknown) {
           typeof saved.width === "number" && saved.width !== 160
             ? saved.width
             : original.width,
-        hidden: saved.hidden === true,
+        // 没配置过的列沿用代码默认（系统字段默认隐藏）
+        hidden:
+          typeof saved.hidden === "boolean"
+            ? saved.hidden
+            : original.hidden === true,
         fixed: ["left", "right"].includes(String(saved.fixed))
           ? String(saved.fixed)
           : ""
