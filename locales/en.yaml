@@ -126,6 +126,7 @@ crud:
   confirmRemove: Delete the {count} selected records?
   confirm: Confirm
   cancel: Cancel
+  close: Close
   save: Save
   apply: Apply
   filter: Categories

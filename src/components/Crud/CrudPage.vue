@@ -984,7 +984,7 @@ defineExpose({ reload: view.initialize });
       />
       <template #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
-          t("crud.cancel")
+          t(editor.readOnly ? "crud.close" : "crud.cancel")
         }}</el-button
         ><el-button
           v-if="!editor.readOnly"
