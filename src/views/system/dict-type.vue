@@ -51,10 +51,13 @@ const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
 
-/** 只有超级管理员能看到系统字典页签；其他人固定在业务字典 */
+/** 系统字典所有租户共用，只有平台超级管理员能看到和维护（阶段 2）；其他人固定在业务字典 */
+const systemManager = computed(
+  () => user.superAdmin && user.tenant?.platform === true
+);
 const kind = ref<Kind>("business");
 const activeKind = computed<Kind>(() =>
-  user.superAdmin ? kind.value : "business"
+  systemManager.value ? kind.value : "business"
 );
 const list = ref<Dictionary[]>([]),
   loading = ref(false),
@@ -293,7 +296,7 @@ onMounted(load);
         <aside class="dict-card dict-side">
           <div class="side-header">
             <div
-              v-if="user.superAdmin"
+              v-if="systemManager"
               class="side-tabs"
               role="tablist"
               :aria-label="t('system.dictionaries')"

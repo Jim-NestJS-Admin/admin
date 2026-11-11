@@ -11,7 +11,8 @@ import {
 import type {
   SessionSnapshot,
   SignInInput,
-  NavigationItem
+  NavigationItem,
+  TenantInfo
 } from "@/platform/contracts";
 
 let refreshPromise: Promise<void> | undefined;
@@ -22,6 +23,8 @@ export const useUserStore = defineStore("admin-user", {
     nickname: "",
     roles: [] as string[],
     superAdmin: false,
+    /** 当前租户；platform 为 true 是平台 */
+    tenant: null as TenantInfo | null,
     permissions: [] as string[],
     accessToken: "",
     expiresAt: 0,
@@ -63,6 +66,7 @@ export const useUserStore = defineStore("admin-user", {
       this.username = session.user.username;
       this.nickname = session.user.nickname ?? "";
       this.superAdmin = session.superAdmin === true;
+      this.tenant = session.tenant ?? null;
       this.organizationId = session.organizationId;
       this.organizations = session.organizations ?? [];
       this.authVersion = session.authVersion;
@@ -83,6 +87,7 @@ export const useUserStore = defineStore("admin-user", {
       this.nickname = "";
       this.roles = [];
       this.superAdmin = false;
+      this.tenant = null;
       this.permissions = [];
       this.menus = [];
       this.organizationId = "";

@@ -138,7 +138,9 @@ async function loadCatalog() {
 /** 字典下拉：业务字典 + （超级管理员）系统字典；读不到也不影响填写，可以手输编码 */
 async function loadDictionaries() {
   const port = resources["dict-type"].port;
-  const kinds = user.superAdmin ? [false, true] : [false];
+  // 系统字典列表只给平台超级管理员（阶段 2）；其他人只列业务字典
+  const kinds =
+    user.superAdmin && user.tenant?.platform === true ? [false, true] : [false];
   const result: { code: string; name: string; builtin: boolean }[] = [];
   for (const builtin of kinds) {
     try {

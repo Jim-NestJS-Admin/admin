@@ -97,6 +97,7 @@ admin:
   retryAfter: 请在 {seconds} 秒后重试
   title: 管理后台
   account: 账号
+  tenantCode: 租户编码（不填为默认租户）
   password: 密码
   signIn: 登录
   welcome: 工作台

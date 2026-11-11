@@ -77,6 +77,26 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/auth/tenant-hint": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * 登录页要不要填租户编码
+     * @description 按访问的域名判断：已绑定租户返回 domain 和租户名称；否则返回 code，登录页显示「租户编码」，出题、登录、刷新、退出请求带 X-Tenant-Code 头（不带等同默认租户）
+     */
+    get: operations["authTenantHint"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/dev/codegen/delete": {
     parameters: {
       query?: never;
@@ -2779,7 +2799,17 @@ export type components = {
       orgs: components["schemas"]["OrgOption"][];
       /** @description 当前组织下有效的超级管理员身份 */
       superAdmin: boolean;
+      tenant: components["schemas"]["ProfileTenant"];
       user: components["schemas"]["ProfileUser"];
+    };
+    ProfileTenant: {
+      /** @description 租户编码，登录时填写 */
+      code: string;
+      /** @description 租户编号（平台为 0） */
+      id: string;
+      name: string;
+      /** @description 是不是平台（管理所有租户） */
+      platform: boolean;
     };
     ProfileUser: {
       avatar: string | null;
@@ -4836,6 +4866,18 @@ export type components = {
       /** @example crm_customer */
       table: string;
     };
+    TenantHintResult: {
+      /**
+       * @description domain：域名已绑定租户，登录页不用填租户编码；code：要填租户编码（不填等同默认租户）
+       * @enum {string}
+       */
+      mode: "domain" | "code";
+      tenant?: components["schemas"]["TenantHintTenant"];
+    };
+    TenantHintTenant: {
+      code: string;
+      name: string;
+    };
     TokenResult: {
       /** @description 访问令牌，只放内存，放在 Authorization: Bearer 头里 */
       accessToken: string;
@@ -5064,6 +5106,40 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 5003：服务暂不可用 */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  authTenantHint: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["TenantHintResult"];
+            /** @example ok */
+            message: string;
+          };
         };
       };
       /** @description 5003：服务暂不可用 */

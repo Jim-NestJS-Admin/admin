@@ -111,6 +111,9 @@ const { t, locale, translationCh, translationEn } = useTranslationLang();
           <el-dropdown-menu class="logout">
             <div class="user-card">
               <p class="user-card-name">{{ username }}</p>
+              <p v-if="account.tenant" class="user-card-org">
+                {{ account.tenant.name }}
+              </p>
               <p v-if="currentOrganization" class="user-card-org">
                 {{ currentOrganization }}
               </p>

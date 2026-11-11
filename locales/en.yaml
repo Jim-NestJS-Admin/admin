@@ -97,6 +97,7 @@ admin:
   retryAfter: Try again in {seconds} seconds
   title: Administration
   account: Account
+  tenantCode: Tenant code (blank for default)
   password: Password
   signIn: Sign in
   welcome: Workspace

@@ -114,6 +114,17 @@ export function createApiClient(
         config
       );
     },
+    authTenantHint(
+      input: OperationInput<"authTenantHint"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"authTenantHint">>(
+        "get",
+        interpolate("/admin/auth/tenant-hint", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     devCodegenDelete(
       input: OperationInput<"devCodegenDelete"> & {
         body: OperationBody<"devCodegenDelete">;

@@ -89,6 +89,7 @@ export const OPERATION_PERMISSIONS = {
   authLogin: [],
   authLogout: [],
   authRefresh: [],
+  authTenantHint: [],
   devCodegenDelete: ["dev:codegen:delete"],
   devCodegenDownload: ["dev:codegen:save"],
   devCodegenFieldTypes: ["dev:codegen:save"],
@@ -760,5 +761,6 @@ export const ENUMS = {
   ],
   "components.schemas.SystemUserSupervisorRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.TenantHintResult.properties.mode": ["domain", "code"],
   "components.schemas.TokenResult.properties.tokenType": ["Bearer"]
 } as const;
