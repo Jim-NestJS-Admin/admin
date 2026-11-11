@@ -33,20 +33,16 @@
     "vite",
     "esm"
   ],
-  "homepage": "https://github.com/pure-admin/pure-admin-thin/tree/i18n",
+  "homepage": "https://github.com/Jim-NestJS-Admin/admin",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pure-admin/pure-admin-thin.git"
+    "url": "git+https://github.com/Jim-NestJS-Admin/admin.git"
   },
   "bugs": {
-    "url": "https://github.com/pure-admin/vue-pure-admin/issues"
+    "url": "https://github.com/Jim-NestJS-Admin/admin/issues"
   },
   "license": "MIT",
-  "author": {
-    "name": "xiaoxian521",
-    "email": "pureadmin@163.com",
-    "url": "https://github.com/xiaoxian521"
-  },
+  "author": "Jimmy",
   "dependencies": {
     "@pureadmin/descriptions": "^1.2.1",
     "@pureadmin/table": "^3.3.0",
@@ -159,5 +155,5 @@
       "@tailwindcss/oxide"
     ]
   },
-  "description": "jim-nestjs-admin 正式前端"
+  "description": "jim-nestjs-admin 后台管理前端（Vue 3 + Element Plus，基于 Pure Admin）"
 }
