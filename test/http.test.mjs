@@ -38,6 +38,12 @@ test("真实 HTTP 响应下的刷新、错误、取消与重放边界", async t 
           },
           message: "参数有误"
         });
+      if (request.url === "/admin/missing-file")
+        return send(404, {
+          code: 4004,
+          data: null,
+          message: "数据不存在或无权访问"
+        });
       if (request.url === "/admin/raw")
         return send(200, { algorithm: "raw-fixture" });
       if (request.url === "/admin/slow")
@@ -129,6 +135,20 @@ test("真实 HTTP 响应下的刷新、错误、取消与重放边界", async t 
       }
       assert.equal(refreshes, 0);
       assert.equal(user.accessToken, "old");
+    });
+    await t.test("下载类请求出错时仍显示后端返回的原因", async () => {
+      reset();
+      await assert.rejects(
+        client.post(
+          "/admin/missing-file",
+          { data: { id: "1" } },
+          { responseType: "blob", responseMode: "raw" }
+        ),
+        error =>
+          error.failure.code === 4004 &&
+          error.failure.message === "数据不存在或无权访问" &&
+          error.failure.status === 404
+      );
     });
     await t.test("显式匿名原始响应不附带访问令牌", async () => {
       reset();
