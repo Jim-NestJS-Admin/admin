@@ -70,6 +70,8 @@ const props = withDefaults(
     fill?: boolean;
     /** 新增时表单的初始值，例如 { enabled: true } */
     addDefaults?: CrudRecord;
+    /** 新增接口独立 DTO 上的额外字段，由 form-extra 插槽采集。 */
+    addExtraFields?: readonly string[];
   }>(),
   { fill: true }
 );
@@ -102,7 +104,8 @@ const view = useCrud(
     props.childCell
       ? props.childCell(resource, row, field)
       : defaultCell(row, field),
-  () => ({ ...props.addDefaults })
+  () => ({ ...props.addDefaults }),
+  () => props.addExtraFields ?? []
 );
 const {
   schema,

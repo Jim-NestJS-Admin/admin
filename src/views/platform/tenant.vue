@@ -55,6 +55,12 @@ onMounted(async () => {
 });
 function cell(row: CrudRecord, field: string): CrudCell {
   const value = defaultCell(row, field) as CrudCell;
+  if (
+    field === "domains" &&
+    value.state !== "hidden" &&
+    Array.isArray(value.display)
+  )
+    return { ...value, display: value.display.join("、") || "—" };
   if (field !== "packageId" || value.state === "hidden") return value;
   const found = packages.value.find(p => p.id === String(value.display));
   return found ? { ...value, display: found.label } : value;
@@ -68,6 +74,7 @@ function cell(row: CrudRecord, field: string): CrudCell {
     :permissions="generated.permissions"
     :cell="cell"
     :add-defaults="{ enabled: true, domains: [] }"
+    :add-extra-fields="['adminUsername', 'adminPassword']"
   >
     <template #form-packageId="{ values, disabled }">
       <el-select
