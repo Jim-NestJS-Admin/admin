@@ -68,6 +68,8 @@ const props = withDefaults(
     childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
     /** 撑满内容区（默认）：只有表格内部滚动，整页不滚动 */
     fill?: boolean;
+    /** 新增时表单的初始值，例如 { enabled: true } */
+    addDefaults?: CrudRecord;
   }>(),
   { fill: true }
 );
@@ -99,7 +101,8 @@ const view = useCrud(
   (resource, row, field) =>
     props.childCell
       ? props.childCell(resource, row, field)
-      : defaultCell(row, field)
+      : defaultCell(row, field),
+  () => ({ ...props.addDefaults })
 );
 const {
   schema,

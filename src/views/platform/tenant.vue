@@ -67,6 +67,7 @@ function cell(row: CrudRecord, field: string): CrudCell {
     page-key="platform:tenant"
     :permissions="generated.permissions"
     :cell="cell"
+    :add-defaults="{ enabled: true, domains: [] }"
   >
     <template #form-packageId="{ values, disabled }">
       <el-select

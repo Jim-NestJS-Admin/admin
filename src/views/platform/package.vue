@@ -72,6 +72,11 @@ const quotaText = (value: number | null | undefined) =>
     :port="generated.port"
     page-key="platform:package"
     :permissions="generated.permissions"
+    :add-defaults="{
+      enabled: true,
+      menuIds: [],
+      quotas: Object.fromEntries(QUOTA_KEYS.map(k => [k, null]))
+    }"
   >
     <template #form-menuIds="{ values, disabled }">
       <div class="field-stack">

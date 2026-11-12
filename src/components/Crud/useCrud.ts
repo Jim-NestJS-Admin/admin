@@ -33,7 +33,9 @@ export function useCrud(
     resource: string,
     row: CrudRecord,
     field: string
-  ) => CrudCell = (_resource, row, field) => defaultCell(row, field)
+  ) => CrudCell = (_resource, row, field) => defaultCell(row, field),
+  /** 新增时表单的初始值（例如「启用」默认打开）；不传为空 */
+  addDefaults: () => CrudRecord = () => ({})
 ) {
   const schema = shallowRef<CrudSchema>();
   const rows = shallowRef<CrudRecord[]>([]),
@@ -313,7 +315,7 @@ export function useCrud(
     if (!row) {
       editor.mode = "add";
       editor.record = undefined;
-      editor.values = {};
+      editor.values = { ...addDefaults() };
       editor.related = (schema.value.children ?? []).map(child =>
         childDraft(child, [], true)
       );
