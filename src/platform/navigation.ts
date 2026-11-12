@@ -19,7 +19,10 @@ export const navigationViews = new Map<string, () => Promise<unknown>>([
   ["system/dict-item", () => import("@/views/system/dict-item.vue")],
   ["system/parameter", () => import("@/views/system/parameter.vue")],
   ["system/operation-log", () => import("@/views/system/operation-log.vue")],
-  ["system/login-log", () => import("@/views/system/login-log.vue")]
+  ["system/login-log", () => import("@/views/system/login-log.vue")],
+  // 平台管理（阶段 2）：只有平台用户的菜单里会出现
+  ["platform/tenant", () => import("@/views/platform/tenant.vue")],
+  ["platform/package", () => import("@/views/platform/package.vue")]
 ]);
 export async function getAsyncRoutes() {
   const user = useUserStoreHook();

@@ -818,8 +818,14 @@ defineExpose({ reload: view.initialize });
           :span="item.wide && !mobile ? 2 : 1"
           label-class-name="crud-info-label"
         >
+          <slot
+            v-if="slots[`detail-${item.field}`]"
+            :name="`detail-${item.field}`"
+            :record="editor.record"
+            :field="item.field"
+          />
           <el-tag
-            v-if="
+            v-else-if="
               item.type === 'boolean' &&
               readCell(editor.record, item.field).state === 'visible' &&
               typeof readCell(editor.record, item.field).display === 'boolean'
@@ -948,6 +954,14 @@ defineExpose({ reload: view.initialize });
             />
           </slot>
         </el-form-item>
+        <!-- 不在实体上的额外输入（例如新建租户时的管理员账号），由页面自己提交 -->
+        <slot
+          name="form-extra"
+          :mode="editor.mode"
+          :values="editor.values"
+          :errors="fields"
+          :disabled="saving"
+        />
       </el-form>
       <el-tabs
         v-if="schema?.children?.length"

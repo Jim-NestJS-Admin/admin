@@ -471,6 +471,278 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/platform/package/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增套餐 */
+    post: operations["platformPackageAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除套餐（整批成败） */
+    post: operations["platformPackageDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出套餐（Excel / CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["platformPackageExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 套餐详情 */
+    post: operations["platformPackageInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/menus": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 可选租户菜单树（含按钮） */
+    post: operations["platformPackageMenus"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 套餐分页列表 */
+    post: operations["platformPackagePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 套餐页面描述 */
+    get: operations["platformPackageSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/package/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改套餐 */
+    post: operations["platformPackageUpdate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 创建租户并在同一事务初始化管理员 */
+    post: operations["platformTenantAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除租户（整批成败） */
+    post: operations["platformTenantDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出租户（Excel / CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["platformTenantExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 租户详情 */
+    post: operations["platformTenantInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 租户分页列表 */
+    post: operations["platformTenantPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 租户页面描述 */
+    get: operations["platformTenantSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改租户 */
+    post: operations["platformTenantUpdate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/platform/tenant/usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 只读查看租户用户数、存储与配额 */
+    post: operations["platformTenantUsage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/session/menu": {
     parameters: {
       query?: never;
@@ -2342,6 +2614,36 @@ export type components = {
       password: string;
       username: string;
     };
+    CreateTenantBody: {
+      /** @description 初始管理员密码，仅用于创建，不返回 */
+      adminPassword: string;
+      /** @description 初始管理员账号 */
+      adminUsername: string;
+      data: components["schemas"]["CreateTenantData"];
+    };
+    CreateTenantData: {
+      /** @description 租户编码 */
+      code: string;
+      /** @description 联系人 */
+      contactName?: Record<string, never> | null;
+      /** @description 联系电话 */
+      contactPhone?: Record<string, never> | null;
+      /** @description 绑定域名 */
+      domains?: string[];
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * Format: date-time
+       * @description 到期时间
+       */
+      expiresAt?: string | null;
+      /** @description 租户名称 */
+      name: string;
+      /** @description 套餐 */
+      packageId: string;
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
+    };
     CrudSchema: {
       actions: components["schemas"]["CrudSchemaActions"];
       api: (
@@ -2771,6 +3073,15 @@ export type components = {
       /** @description 从根到自己的名称 */
       path: string[];
     };
+    PackageMenuItem: {
+      children: components["schemas"]["PackageMenuItem"][];
+      id: string;
+      parentId: string | null;
+      permission: string | null;
+      title: string;
+      /** @enum {string} */
+      type: "directory" | "page" | "button";
+    };
     PermissionItem: {
       code: string;
       /** @enum {string} */
@@ -2778,6 +3089,311 @@ export type components = {
     };
     PermissionList: {
       list: components["schemas"]["PermissionItem"][];
+    };
+    PlatformPackageAddBody: {
+      data: components["schemas"]["PlatformPackageAddData"];
+    };
+    PlatformPackageAddData: {
+      /** @description 套餐编码 */
+      code: string;
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 可用菜单 */
+      menuIds?: string[];
+      /** @description 套餐名称 */
+      name: string;
+      /** @description 配额 */
+      quotas?: components["schemas"]["TenantQuotas"];
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
+    };
+    PlatformPackageDeleteBody: {
+      ids: string[];
+    };
+    PlatformPackageDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    PlatformPackageExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["PlatformPackagePageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["PlatformPackagePageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    PlatformPackageInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    PlatformPackagePageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["PlatformPackagePageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["PlatformPackagePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    PlatformPackagePageEq: {
+      /** @description 启用 */
+      enabled?: boolean;
+    };
+    PlatformPackagePageResult: {
+      list: components["schemas"]["PlatformPackageRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    PlatformPackagePageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    PlatformPackageRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 套餐编码 */
+      code?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 可用菜单 */
+      menuIds?: string[];
+      /** @description 套餐名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 配额 */
+      quotas?: components["schemas"]["TenantQuotas"];
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    PlatformPackageUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["PlatformPackageUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    PlatformPackageUpdateData: {
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 可用菜单 */
+      menuIds?: string[];
+      /** @description 套餐名称 */
+      name?: string;
+      /** @description 配额 */
+      quotas?: components["schemas"]["TenantQuotas"];
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
+    };
+    PlatformTenantDeleteBody: {
+      ids: string[];
+    };
+    PlatformTenantDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    PlatformTenantExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["PlatformTenantPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["PlatformTenantPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    PlatformTenantInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    PlatformTenantPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["PlatformTenantPageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["PlatformTenantPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    PlatformTenantPageEq: {
+      /** @description 租户编码 */
+      code?: string;
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 套餐 */
+      packageId?: string;
+    };
+    PlatformTenantPageResult: {
+      list: components["schemas"]["PlatformTenantRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    PlatformTenantPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    PlatformTenantRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 租户编码 */
+      code?: string;
+      /** @description 联系人 */
+      contactName?: Record<string, never> | null;
+      /** @description 联系电话 */
+      contactPhone?: Record<string, never> | null;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 绑定域名 */
+      domains?: string[];
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * Format: date-time
+       * @description 到期时间
+       */
+      expiresAt?: string | null;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 租户名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 套餐 */
+      packageId?: string;
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    PlatformTenantUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["PlatformTenantUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    PlatformTenantUpdateData: {
+      /** @description 联系人 */
+      contactName?: Record<string, never> | null;
+      /** @description 联系电话 */
+      contactPhone?: Record<string, never> | null;
+      /** @description 绑定域名 */
+      domains?: string[];
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * Format: date-time
+       * @description 到期时间
+       */
+      expiresAt?: string | null;
+      /** @description 租户名称 */
+      name?: string;
+      /** @description 套餐 */
+      packageId?: string;
+      /** @description 备注 */
+      remark?: Record<string, never> | null;
     };
     PreferenceKeyDto: {
       /**
@@ -3597,6 +4213,11 @@ export type components = {
       permission?: Record<string, never> | null;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 菜单范围
+       * @enum {string}
+       */
+      scope: "tenant" | "platform";
       /** @description 标题 */
       title: string;
       /**
@@ -3717,6 +4338,11 @@ export type components = {
       permission?: Record<string, never> | null;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 菜单范围
+       * @enum {string}
+       */
+      scope?: "tenant" | "platform";
       /** @description 标题 */
       title?: string;
       /**
@@ -3763,6 +4389,11 @@ export type components = {
       permission?: Record<string, never> | null;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 菜单范围
+       * @enum {string}
+       */
+      scope?: "tenant" | "platform";
       /** @description 标题 */
       title?: string;
       /**
@@ -4866,6 +5497,15 @@ export type components = {
       /** @example crm_customer */
       table: string;
     };
+    TenantCreationResult: {
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
     TenantHintResult: {
       /**
        * @description domain：域名已绑定租户，登录页不用填租户编码；code：要填租户编码（不填等同默认租户）
@@ -4877,6 +5517,28 @@ export type components = {
     TenantHintTenant: {
       code: string;
       name: string;
+    };
+    TenantIdBody: {
+      id: string;
+    };
+    TenantQuotas: {
+      /** @default null */
+      aiTokensMonthly: number | null;
+      /** @default null */
+      maxSites: number | null;
+      /** @default null */
+      maxUsers: number | null;
+      /** @default null */
+      mcpCallsMonthly: number | null;
+      /** @default null */
+      storageMb: number | null;
+    };
+    TenantUsageResult: {
+      quotas: components["schemas"]["TenantQuotas"];
+      /** @description 已用字节，十进制字符串，避免大数丢精度 */
+      storageBytes: string;
+      tenantId: string;
+      users: number;
     };
     TokenResult: {
       /** @description 访问令牌，只放内存，放在 Authorization: Bearer 头里 */
@@ -6296,6 +6958,692 @@ export interface operations {
         };
       };
       503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackageAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformPackageRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackageDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformPackageDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackageExportBody"];
+      };
+    };
+    responses: {
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
+          "text/csv": Blob;
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackageInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformPackageRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageMenus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PackageMenuItem"][];
+            message: string;
+          };
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackagePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackagePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformPackagePageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformPackageSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  platformPackageUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformPackageUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformPackageRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateTenantBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["TenantCreationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformTenantDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformTenantDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformTenantExportBody"];
+      };
+    };
+    responses: {
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
+          "text/csv": Blob;
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformTenantInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformTenantRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformTenantPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformTenantPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  platformTenantUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PlatformTenantUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PlatformTenantRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  platformTenantUsage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TenantIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["TenantUsageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
         headers: {
           [name: string]: unknown;
         };

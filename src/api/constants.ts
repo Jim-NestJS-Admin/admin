@@ -8,6 +8,18 @@ export const PERMISSIONS = [
   "file:asset:page",
   "file:asset:read",
   "file:asset:upload",
+  "platform:package:add",
+  "platform:package:delete",
+  "platform:package:export",
+  "platform:package:info",
+  "platform:package:page",
+  "platform:package:update",
+  "platform:tenant:add",
+  "platform:tenant:delete",
+  "platform:tenant:export",
+  "platform:tenant:info",
+  "platform:tenant:page",
+  "platform:tenant:update",
   "system:dict-item:add",
   "system:dict-item:delete",
   "system:dict-item:export",
@@ -112,6 +124,22 @@ export const OPERATION_PERMISSIONS = {
   fileAssetPage: ["file:asset:page"],
   fileAssetSchema: ["file:asset:page"],
   fileAssetUpload: ["file:asset:upload"],
+  platformPackageAdd: ["platform:package:add"],
+  platformPackageDelete: ["platform:package:delete"],
+  platformPackageExport: ["platform:package:export"],
+  platformPackageInfo: ["platform:package:info"],
+  platformPackageMenus: ["platform:package:info"],
+  platformPackagePage: ["platform:package:page"],
+  platformPackageSchema: ["platform:package:page"],
+  platformPackageUpdate: ["platform:package:update"],
+  platformTenantAdd: ["platform:tenant:add"],
+  platformTenantDelete: ["platform:tenant:delete"],
+  platformTenantExport: ["platform:tenant:export"],
+  platformTenantInfo: ["platform:tenant:info"],
+  platformTenantPage: ["platform:tenant:page"],
+  platformTenantSchema: ["platform:tenant:page"],
+  platformTenantUpdate: ["platform:tenant:update"],
+  platformTenantUsage: ["platform:tenant:info"],
   sessionMenu: [],
   sessionPreferenceDelete: [],
   sessionPreferenceGet: [],
@@ -412,7 +440,39 @@ export const ENUMS = {
     "masterDetail"
   ],
   "components.schemas.ModuleSpec.properties.version": [1],
+  "components.schemas.PackageMenuItem.properties.type": [
+    "directory",
+    "page",
+    "button"
+  ],
   "components.schemas.PermissionItem.properties.risk": ["normal", "high"],
+  "components.schemas.PlatformPackageExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
+  "components.schemas.PlatformPackagePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.PlatformPackagePageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.PlatformPackageRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.PlatformTenantExportBody.properties.format": [
+    "csv",
+    "xlsx"
+  ],
+  "components.schemas.PlatformTenantPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.PlatformTenantPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.PlatformTenantRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.QueryConditionDto.properties.op": [
     "eq",
     "ne",
@@ -574,6 +634,10 @@ export const ENUMS = {
   "components.schemas.SystemLoginLogPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemLoginLogRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemMenuAddData.properties.scope": [
+    "tenant",
+    "platform"
+  ],
   "components.schemas.SystemMenuAddData.properties.type": [
     "directory",
     "page",
@@ -594,10 +658,15 @@ export const ENUMS = {
   "components.schemas.SystemMenuPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemMenuRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemMenuRow.properties.scope": ["tenant", "platform"],
   "components.schemas.SystemMenuRow.properties.type": [
     "directory",
     "page",
     "button"
+  ],
+  "components.schemas.SystemMenuUpdateData.properties.scope": [
+    "tenant",
+    "platform"
   ],
   "components.schemas.SystemMenuUpdateData.properties.type": [
     "directory",
