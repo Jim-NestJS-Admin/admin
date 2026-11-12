@@ -231,8 +231,9 @@ export function generatedCrud(prefix: string, resource = "") {
   };
   return { port, permissions };
 }
+/** 只有真的带子表改动时才发 children；没有子表的资源（如平台套餐）的接口不接受这个字段 */
 function children(context: CrudMutation, adding = false) {
-  return context.relatedChanges
+  return context.relatedChanges?.length
     ? Object.fromEntries(
         context.relatedChanges.map(change => [
           change.resource,
