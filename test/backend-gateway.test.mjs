@@ -16,6 +16,9 @@ test("正式生成客户端的认证适配与会话边界", async t => {
     const { createBackendGateway } = await server.ssrLoadModule(
       "/src/platform/backend-gateway.ts"
     );
+    const { writeTenantCode } = await server.ssrLoadModule(
+      "/src/platform/tenant-code.ts"
+    );
     const { useUserStoreHook } = await server.ssrLoadModule(
       "/src/store/modules/user.ts"
     );
@@ -56,6 +59,13 @@ test("正式生成客户端的认证适配与会话边界", async t => {
               }
             };
           data = {
+            tenant: {
+              id: "2",
+              code: "demo",
+              name: "演示租户",
+              platform: false
+            },
+            superAdmin: true,
             user: { id: "1", username: "tester", nickname: "测试" },
             currentOrg: null,
             orgs: [],
@@ -147,6 +157,37 @@ test("正式生成客户端的认证适配与会话边界", async t => {
         );
         await gateway.signOut("");
         assert.equal(calls.at(-1).headers.get("Authorization"), undefined);
+      }
+    );
+    await t.test(
+      "租户编码绑定出题、登录、刷新和退出；资料保留租户超管身份",
+      async () => {
+        writeTenantCode(" DEMO ");
+        const start = calls.length;
+        await gateway.challenge("tester", "zh-CN");
+        const snapshot = await gateway.signIn({
+          account: "tester",
+          password: "仅测试输入",
+          captchaId: "image-id",
+          captchaCode: "aB12"
+        });
+        await gateway.refresh();
+        await gateway.signOut();
+        assert.ok(
+          calls
+            .slice(start)
+            .every(call => call.headers.get("X-Tenant-Code") === "demo")
+        );
+        assert.deepEqual(snapshot.tenant, {
+          id: "2",
+          code: "demo",
+          name: "演示租户",
+          platform: false
+        });
+        assert.equal(snapshot.superAdmin, true);
+        writeTenantCode("");
+        await gateway.challenge("tester", "zh-CN");
+        assert.equal(calls.at(-1).headers.get("X-Tenant-Code"), undefined);
       }
     );
     await t.test("切组织使用现有令牌；资料失败不返回部分会话", async () => {

@@ -4,6 +4,7 @@ import type { components } from "@/api/schema";
 import { RequestFailure } from "@/utils/http";
 import type { PureHttpRequestConfig, RequestMethods } from "@/utils/http/types";
 import { normalizeFailure } from "./policy.mjs";
+import { TENANT_CODE_HEADER, currentTenantCode } from "./tenant-code";
 import type {
   AdminGateway,
   NavigationItem,
@@ -30,6 +31,9 @@ export function createBackendGateway(
             Accept: "application/json"
           });
           if (token) headers.set("Authorization", `Bearer ${token}`);
+          // 共用域名时按租户编码识别租户；登录后的请求后端只认令牌里的租户
+          const tenantCode = currentTenantCode();
+          if (tenantCode) headers.set(TENANT_CODE_HEADER, tenantCode);
           const response = await transport.request({
             ...params,
             method,
@@ -95,6 +99,14 @@ export function createBackendGateway(
       expiresAt,
       user: data.user,
       superAdmin: data.superAdmin === true,
+      tenant: data.tenant
+        ? {
+            id: data.tenant.id,
+            code: data.tenant.code,
+            name: data.tenant.name,
+            platform: data.tenant.platform === true
+          }
+        : undefined,
       organizationId: data.currentOrg?.id ?? "",
       authVersion: access.authVersion,
       organizations: data.orgs,
@@ -138,6 +150,16 @@ export function createBackendGateway(
       return hydrate(
         (await client(token).sessionSwitchOrg({ body: { orgId: id } })).data
       );
+    },
+    async tenantHint(signal) {
+      const result = await client().authTenantHint({}, { signal });
+      const data = result.data;
+      return data?.mode === "domain" && data.tenant?.code
+        ? {
+            mode: "domain",
+            tenant: { code: data.tenant.code, name: data.tenant.name }
+          }
+        : { mode: "code" };
     },
     async challenge(account, _language, signal) {
       const result = await client().authCaptcha(

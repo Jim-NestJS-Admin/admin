@@ -97,6 +97,7 @@ admin:
   retryAfter: Try again in {seconds} seconds
   title: Administration
   account: Account
+  tenantCode: Tenant code (blank for default)
   password: Password
   signIn: Sign in
   welcome: Workspace
@@ -545,3 +546,21 @@ pageConfig:
   changedBy: Changed by
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
+platform:
+  adminUsername: Admin account
+  adminPassword: Admin password
+  adminHint: Super admin of the new tenant; at least 8 characters with letters and digits
+  domainsHint: Press Enter after each domain; leave empty to sign in with the tenant code
+  usage: Usage
+  users: Users
+  storage: Storage
+  unlimited: Unlimited
+  maxUsers: Max users
+  storageMb: Storage (MB)
+  maxSites: Max sites
+  aiTokensMonthly: AI tokens per month
+  mcpCallsMonthly: MCP calls per month
+  quotaHint: Leave empty for unlimited; stage 2 enforces users and storage only
+  menuHint: Tick the menus and buttons this package can use; platform-only menus are not listed
+  menuCount: "{count} selected"
+  loadFailed: Failed to load, reopen to retry

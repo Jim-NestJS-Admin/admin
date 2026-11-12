@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from "vue";
+import { ref, watch, onBeforeUnmount, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { gatewayReady } from "@/platform/gateway";
+import { gatewayReady, getAdminGateway } from "@/platform/gateway";
+import type { TenantHint } from "@/platform/contracts";
+import { readTenantCode, writeTenantCode } from "@/platform/tenant-code";
 import { useUserStoreHook } from "@/store/modules/user";
 import Verification from "./verification.vue";
 import { RequestFailure } from "@/utils/http";
@@ -12,6 +14,7 @@ import Avatar from "@/assets/login/avatar.svg?component";
 import Illustration from "@/assets/login/illustration.svg?component";
 import User from "~icons/ri/user-3-fill";
 import Lock from "~icons/ri/lock-fill";
+import Building from "~icons/ri/building-line";
 import { getConfig } from "@/config";
 import { message } from "@/utils/message";
 const TITLE = getConfig("Title");
@@ -46,7 +49,23 @@ const timer = setInterval(() => {
   if (retry.value > 0) retry.value--;
 }, 1000);
 onBeforeUnmount(() => clearInterval(timer));
-watch([account, locale], () => {
+/** 租户：域名绑定了租户就不用填；否则填租户编码（不填为默认租户），验证码绑定租户，改了要重新出题 */
+const hint = ref<TenantHint | null>(null);
+const tenantCode = ref(readTenantCode());
+onMounted(async () => {
+  if (!gatewayReady()) return;
+  try {
+    hint.value = await getAdminGateway().tenantHint();
+  } catch {
+    hint.value = { mode: "code" };
+  }
+  if (hint.value.mode === "domain") {
+    tenantCode.value = "";
+    writeTenantCode("");
+  }
+});
+watch(tenantCode, value => writeTenantCode(value));
+watch([account, locale, tenantCode], () => {
   proof.value = "";
   captchaId.value = "";
   revision.value++;
@@ -131,7 +150,23 @@ async function signIn() {
             :closable="false"
             show-icon
           />
+          <p v-if="hint?.mode === 'domain'" class="login-tenant">
+            {{ hint.tenant.name }}
+          </p>
           <form @submit.prevent="signIn">
+            <el-input
+              v-if="hint?.mode !== 'domain'"
+              id="tenant-code"
+              v-model="tenantCode"
+              :aria-label="t('admin.tenantCode')"
+              :placeholder="t('admin.tenantCode')"
+              :prefix-icon="Building"
+              autocomplete="organization"
+              :disabled="busy"
+              maxlength="32"
+              size="large"
+              clearable
+            />
             <el-input
               id="account"
               v-model="account"
@@ -202,6 +237,13 @@ async function signIn() {
   .login-container {
     min-height: 600px;
   }
+}
+
+.login-tenant {
+  margin: -8px 0 12px;
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
+  text-align: center;
 }
 
 .pure-login {

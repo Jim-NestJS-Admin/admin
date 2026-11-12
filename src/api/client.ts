@@ -114,6 +114,17 @@ export function createApiClient(
         config
       );
     },
+    authTenantHint(
+      input: OperationInput<"authTenantHint"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"authTenantHint">>(
+        "get",
+        interpolate("/admin/auth/tenant-hint", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     devCodegenDelete(
       input: OperationInput<"devCodegenDelete"> & {
         body: OperationBody<"devCodegenDelete">;
@@ -393,6 +404,208 @@ export function createApiClient(
           headers: input.headers,
           data: multipart(input.body)
         },
+        config
+      );
+    },
+    platformPackageAdd(
+      input: OperationInput<"platformPackageAdd"> & {
+        body: OperationBody<"platformPackageAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageAdd">>(
+        "post",
+        interpolate("/admin/platform/package/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackageDelete(
+      input: OperationInput<"platformPackageDelete"> & {
+        body: OperationBody<"platformPackageDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageDelete">>(
+        "post",
+        interpolate("/admin/platform/package/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackageExport(
+      input: OperationInput<"platformPackageExport"> & {
+        body: OperationBody<"platformPackageExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageExport">>(
+        "post",
+        interpolate("/admin/platform/package/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    platformPackageInfo(
+      input: OperationInput<"platformPackageInfo"> & {
+        body: OperationBody<"platformPackageInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageInfo">>(
+        "post",
+        interpolate("/admin/platform/package/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackageMenus(
+      input: OperationInput<"platformPackageMenus"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageMenus">>(
+        "post",
+        interpolate("/admin/platform/package/menus", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackagePage(
+      input: OperationInput<"platformPackagePage"> & {
+        body: OperationBody<"platformPackagePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackagePage">>(
+        "post",
+        interpolate("/admin/platform/package/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackageSchema(
+      input: OperationInput<"platformPackageSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageSchema">>(
+        "get",
+        interpolate("/admin/platform/package/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformPackageUpdate(
+      input: OperationInput<"platformPackageUpdate"> & {
+        body: OperationBody<"platformPackageUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformPackageUpdate">>(
+        "post",
+        interpolate("/admin/platform/package/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantAdd(
+      input: OperationInput<"platformTenantAdd"> & {
+        body: OperationBody<"platformTenantAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantAdd">>(
+        "post",
+        interpolate("/admin/platform/tenant/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantDelete(
+      input: OperationInput<"platformTenantDelete"> & {
+        body: OperationBody<"platformTenantDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantDelete">>(
+        "post",
+        interpolate("/admin/platform/tenant/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantExport(
+      input: OperationInput<"platformTenantExport"> & {
+        body: OperationBody<"platformTenantExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantExport">>(
+        "post",
+        interpolate("/admin/platform/tenant/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    platformTenantInfo(
+      input: OperationInput<"platformTenantInfo"> & {
+        body: OperationBody<"platformTenantInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantInfo">>(
+        "post",
+        interpolate("/admin/platform/tenant/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantPage(
+      input: OperationInput<"platformTenantPage"> & {
+        body: OperationBody<"platformTenantPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantPage">>(
+        "post",
+        interpolate("/admin/platform/tenant/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantSchema(
+      input: OperationInput<"platformTenantSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantSchema">>(
+        "get",
+        interpolate("/admin/platform/tenant/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantUpdate(
+      input: OperationInput<"platformTenantUpdate"> & {
+        body: OperationBody<"platformTenantUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantUpdate">>(
+        "post",
+        interpolate("/admin/platform/tenant/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    platformTenantUsage(
+      input: OperationInput<"platformTenantUsage"> & {
+        body: OperationBody<"platformTenantUsage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"platformTenantUsage">>(
+        "post",
+        interpolate("/admin/platform/tenant/usage", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
         config
       );
     },

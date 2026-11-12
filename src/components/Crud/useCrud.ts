@@ -33,7 +33,11 @@ export function useCrud(
     resource: string,
     row: CrudRecord,
     field: string
-  ) => CrudCell = (_resource, row, field) => defaultCell(row, field)
+  ) => CrudCell = (_resource, row, field) => defaultCell(row, field),
+  /** 新增时表单的初始值（例如「启用」默认打开）；不传为空 */
+  addDefaults: () => CrudRecord = () => ({}),
+  /** 新增接口的额外 DTO 字段，只允许页面显式声明，不能覆盖实体字段权限。 */
+  addExtraFields: () => readonly string[] = () => []
 ) {
   const schema = shallowRef<CrudSchema>();
   const rows = shallowRef<CrudRecord[]>([]),
@@ -313,7 +317,7 @@ export function useCrud(
     if (!row) {
       editor.mode = "add";
       editor.record = undefined;
-      editor.values = {};
+      editor.values = { ...addDefaults() };
       editor.related = (schema.value.children ?? []).map(child =>
         childDraft(child, [], true)
       );
@@ -408,6 +412,15 @@ export function useCrud(
       editor.record,
       cell
     );
+    if (editor.mode === "add") {
+      const entityFields = new Set(
+        [...schema.value.form, ...schema.value.columns].map(item => item.field)
+      );
+      for (const field of addExtraFields()) {
+        if (!entityFields.has(field) && Object.hasOwn(editor.values, field))
+          values[field] = editor.values[field];
+      }
+    }
     const current =
       editor.mode === "update" ? identity(editor.record) : undefined;
     const key = mutationKey(

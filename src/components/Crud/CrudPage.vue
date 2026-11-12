@@ -68,6 +68,10 @@ const props = withDefaults(
     childCell?: (resource: string, row: CrudRecord, field: string) => CrudCell;
     /** 撑满内容区（默认）：只有表格内部滚动，整页不滚动 */
     fill?: boolean;
+    /** 新增时表单的初始值，例如 { enabled: true } */
+    addDefaults?: CrudRecord;
+    /** 新增接口独立 DTO 上的额外字段，由 form-extra 插槽采集。 */
+    addExtraFields?: readonly string[];
   }>(),
   { fill: true }
 );
@@ -99,7 +103,9 @@ const view = useCrud(
   (resource, row, field) =>
     props.childCell
       ? props.childCell(resource, row, field)
-      : defaultCell(row, field)
+      : defaultCell(row, field),
+  () => ({ ...props.addDefaults }),
+  () => props.addExtraFields ?? []
 );
 const {
   schema,
@@ -818,8 +824,14 @@ defineExpose({ reload: view.initialize });
           :span="item.wide && !mobile ? 2 : 1"
           label-class-name="crud-info-label"
         >
+          <slot
+            v-if="slots[`detail-${item.field}`]"
+            :name="`detail-${item.field}`"
+            :record="editor.record"
+            :field="item.field"
+          />
           <el-tag
-            v-if="
+            v-else-if="
               item.type === 'boolean' &&
               readCell(editor.record, item.field).state === 'visible' &&
               typeof readCell(editor.record, item.field).display === 'boolean'
@@ -948,6 +960,14 @@ defineExpose({ reload: view.initialize });
             />
           </slot>
         </el-form-item>
+        <!-- 不在实体上的额外输入（例如新建租户时的管理员账号），由页面自己提交 -->
+        <slot
+          name="form-extra"
+          :mode="editor.mode"
+          :values="editor.values"
+          :errors="fields"
+          :disabled="saving"
+        />
       </el-form>
       <el-tabs
         v-if="schema?.children?.length"
