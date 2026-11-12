@@ -546,6 +546,102 @@ pageConfig:
   changedBy: Changed by
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
+forms:
+  newForm: New form
+  newRevision: New version
+  back: Back to list
+  name: Form name
+  code: Form code
+  codeHint: Lowercase letter first, then letters, numbers or underscores
+  design: Design
+  fields: Fields
+  preview: Fill preview
+  linkages: Conditions
+  check: Check form
+  checked: Form checked and field list updated
+  saveFirst: Save first version
+  saveRevision: Save new version
+  saved: Form version saved
+  immutableHint: Saving a new version preserves historical versions and submitted data.
+  versionListHint: Each record is a preserved form version
+  searchHint: Search name or code
+  empty: No forms yet. Create a form to get started.
+  revision: Version
+  createdAt: Created at
+  fieldCount: Fields
+  view: View and try
+  records: "{n} versions"
+  availableFields: Available fields
+  fieldKey: Field key
+  fieldTitle: Field label
+  fieldHint: Help text
+  fieldNumber: Field {n}
+  required: Required
+  multilingual: Multilingual field
+  queryable: Available for querying
+  options: Options
+  optionLabel: Option label
+  optionValue: Stored value
+  addOption: Add option
+  optionOne: Option one
+  optionTwo: Option two
+  inputType: Input type
+  maxLength: Maximum length
+  min: Minimum
+  max: Maximum
+  precision: Decimal places
+  multiple: Multiple selection
+  placeholder: Placeholder
+  component: Component
+  constraints: Validation limits
+  yes: Yes
+  no: No
+  checkFirst: Check the form to generate its field list
+  fieldListHint: Fields are parsed by the server. Check again after changing the design.
+  invalidDesign: Unable to read this design. Check the field settings and retry.
+  unavailable: You do not have access to the complete form design.
+  unsavedChanges: Discard unsaved changes and return to the list?
+  reloadLatest: Load latest version
+  reloadLatestHint: Discard this draft and start from the latest version?
+  previewFirst: Open Fill preview to check the design and see the result
+  unsavedPreview: This design is not saved. Save it to test server validation.
+  testHint: Test filling and validation only. Values will not be saved.
+  validateValues: Validate values
+  valid: Validation passed. Test values were not saved.
+  linkageHint: Refresh the field list first. Conditions may only target later fields.
+  refreshFields: Refresh fields
+  noLinkages: No conditions configured
+  condition: Condition {n}
+  source: When field
+  operator: Matches
+  compareValue: Compare value
+  target: Target field
+  action: Action
+  whenTrue: When matched
+  whenFalse: When not matched
+  addCondition: Add condition
+  operators:
+    eq: Equals
+    ne: Does not equal
+    in: Is one of
+  actions:
+    visible: Show field
+    required: Require field
+    options: Limit options
+  components:
+    input: Text input
+    inputNumber: Number input
+    switch: Switch
+    select: Select
+    radio: Radio
+    checkbox: Checkboxes
+    datePicker: Date
+  inputTypes:
+    text: Single line
+    textarea: Multiple lines
+    password: Password
+    email: Email
+    url: URL
 platform:
   adminUsername: Admin account
   adminPassword: Admin password

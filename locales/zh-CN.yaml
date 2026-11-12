@@ -546,6 +546,102 @@ pageConfig:
   changedBy: 修改人
   date: 修改时间
   confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。
+forms:
+  newForm: 新建表单
+  newRevision: 创建新版本
+  back: 返回列表
+  name: 表单名称
+  code: 表单编码
+  codeHint: 小写字母开头，可含数字和下划线
+  design: 设计表单
+  fields: 字段清单
+  preview: 填写预览
+  linkages: 条件联动
+  check: 检查表单
+  checked: 表单检查通过，字段清单已更新
+  saveFirst: 保存第一版
+  saveRevision: 保存新版本
+  saved: 表单版本已保存
+  immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
+  versionListHint: 每条记录都是一个保留的表单版本
+  searchHint: 搜索名称或编码
+  empty: 暂无表单，点击“新建表单”开始设计
+  revision: 版本
+  createdAt: 创建时间
+  fieldCount: 字段数
+  view: 查看与试填
+  records: 共 {n} 个版本
+  availableFields: 可用字段
+  fieldKey: 字段标识
+  fieldTitle: 字段名称
+  fieldHint: 填写说明
+  fieldNumber: 第 {n} 个字段
+  required: 必填
+  multilingual: 多语言字段
+  queryable: 可用于查询
+  options: 选项
+  optionLabel: 选项名称
+  optionValue: 保存值
+  addOption: 添加选项
+  optionOne: 选项一
+  optionTwo: 选项二
+  inputType: 输入方式
+  maxLength: 最长字符数
+  min: 最小值
+  max: 最大值
+  precision: 小数位数
+  multiple: 多选
+  placeholder: 输入提示
+  component: 控件
+  constraints: 校验范围
+  yes: 是
+  no: 否
+  checkFirst: 点击“检查表单”生成字段清单
+  fieldListHint: 字段清单由后端解析生成；修改设计后请重新检查。
+  invalidDesign: 无法读取当前设计，请检查字段设置后重试。
+  unavailable: 当前没有查看完整表单设计的权限。
+  unsavedChanges: 当前修改尚未保存，确定返回并丢弃修改吗？
+  reloadLatest: 载入最新版本
+  reloadLatestHint: 将丢弃当前修改，并基于最新版本重新设计，确定继续吗？
+  previewFirst: 点击“填写预览”，检查设计后查看效果
+  unsavedPreview: 这是未保存的设计预览。保存后可运行后端填写校验。
+  testHint: 仅供试填和校验，填写内容不会保存。
+  validateValues: 校验填写内容
+  valid: 填写校验通过，测试内容未保存。
+  linkageHint: 先检查表单更新字段清单，再配置条件。联动只能指向后面的字段。
+  refreshFields: 更新字段清单
+  noLinkages: 暂未配置条件联动
+  condition: 条件 {n}
+  source: 当字段
+  operator: 满足条件
+  compareValue: 比较值
+  target: 目标字段
+  action: 执行动作
+  whenTrue: 条件成立时
+  whenFalse: 条件不成立时
+  addCondition: 添加条件
+  operators:
+    eq: 等于
+    ne: 不等于
+    in: 属于以下任一项
+  actions:
+    visible: 显示字段
+    required: 设为必填
+    options: 限定选项
+  components:
+    input: 文本输入
+    inputNumber: 数值输入
+    switch: 开关
+    select: 下拉选择
+    radio: 单选
+    checkbox: 多选
+    datePicker: 日期
+  inputTypes:
+    text: 单行文本
+    textarea: 多行文本
+    password: 密码
+    email: 邮箱
+    url: 网址
 platform:
   adminUsername: 管理员账号
   adminPassword: 管理员密码

@@ -8,6 +8,11 @@ export const PERMISSIONS = [
   "file:asset:page",
   "file:asset:read",
   "file:asset:upload",
+  "form:definition:add",
+  "form:definition:info",
+  "form:definition:page",
+  "form:definition:update",
+  "form:definition:validate",
   "platform:package:add",
   "platform:package:delete",
   "platform:package:export",
@@ -124,6 +129,13 @@ export const OPERATION_PERMISSIONS = {
   fileAssetPage: ["file:asset:page"],
   fileAssetSchema: ["file:asset:page"],
   fileAssetUpload: ["file:asset:upload"],
+  formDefinitionAdd: ["form:definition:add"],
+  formDefinitionInfo: ["form:definition:info"],
+  formDefinitionInspect: ["form:definition:info"],
+  formDefinitionPage: ["form:definition:page"],
+  formDefinitionRevise: ["form:definition:update"],
+  formDefinitionSchema: ["form:definition:page"],
+  formDefinitionValidate: ["form:definition:validate"],
   platformPackageAdd: ["platform:package:add"],
   platformPackageDelete: ["platform:package:delete"],
   platformPackageExport: ["platform:package:export"],
@@ -426,6 +438,41 @@ export const ENUMS = {
   "components.schemas.FileAssetPageSort.properties.order": ["asc", "desc"],
   "components.schemas.FileAssetRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.FormDefinitionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "code",
+    "revision"
+  ],
+  "components.schemas.FormDefinitionPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.FormDefinitionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.FormDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.FormFieldDto.properties.component": [
+    "input",
+    "inputNumber",
+    "switch",
+    "select",
+    "radio",
+    "checkbox",
+    "datePicker"
+  ],
+  "components.schemas.FormFieldDto.properties.type": [
+    "string",
+    "number",
+    "boolean",
+    "array",
+    "date"
+  ],
+  "components.schemas.FormLinkageDto.properties.action": [
+    "visible",
+    "required",
+    "options"
+  ],
+  "components.schemas.FormLinkageDto.properties.operator": ["eq", "ne", "in"],
+  "components.schemas.FormValidationDto.properties.format": ["email", "url"],
+  "components.schemas.FormValidationResult.properties.valid": [true],
   "components.schemas.MaskRuleDto.properties.code": [
     "phone",
     "email",

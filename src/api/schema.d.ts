@@ -471,6 +471,125 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/form/definition/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 创建表单第一版快照 */
+    post: operations["formDefinitionAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 表单定义详情 */
+    post: operations["formDefinitionInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/inspect": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 校验设计并解析字段清单，不保存 */
+    post: operations["formDefinitionInspect"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 表单定义分页列表 */
+    post: operations["formDefinitionPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/revise": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 追加表单修订，旧版本不可变 */
+    post: operations["formDefinitionRevise"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 表单定义页面描述 */
+    get: operations["formDefinitionSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/definition/validate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 按固定表单版本校验提交值，不保存业务数据 */
+    post: operations["formDefinitionValidate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/platform/package/add": {
     parameters: {
       query?: never;
@@ -2606,6 +2725,9 @@ export type components = {
       password: string;
       version: number;
     };
+    CreateFormBody: {
+      data: components["schemas"]["FormDefinitionInput"];
+    };
     CreateSystemUser: {
       defaultOrgId?: string | null;
       enabled?: boolean;
@@ -2987,6 +3109,206 @@ export type components = {
       /** @description 系统生成的文件名，不使用客户端提供的名称 */
       name: string;
     };
+    FormDefinition: {
+      /** @description 表单编码 */
+      code?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 表单设计 */
+      designer?: components["schemas"]["FormDesignerDto"];
+      /** @description 字段清单 */
+      fields?: components["schemas"]["FormFieldDto"][];
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 表单名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 表单版本 */
+      revision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    FormDefinitionInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    FormDefinitionInput: {
+      /** @example leave_request */
+      code: string;
+      designer: components["schemas"]["FormDesignerDto"];
+      name: string;
+    };
+    FormDefinitionPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["FormDefinitionPageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["FormDefinitionPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    FormDefinitionPageEq: {
+      /** @description 表单编码 */
+      code?: string;
+      /** @description 表单版本 */
+      revision?: number;
+    };
+    FormDefinitionPageResult: {
+      list: components["schemas"]["FormDefinitionRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    FormDefinitionPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt" | "code" | "revision";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    FormDefinitionRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 表单编码 */
+      code?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 表单设计 */
+      designer?: components["schemas"]["FormDesignerDto"];
+      /** @description 字段清单 */
+      fields?: components["schemas"]["FormFieldDto"][];
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 表单名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 表单版本 */
+      revision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    FormDesignerDto: {
+      linkages?: components["schemas"]["FormLinkageDto"][];
+      option?: {
+        [key: string]: unknown;
+      };
+      /** @description FormCreate 规则安全子集，详见 docs/contracts/form.md */
+      rule: {
+        [key: string]: unknown;
+      }[];
+      /**
+       * @description 安全表单契约版本
+       * @enum {number}
+       */
+      schemaVersion: 1;
+    };
+    FormFieldDto: {
+      /** @enum {string} */
+      component:
+        | "input"
+        | "inputNumber"
+        | "switch"
+        | "select"
+        | "radio"
+        | "checkbox"
+        | "datePicker";
+      field: string;
+      multilingual: boolean;
+      multiple: boolean;
+      options: components["schemas"]["FormOptionDto"][];
+      queryable: boolean;
+      required: boolean;
+      title: string;
+      /** @enum {string} */
+      type: "string" | "number" | "boolean" | "array" | "date";
+      validation: components["schemas"]["FormValidationDto"];
+      visible: boolean;
+    };
+    FormLinkageDto: {
+      /** @enum {string} */
+      action: "visible" | "required" | "options";
+      /** @enum {string} */
+      operator: "eq" | "ne" | "in";
+      source: string;
+      target: string;
+      /** @description 与来源字段比较的标量，in 使用标量数组 */
+      value: string | number | boolean | (string | number | boolean)[];
+      /** @description 不匹配时应用的布尔值或静态选项数组 */
+      whenFalse:
+        | boolean
+        | {
+            label: string;
+            value: string | number | boolean;
+          }[];
+      /** @description 匹配时应用的布尔值或静态选项数组 */
+      whenTrue:
+        | boolean
+        | {
+            label: string;
+            value: string | number | boolean;
+          }[];
+    };
+    FormOptionDto: {
+      label: string;
+      value: string | number | boolean;
+    };
+    FormValidationDto: {
+      /** @enum {string} */
+      format?: "email" | "url";
+      max?: number;
+      min?: number;
+      precision?: number;
+    };
+    FormValidationResult: {
+      definitionId: string;
+      revision: number;
+      /** @enum {boolean} */
+      valid: true;
+    };
     HistoryBody: {
       page?: number;
       /**
@@ -3009,6 +3331,13 @@ export type components = {
     };
     ImportSpecBody: {
       tables: string[];
+    };
+    InspectFormBody: {
+      designer: components["schemas"]["FormDesignerDto"];
+    };
+    InspectFormResult: {
+      designer: components["schemas"]["FormDesignerDto"];
+      fields: components["schemas"]["FormFieldDto"][];
     };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
@@ -3475,6 +3804,11 @@ export type components = {
        */
       resource: string;
       version: number;
+    };
+    ReviseFormBody: {
+      /** @description 当前最新业务修订号，修订后加1 */
+      baseRevision: number;
+      data: components["schemas"]["FormDefinitionInput"];
     };
     SaveBody: {
       /** @description 生成配置（契约 codegen.md 第 2 节） */
@@ -5551,6 +5885,13 @@ export type components = {
       /** @enum {string} */
       tokenType: "Bearer";
     };
+    ValidateFormBody: {
+      data: {
+        [key: string]: unknown;
+      };
+      /** @description 固定表单版本记录编号 */
+      definitionId: string;
+    };
     VersionBody: {
       /**
        * @description 资源（权限码前缀）
@@ -6958,6 +7299,331 @@ export interface operations {
         };
       };
       503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateFormBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FormDefinitionInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormDefinitionRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionInspect: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InspectFormBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["InspectFormResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FormDefinitionPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormDefinitionPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionRevise: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReviseFormBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  formDefinitionValidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ValidateFormBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormValidationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
         headers: {
           [name: string]: unknown;
         };

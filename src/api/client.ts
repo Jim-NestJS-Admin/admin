@@ -407,6 +407,95 @@ export function createApiClient(
         config
       );
     },
+    formDefinitionAdd(
+      input: OperationInput<"formDefinitionAdd"> & {
+        body: OperationBody<"formDefinitionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionAdd">>(
+        "post",
+        interpolate("/admin/form/definition/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionInfo(
+      input: OperationInput<"formDefinitionInfo"> & {
+        body: OperationBody<"formDefinitionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionInfo">>(
+        "post",
+        interpolate("/admin/form/definition/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionInspect(
+      input: OperationInput<"formDefinitionInspect"> & {
+        body: OperationBody<"formDefinitionInspect">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionInspect">>(
+        "post",
+        interpolate("/admin/form/definition/inspect", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionPage(
+      input: OperationInput<"formDefinitionPage"> & {
+        body: OperationBody<"formDefinitionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionPage">>(
+        "post",
+        interpolate("/admin/form/definition/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionRevise(
+      input: OperationInput<"formDefinitionRevise"> & {
+        body: OperationBody<"formDefinitionRevise">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionRevise">>(
+        "post",
+        interpolate("/admin/form/definition/revise", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionSchema(
+      input: OperationInput<"formDefinitionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionSchema">>(
+        "get",
+        interpolate("/admin/form/definition/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionValidate(
+      input: OperationInput<"formDefinitionValidate"> & {
+        body: OperationBody<"formDefinitionValidate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionValidate">>(
+        "post",
+        interpolate("/admin/form/definition/validate", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     platformPackageAdd(
       input: OperationInput<"platformPackageAdd"> & {
         body: OperationBody<"platformPackageAdd">;

@@ -44,6 +44,8 @@
   "license": "MIT",
   "author": "Jimmy",
   "dependencies": {
+    "@form-create/designer": "3.6.0",
+    "@form-create/element-ui": "3.3.6",
     "@pureadmin/descriptions": "^1.2.1",
     "@pureadmin/table": "^3.3.0",
     "@pureadmin/utils": "^2.6.4",
