@@ -648,6 +648,26 @@ forms:
     email: 邮箱
     url: 网址
 codeRules:
+  previewPeriod: 本次预览周期
+  snapshot:
+    code: 规则编码
+    name: 规则名称
+    description: 说明
+    timezone: 时区
+    resetPeriod: 重置周期
+    start: 起始值
+    status: 状态
+    segments: 编码段
+  period:
+    never: 不重置
+    year: 每年
+    month: 每月
+    day: 每天
+  usageConfig: 用途配置
+  more: 更多
+  copy: 复制规则
+  sequenceRecords: 序号记录
+  snapshotReadonly: 历史快照 · 只读
   timeZoneSearch: 搜索中文城市、英文名称或IANA标识
   commonTimeZones: 常用时区
   allTimeZones: 其他时区
@@ -679,9 +699,9 @@ codeRules:
   up: 上移
   down: 下移
   start: 起始值
-  preview: 预览后续编码
+  preview: 预计下一批编码
   history: 版本历史
-  previewHint: 预览不占用号码，最终编码以业务保存时为准。首次发号后不能修改格式。
+  previewHint: 按当前周期的下一序号预估，尚未发号则从起始值计算；不占号、不预留，实际以保存时为准。
   bind: 保存绑定
   bindConfirm: 确认保存用途绑定？规则首次绑定后不能被其他用途重新使用；换绑必须采用全新规则和未占用的前缀。
   bindHint: 业务保存时自动使用所绑定的规则。换绑只允许全新规则与新前缀；已有编码保持不变。

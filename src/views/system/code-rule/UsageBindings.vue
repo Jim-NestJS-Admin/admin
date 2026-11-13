@@ -6,6 +6,8 @@ import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
 import { ElMessageBox } from "element-plus";
 import { ruleError } from "./messages";
+const props = defineProps<{ ruleId?: string; ruleName?: string }>();
+const emit = defineEmits<{ changed: [] }>();
 const { t } = useI18n();
 const usages = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>([]);
 const rules = ref<OperationResponse<"systemCodeRulePage">["data"]["list"]>([]);
@@ -23,17 +25,21 @@ async function load(keyword = "") {
   try {
     const [a, b] = await Promise.all([
       api.codeRuleUsageList({}, { signal: request.signal }),
-      api.systemCodeRulePage(
-        { body: { page: 1, size: 100, keyword, eq: { status: "enabled" } } },
-        { signal: request.signal }
-      )
+      props.ruleId
+        ? Promise.resolve({ data: { list: [] } })
+        : api.systemCodeRulePage(
+            {
+              body: { page: 1, size: 100, keyword, eq: { status: "enabled" } }
+            },
+            { signal: request.signal }
+          )
     ]);
     if (request.signal.aborted) return;
     usages.value = a.data.list;
     rules.value = b.data.list;
     if (!keyword)
       selected.value = Object.fromEntries(
-        usages.value.map(u => [u.key, u.ruleId ?? ""])
+        usages.value.map(u => [u.key, props.ruleId ?? u.ruleId ?? ""])
       );
   } catch (reason) {
     if (!request.signal.aborted) error.value = ruleError(reason);
@@ -73,7 +79,10 @@ async function bind(key: string) {
         headers: { "Idempotency-Key": mutationKey }
       }
     );
-    if (!request.signal.aborted) await load();
+    if (!request.signal.aborted) {
+      await load();
+      emit("changed");
+    }
   } catch (reason) {
     if (!request.signal.aborted) error.value = ruleError(reason);
   } finally {
@@ -113,11 +122,20 @@ onBeforeUnmount(() => {
             filterable
             remote
             :remote-method="load"
-            :disabled="busy"
+            :disabled="busy || Boolean(ruleId)"
             :placeholder="t('codeRules.selectRule')"
           >
             <el-option
-              v-if="usage.ruleId && !rules.some(r => r.id === usage.ruleId)"
+              v-if="ruleId"
+              :label="ruleName ?? ruleId"
+              :value="ruleId"
+            />
+            <el-option
+              v-if="
+                !ruleId &&
+                usage.ruleId &&
+                !rules.some(r => r.id === usage.ruleId)
+              "
               :label="usage.ruleName ?? usage.ruleId"
               :value="usage.ruleId"
             />

@@ -4,6 +4,8 @@
 
 ## 已实现与适配边界
 
+- `row-actions-extra` 在默认详情/编辑/删除后追加操作，保留默认权限和确认流程；`detail-aside` 仅在只读详情中显示右侧栏，窄屏自动上下排列。`cell-字段` 另提供 row，显示仍遵守逐字段裁剪，不能借此展示隐藏或脱敏原文。公开的 `create(values)` 打开新增草稿，不保存；复制业务须只提供可配置字段，保存仍经过统一 Schema 写白名单及后端校验。
+
 - `editor-footer` 插槽位于取消/关闭与默认保存按钮之间，接收values、record、readonly、disabled，供业务放置检查/预览等附加操作。表单组件由Schema的component选择，也可用form-字段名插槽适配；编码规则状态开关通过active-value/inactive-value映射enabled/disabled，不把字符串状态改成布尔值。
 
 - 专用工作区可通过 `toolbar` 插入新增入口、通过 `row-actions` 替换默认行操作；后者接收 `row` 和 `disabled`，业务按钮仍须使用生成权限码的 `v-perm`。`rowActionsWidth` 可配置专用操作列宽度。`refresh()` 仅重载当前列表，保留搜索、排序和分页；原有 `reload()` 仍重新初始化描述与偏好。表单定义列表使用此扩展，列表适配口仅保留读取和列偏好能力，新建/修订进入设计工作区，不开放普通修改或删除历史快照。

@@ -648,6 +648,26 @@ forms:
     email: Email
     url: URL
 codeRules:
+  previewPeriod: Preview period
+  snapshot:
+    code: Rule code
+    name: Rule name
+    description: Description
+    timezone: Time zone
+    resetPeriod: Reset period
+    start: Start
+    status: Status
+    segments: Segments
+  period:
+    never: Never
+    year: Yearly
+    month: Monthly
+    day: Daily
+  usageConfig: Usage configuration
+  more: More
+  copy: Copy rule
+  sequenceRecords: Sequence records
+  snapshotReadonly: Historical snapshot · read-only
   timeZoneSearch: Search city names or IANA identifiers
   commonTimeZones: Common time zones
   allTimeZones: Other time zones

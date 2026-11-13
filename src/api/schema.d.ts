@@ -4473,7 +4473,7 @@ export type components = {
     SystemCodeSequencePageBody: {
       /** @description 按等于筛选 */
       eq?: components["schemas"]["SystemCodeSequencePageEq"];
-      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      /** @description 搜索框，模糊匹配：periodKey、lastCode */
       keyword?: string;
       /** @default 1 */
       page: number;

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import type { CrudRecord } from "@/components/Crud/types";
+import { api, type OperationResponse } from "@/api/client";
+import { onSessionReset } from "@/platform/lifecycle";
+import { scopedSequencePort, copyRuleDraft } from "./code-rule/rule-page";
+import { ruleError } from "./code-rule/messages";
 import { useI18n } from "vue-i18n";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { generatedCrud } from "@/platform/generated-crud";
@@ -10,10 +15,70 @@ import UsageBindings from "./code-rule/UsageBindings.vue";
 import TimeZoneSelect from "./code-rule/TimeZoneSelect.vue";
 defineOptions({ name: "SystemCodeRule" });
 const { t } = useI18n();
-const tab = ref("rules");
+const page = ref<InstanceType<typeof CrudPage>>();
+const panel = ref<"bindings" | "sequences" | "">("");
+const active = ref<CrudRecord>();
+const error = ref("");
+const copying = ref(false);
+const usagesLoaded = ref(false);
+const usages = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>([]);
+let pending: AbortController | undefined;
+let usageRequest: AbortController | undefined;
+async function loadUsages() {
+  usageRequest?.abort();
+  const request = (usageRequest = new AbortController());
+  try {
+    const result = await api.codeRuleUsageList({}, { signal: request.signal });
+    if (!request.signal.aborted) {
+      usages.value = result.data.list;
+      usagesLoaded.value = true;
+    }
+  } catch (reason) {
+    if (!request.signal.aborted) error.value = ruleError(reason);
+  }
+}
+function openPanel(kind: "bindings" | "sequences", row?: CrudRecord) {
+  active.value = row;
+  panel.value = kind;
+}
+async function copy(row: CrudRecord) {
+  if (copying.value) return;
+  pending?.abort();
+  const request = (pending = new AbortController());
+  copying.value = true;
+  error.value = "";
+  try {
+    const record = await rules.port.detail(String(row.id), request.signal);
+    if (!request.signal.aborted)
+      await page.value?.create(copyRuleDraft(record));
+  } catch (reason) {
+    if (!request.signal.aborted) error.value = ruleError(reason);
+  } finally {
+    if (!request.signal.aborted) copying.value = false;
+  }
+}
+function resetPanels() {
+  pending?.abort();
+  usageRequest?.abort();
+  panel.value = "";
+  active.value = undefined;
+  usages.value = [];
+  usagesLoaded.value = false;
+  copying.value = false;
+  error.value = "";
+}
+const stop = onSessionReset(resetPanels);
+onMounted(loadUsages);
+onBeforeUnmount(() => {
+  stop();
+  resetPanels();
+});
 const draftTools = ref<InstanceType<typeof RuleTools>>();
 const rules = generatedCrud("systemCodeRule"),
   sequences = generatedCrud("systemCodeSequence");
+const sequencePort = computed(() =>
+  scopedSequencePort(sequences.port, String(active.value?.id ?? ""))
+);
 const defaults = {
   description: "",
   timezone: "Asia/Shanghai",
@@ -27,96 +92,171 @@ const defaults = {
 };
 </script>
 <template>
-  <div>
-    <el-tabs v-model="tab">
-      <el-tab-pane :label="t('codeRules.rules')" name="rules">
-        <CrudPage
-          v-if="tab === 'rules'"
-          :port="rules.port"
-          page-key="system:code-rule"
-          :permissions="rules.permissions"
-          :add-defaults="defaults"
+  <div class="code-rule-page">
+    <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+    <CrudPage
+      ref="page"
+      :row-actions-width="310"
+      :port="rules.port"
+      page-key="system:code-rule"
+      :permissions="rules.permissions"
+      :add-defaults="defaults"
+    >
+      <template #toolbar>
+        <el-button
+          v-perm="permission('codeRuleUsageList')"
+          @click="openPanel('bindings')"
+          >{{ t("codeRules.usageConfig") }}</el-button
         >
-          <template #form-code="{ values, disabled }">
-            <div class="code-field">
-              <el-input
-                v-model="values.code as string"
-                :formatter="(value: string) => value.toLowerCase()"
-                :parser="(value: string) => value.toLowerCase()"
-                :disabled="disabled"
-                maxlength="64"
-                :placeholder="t('codeRules.codeExample')"
-                aria-describedby="code-rule-code-hint"
-              />
-              <span id="code-rule-code-hint" class="code-hint">{{
-                t("codeRules.codeHint")
-              }}</span>
-            </div>
-          </template>
-          <template #form-timezone="{ values, disabled }">
-            <TimeZoneSelect
-              v-model="values.timezone as string"
-              :disabled="disabled"
-            />
-          </template>
-          <template #form-segments="{ values, disabled }"
-            ><SegmentEditor
-              :model-value="
-                Array.isArray(values.segments) ? values.segments : []
-              "
-              :disabled="disabled"
-              @update:model-value="values.segments = $event"
-          /></template>
-          <template #form-extra="{ values }">
-            <el-form-item>
-              <RuleTools
-                ref="draftTools"
-                :draft="values"
-                :show-actions="false"
-              />
-            </el-form-item>
-          </template>
-          <template #form-status="{ values, disabled }">
-            <el-switch
-              v-model="values.status as string"
-              active-value="enabled"
-              inactive-value="disabled"
-              :active-text="t('codeRules.enabled')"
-              :inactive-text="t('codeRules.disabled')"
-              :disabled="disabled"
-            />
-          </template>
-          <template #editor-footer="{ readonly, disabled }">
-            <el-button
-              v-if="!readonly"
-              v-perm="permission('codeRuleValidate')"
-              :disabled="disabled"
-              :loading="draftTools?.busy"
-              @click="draftTools?.preview()"
-              >{{ t("codeRules.configPreview") }}</el-button
-            >
-          </template>
-          <template #editor-related="{ record }"
-            ><RuleTools
-              :key="String(record.id) + String(record.version)"
-              :rule-id="String(record.id)"
-          /></template>
-        </CrudPage>
-      </el-tab-pane>
-      <el-tab-pane :label="t('codeRules.bindings')" name="bindings"
-        ><UsageBindings v-if="tab === 'bindings'"
-      /></el-tab-pane>
-      <el-tab-pane :label="t('codeRules.sequences')" name="sequences"
-        ><CrudPage
-          v-if="tab === 'sequences'"
-          :port="sequences.port"
-          page-key="system:code-sequence"
+      </template>
+      <template #cell-name="{ text, row }">
+        <span>{{ text }}</span>
+        <div class="code-hint">
+          {{
+            usagesLoaded
+              ? usages
+                  .filter(u => u.ruleId === String(row.id))
+                  .map(u => u.name)
+                  .join("、") || t("codeRules.unbound")
+              : "—"
+          }}
+        </div>
+      </template>
+      <template #row-actions-extra="{ row, disabled }">
+        <el-dropdown trigger="click" :disabled="disabled || copying">
+          <el-button link type="primary" :disabled="disabled || copying">{{
+            t("codeRules.more")
+          }}</el-button>
+          <template #dropdown
+            ><el-dropdown-menu>
+              <el-dropdown-item
+                v-perm="rules.permissions.create"
+                @click="copy(row)"
+                >{{ t("codeRules.copy") }}</el-dropdown-item
+              >
+              <el-dropdown-item
+                v-perm="permission('codeRuleBindingSet')"
+                @click="openPanel('bindings', row)"
+                >{{ t("codeRules.bindings") }}</el-dropdown-item
+              >
+              <el-dropdown-item
+                v-perm="permission('systemCodeSequencePage')"
+                @click="openPanel('sequences', row)"
+                >{{ t("codeRules.sequenceRecords") }}</el-dropdown-item
+              >
+            </el-dropdown-menu></template
+          >
+        </el-dropdown>
+      </template>
+      <template #form-code="{ values, disabled }">
+        <div class="code-field">
+          <el-input
+            v-model="values.code as string"
+            :formatter="(value: string) => value.toLowerCase()"
+            :parser="(value: string) => value.toLowerCase()"
+            :disabled="disabled"
+            maxlength="64"
+            :placeholder="t('codeRules.codeExample')"
+            aria-describedby="code-rule-code-hint"
+          />
+          <span id="code-rule-code-hint" class="code-hint">{{
+            t("codeRules.codeHint")
+          }}</span>
+        </div>
+      </template>
+      <template #form-timezone="{ values, disabled }">
+        <TimeZoneSelect
+          v-model="values.timezone as string"
+          :disabled="disabled"
+        />
+      </template>
+      <template #form-segments="{ values, disabled }"
+        ><SegmentEditor
+          :model-value="Array.isArray(values.segments) ? values.segments : []"
+          :disabled="disabled"
+          @update:model-value="values.segments = $event"
+      /></template>
+      <template #form-extra="{ values }">
+        <el-form-item>
+          <RuleTools ref="draftTools" :draft="values" :show-actions="false" />
+        </el-form-item>
+      </template>
+      <template #form-status="{ values, disabled }">
+        <el-switch
+          v-model="values.status as string"
+          active-value="enabled"
+          inactive-value="disabled"
+          :active-text="t('codeRules.enabled')"
+          :inactive-text="t('codeRules.disabled')"
+          :disabled="disabled"
+        />
+      </template>
+      <template #editor-footer="{ readonly, disabled }">
+        <el-button
+          v-if="!readonly"
+          v-perm="permission('codeRuleValidate')"
+          :disabled="disabled"
+          :loading="draftTools?.busy"
+          @click="draftTools?.preview()"
+          >{{ t("codeRules.configPreview") }}</el-button
+        >
+      </template>
+      <template #detail-aside="{ record }"
+        ><RuleTools :rule-id="String(record.id)" history-only
+      /></template>
+      <template #editor-related="{ record }"
+        ><RuleTools
+          :key="String(record.id) + String(record.version)"
+          :rule-id="String(record.id)"
+      /></template>
+    </CrudPage>
+    <el-drawer
+      :model-value="Boolean(panel)"
+      :title="
+        panel === 'sequences'
+          ? t('codeRules.sequenceRecords')
+          : t('codeRules.usageConfig')
+      "
+      size="min(1000px, 96vw)"
+      destroy-on-close
+      @update:model-value="panel = ''"
+    >
+      <template v-if="panel">
+        <el-alert
+          v-if="active"
+          :title="String(active.name) + ' (' + String(active.code) + ')'"
+          type="info"
+          :closable="false"
+        />
+        <UsageBindings
+          v-if="panel === 'bindings'"
+          :rule-id="active ? String(active.id) : undefined"
+          :rule-name="active ? String(active.name) : undefined"
+          @changed="loadUsages"
+        />
+        <CrudPage
+          v-else-if="active"
+          :key="String(active.id)"
+          class="sequence-list"
+          :port="sequencePort"
+          :fill="false"
+          :page-key="'system:code-sequence:' + String(active.id)"
           :permissions="sequences.permissions"
-      /></el-tab-pane>
-    </el-tabs>
+        />
+      </template>
+    </el-drawer>
   </div>
 </template>
 <style scoped>
+.code-rule-page {
+  min-width: 0;
+}
+
+.sequence-list {
+  height: calc(100dvh - 190px);
+  min-height: 320px;
+}
+
 .code-field {
   width: 100%;
 }
