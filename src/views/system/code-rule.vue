@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from "vue";
-import type { CrudRecord } from "@/components/Crud/types";
+import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import { onSessionReset } from "@/platform/lifecycle";
 import { scopedSequencePort, copyRuleDraft } from "./code-rule/rule-page";
 import { ruleError } from "./code-rule/messages";
@@ -60,6 +60,20 @@ onBeforeUnmount(() => {
 const draftTools = ref<InstanceType<typeof RuleTools>>();
 const rules = generatedCrud("systemCodeRule"),
   sequences = generatedCrud("systemCodeSequence");
+const rulePort: CrudPort = {
+  ...rules.port,
+  async describe(signal) {
+    const schema = await rules.port.describe(signal);
+    return {
+      ...schema,
+      columns: schema.columns.map(column =>
+        column.field === "revision"
+          ? { ...column, label: t("codeRules.businessVersion") }
+          : column
+      )
+    };
+  }
+};
 const sequencePort = computed(() =>
   scopedSequencePort(sequences.port, String(active.value?.id ?? ""))
 );
@@ -82,11 +96,14 @@ const defaults = {
       ref="page"
       hide-detail-footer
       :row-actions-width="310"
-      :port="rules.port"
+      :port="rulePort"
       page-key="system:code-rule"
       :permissions="rules.permissions"
       :add-defaults="defaults"
     >
+      <template #cell-revision="{ value }"
+        ><el-tag effect="plain">v{{ value }}</el-tag></template
+      >
       <template #cell-timezone="{ value }"
         ><TimeZoneText :value="value"
       /></template>
