@@ -168,6 +168,41 @@ export function cleanPreviewValues(
   return out;
 }
 
+export function formIssueLabel(
+  path: string,
+  t: (key: string, params?: Record<string, number>) => string
+) {
+  if (path === "data.code") return t("forms.code");
+  if (path === "data.name") return t("forms.name");
+  if (/^data\.designer\.rule(?:\.|$)/.test(path)) {
+    const positions = [...path.matchAll(/(?:rule|children)\.(\d+)(?=\.|$)/g)];
+    return positions.length
+      ? positions
+          .map(match => t("forms.fieldNumber", { n: Number(match[1]) + 1 }))
+          .join(" / ")
+      : t("forms.content");
+  }
+  const condition = /^data\.designer\.linkages\.(\d+)(?=\.|$)/.exec(path);
+  if (condition) return t("forms.condition", { n: Number(condition[1]) + 1 });
+  if (/^data\.designer\.linkages(?:\.|$)/.test(path))
+    return t("forms.linkages");
+  if (/^data\.designer\.option(?:\.|$)/.test(path)) return t("forms.settings");
+  return t("forms.design");
+}
+
+export function formIssueText(
+  issue: FieldIssue,
+  t: (key: string, params?: Record<string, number>) => string
+) {
+  return issue.messages
+    .map(message =>
+      issue.field === "data.designer.rule" && message === "表单至少包含一个字段"
+        ? t("forms.addFieldHint")
+        : `${formIssueLabel(issue.field, t)}：${message}`
+    )
+    .join("；");
+}
+
 export function issuesFrom(reason: unknown): FieldIssue[] {
   const errors = (reason as { failure?: { data?: { errors?: unknown } } })
     ?.failure?.data?.errors;

@@ -335,3 +335,43 @@ test("上一会话的检查错误不能污染重开的编辑器", async () => {
     workspace.dispose();
   }
 });
+
+test("表单错误明确说明缺少字段及补充入口，不展示内部路径", () => {
+  const labels = {
+    "forms.addFieldHint":
+      "表单中还没有字段。请到“设计表单”中拖入至少一个控件，再检查或保存。",
+    "forms.content": "表单内容",
+    "forms.settings": "表单设置",
+    "forms.design": "设计表单",
+    "forms.code": "表单编码",
+    "forms.linkages": "条件联动"
+  };
+  const t = (key, params) => {
+    if (key === "forms.fieldNumber") return `第 ${params.n} 个字段`;
+    if (key === "forms.condition") return `条件 ${params.n}`;
+    return labels[key];
+  };
+  const issue = {
+    field: "data.designer.rule",
+    messages: ["表单至少包含一个字段"]
+  };
+  assert.equal(model.formIssueText(issue, t), labels["forms.addFieldHint"]);
+  assert.equal(issue.field, "data.designer.rule");
+  assert.equal(
+    model.formIssueText(
+      { ...issue, messages: [...issue.messages, "字段数量超限"] },
+      t
+    ),
+    `${labels["forms.addFieldHint"]}；表单内容：字段数量超限`
+  );
+  for (const [path, expected] of [
+    ["data.code", "表单编码"],
+    ["data.designer.rule.1.props.maxLength", "第 2 个字段"],
+    ["data.designer.rule.0.children.2.title", "第 1 个字段 / 第 3 个字段"],
+    ["data.designer.linkages.0.whenTrue", "条件 1"],
+    ["data.designer.linkages", "条件联动"],
+    ["data.designer.option.form.size", "表单设置"],
+    ["data.designer.unknown", "设计表单"]
+  ])
+    assert.equal(model.formIssueLabel(path, t), expected);
+});

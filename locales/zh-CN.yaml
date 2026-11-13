@@ -547,6 +547,9 @@ pageConfig:
   date: 修改时间
   confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。
 forms:
+  content: 表单内容
+  settings: 表单设置
+  addFieldHint: 表单中还没有字段。请到“设计表单”中拖入至少一个控件，再检查或保存。
   newForm: 新建表单
   newRevision: 创建新版本
   back: 返回列表

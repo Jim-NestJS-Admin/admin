@@ -72,6 +72,8 @@ const props = withDefaults(
     addDefaults?: CrudRecord;
     /** 新增接口独立 DTO 上的额外字段，由 form-extra 插槽采集。 */
     addExtraFields?: readonly string[];
+    /** 自定义行操作插槽的列宽；默认操作仍按按钮数量计算。 */
+    rowActionsWidth?: number;
   }>(),
   { fill: true }
 );
@@ -313,6 +315,7 @@ function autoWidth(column) {
 }
 /** 操作列宽度：按实际会出现的按钮数 */
 const actionWidth = computed(() => {
+  if (slots["row-actions"]) return props.rowActionsWidth ?? 220;
   const count =
     (props.permissions?.info && schema.value?.api.includes("info") ? 1 : 0) +
     (props.port.update && schema.value?.api.includes("update") ? 1 : 0) +
@@ -377,7 +380,7 @@ async function confirmRecycle(action: "restore" | "purge") {
     return;
   await view.recycleAction(action, records);
 }
-defineExpose({ reload: view.initialize });
+defineExpose({ reload: view.initialize, refresh: view.load });
 </script>
 
 <template>
@@ -674,7 +677,10 @@ defineExpose({ reload: view.initialize });
               </el-table-column>
               <el-table-column
                 v-if="
-                  (port.update || port.remove || permissions?.info) &&
+                  (slots['row-actions'] ||
+                    port.update ||
+                    port.remove ||
+                    permissions?.info) &&
                   !recycledView
                 "
                 :label="t('crud.actions')"
@@ -682,36 +688,38 @@ defineExpose({ reload: view.initialize });
                 :width="actionWidth"
                 align="center"
               >
-                <template #default="{ row }"
-                  ><el-button
-                    v-if="permissions?.info && schema.api.includes('info')"
-                    v-perm="permissions.info"
-                    link
-                    type="primary"
-                    :icon="useRenderIcon(ViewIcon)"
-                    :disabled="saving"
-                    @click="view.edit(row, true)"
-                    >{{ t("crud.info") }}</el-button
-                  ><el-button
-                    v-if="port.update && schema.api.includes('update')"
-                    v-perm="permissions?.update ?? []"
-                    link
-                    type="primary"
-                    :icon="useRenderIcon(EditIcon)"
-                    :disabled="saving"
-                    @click="view.edit(row)"
-                    >{{ t("crud.edit") }}</el-button
-                  ><el-button
-                    v-if="port.remove && schema.api.includes('delete')"
-                    v-perm="permissions?.remove ?? []"
-                    link
-                    type="danger"
-                    :icon="useRenderIcon(DeleteIcon)"
-                    :disabled="saving"
-                    @click="confirmRemove([String(row.id)])"
-                    >{{ t("crud.remove") }}</el-button
-                  ></template
-                >
+                <template #default="{ row }">
+                  <slot name="row-actions" :row="row" :disabled="saving">
+                    <el-button
+                      v-if="permissions?.info && schema.api.includes('info')"
+                      v-perm="permissions.info"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(ViewIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row, true)"
+                      >{{ t("crud.info") }}</el-button
+                    ><el-button
+                      v-if="port.update && schema.api.includes('update')"
+                      v-perm="permissions?.update ?? []"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(EditIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row)"
+                      >{{ t("crud.edit") }}</el-button
+                    ><el-button
+                      v-if="port.remove && schema.api.includes('delete')"
+                      v-perm="permissions?.remove ?? []"
+                      link
+                      type="danger"
+                      :icon="useRenderIcon(DeleteIcon)"
+                      :disabled="saving"
+                      @click="confirmRemove([String(row.id)])"
+                      >{{ t("crud.remove") }}</el-button
+                    >
+                  </slot>
+                </template>
               </el-table-column>
             </el-table>
           </div>

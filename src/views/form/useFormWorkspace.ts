@@ -103,7 +103,10 @@ export function useFormWorkspace(client = api) {
       if (!request.signal.aborted) loading.value = false;
     }
   }
-  async function open(record: FormRecord | null, mode: typeof editor.mode) {
+  async function open(
+    record: Pick<FormRecord, "id"> | null,
+    mode: typeof editor.mode
+  ) {
     ++generation;
     taskRequest?.abort();
     const request = (taskRequest = new AbortController());

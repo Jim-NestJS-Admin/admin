@@ -8,6 +8,7 @@ import type { useFormWorkspace } from "./useFormWorkspace";
 import {
   copy,
   fingerprint,
+  formIssueText,
   type Designer,
   type Field,
   type FieldIssue
@@ -48,17 +49,6 @@ function designer(): Designer {
       ? (canvas.value?.rules() ?? editor.designer.rule)
       : copy(editor.designer.rule)
   };
-}
-function issueLabel(issue: FieldIssue) {
-  if (issue.field === "data.code") return t("forms.code");
-  if (issue.field === "data.name") return t("forms.name");
-  return issue.field
-    .replace(/^data\.designer\.rule\.(\d+)/, (_, index) =>
-      t("forms.fieldNumber", { n: Number(index) + 1 })
-    )
-    .replace(/^data\.designer\.linkages\.(\d+)/, (_, index) =>
-      t("forms.condition", { n: Number(index) + 1 })
-    );
 }
 async function check(openPreview = false) {
   try {
@@ -146,6 +136,10 @@ async function latest() {
   if (await props.workspace.latest()) emit("reopen");
 }
 async function locate(issue: FieldIssue) {
+  if (issue.field === "data.designer.rule" && editable.value) {
+    tab.value = "design";
+    return;
+  }
   const path = issue.field.replace(/^data\.designer\./, "").split(".");
   let item: unknown = designer(),
     key = "";
@@ -251,9 +245,9 @@ async function beforeTab(name: string) {
     >
       <ul class="issue-list">
         <li v-for="(issue, index) in editor.issues" :key="index">
-          <el-button link type="danger" @click="locate(issue)"
-            >{{ issueLabel(issue) }}：{{ issue.messages.join("；") }}</el-button
-          >
+          <el-button link type="danger" @click="locate(issue)">{{
+            formIssueText(issue, t)
+          }}</el-button>
         </li>
       </ul>
       <el-button v-if="editor.conflict" :disabled="busy" @click="latest">{{

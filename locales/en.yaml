@@ -547,6 +547,9 @@ pageConfig:
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
 forms:
+  content: Form content
+  settings: Form settings
+  addFieldHint: This form has no fields. Drag at least one control into Design before checking or saving.
   newForm: New form
   newRevision: New version
   back: Back to list

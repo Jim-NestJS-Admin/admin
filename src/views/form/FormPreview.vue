@@ -12,6 +12,7 @@ import {
   cleanPreviewValues,
   copy,
   fingerprint,
+  formIssueLabel,
   issuesFrom,
   previewRules,
   type Designer,
@@ -150,7 +151,7 @@ onBeforeUnmount(() => request?.abort());
         <li v-for="issue in issues" :key="issue.field">
           {{
             fields.find(field => `data.${field.field}` === issue.field)
-              ?.title ?? issue.field
+              ?.title ?? formIssueLabel(issue.field, t)
           }}：{{ issue.messages.join("；") }}
         </li>
       </ul>
@@ -171,30 +172,48 @@ onBeforeUnmount(() => request?.abort());
         :option="options"
       />
     </div>
-    <el-button
-      v-if="definitionId"
-      v-perm="permission('formDefinitionValidate')"
-      type="primary"
-      :loading="busy"
-      @click="validate"
-      >{{ t("forms.validateValues") }}</el-button
-    >
+    <div v-if="definitionId" class="preview-actions">
+      <el-button
+        v-perm="permission('formDefinitionValidate')"
+        type="primary"
+        :loading="busy"
+        @click="validate"
+        >{{ t("forms.validateValues") }}</el-button
+      >
+    </div>
   </section>
 </template>
 <style scoped>
 .form-preview {
   display: grid;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
+  max-width: 760px;
 }
 
 .preview-paper {
+  box-sizing: border-box;
   width: 100%;
-  max-width: 760px;
+  min-width: 0;
   padding: 20px;
-  margin-inline: auto;
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 6px;
+}
+
+.preview-paper :deep(.el-date-editor.el-input),
+.preview-paper :deep(.el-input-number),
+.preview-paper :deep(.el-select) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 @media (width <= 600px) {
