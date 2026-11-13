@@ -25,6 +25,15 @@ export const PERMISSIONS = [
   "platform:tenant:info",
   "platform:tenant:page",
   "platform:tenant:update",
+  "system:code-rule:add",
+  "system:code-rule:bind",
+  "system:code-rule:delete",
+  "system:code-rule:info",
+  "system:code-rule:page",
+  "system:code-rule:preview",
+  "system:code-rule:update",
+  "system:code-sequence:info",
+  "system:code-sequence:page",
   "system:dict-item:add",
   "system:dict-item:delete",
   "system:dict-item:export",
@@ -107,6 +116,11 @@ export const OPERATION_PERMISSIONS = {
   authLogout: [],
   authRefresh: [],
   authTenantHint: [],
+  codeRuleBindingSet: ["system:code-rule:bind"],
+  codeRuleHistory: ["system:code-rule:info"],
+  codeRulePreview: ["system:code-rule:preview"],
+  codeRuleUsageList: ["system:code-rule:page"],
+  codeRuleValidate: ["system:code-rule:preview"],
   devCodegenDelete: ["dev:codegen:delete"],
   devCodegenDownload: ["dev:codegen:save"],
   devCodegenFieldTypes: ["dev:codegen:save"],
@@ -158,6 +172,15 @@ export const OPERATION_PERMISSIONS = {
   sessionPreferenceSave: [],
   sessionProfile: [],
   sessionSwitchOrg: [],
+  systemCodeRuleAdd: ["system:code-rule:add"],
+  systemCodeRuleDelete: ["system:code-rule:delete"],
+  systemCodeRuleInfo: ["system:code-rule:info"],
+  systemCodeRulePage: ["system:code-rule:page"],
+  systemCodeRuleSchema: ["system:code-rule:page"],
+  systemCodeRuleUpdate: ["system:code-rule:update"],
+  systemCodeSequenceInfo: ["system:code-sequence:info"],
+  systemCodeSequencePage: ["system:code-sequence:page"],
+  systemCodeSequenceSchema: ["system:code-sequence:page"],
   systemDictItemAdd: ["system:dict-item:add"],
   systemDictItemDelete: ["system:dict-item:delete"],
   systemDictItemExport: ["system:dict-item:export"],
@@ -262,6 +285,11 @@ export const OPERATION_PERMISSIONS = {
 } as const;
 export const SCOPES = [] as const;
 export const ENUMS = {
+  "components.schemas.CodeUsageItem.properties.charset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits"
+  ],
   "components.schemas.CrudSchema.properties.api.items": [
     "page",
     "info",
@@ -578,6 +606,65 @@ export const ENUMS = {
     "modified",
     "invalid"
   ],
+  "components.schemas.SystemCodeRuleAddData.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRuleAddData.properties.status": [
+    "enabled",
+    "disabled"
+  ],
+  "components.schemas.SystemCodeRulePageEq.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRulePageEq.properties.status": [
+    "enabled",
+    "disabled"
+  ],
+  "components.schemas.SystemCodeRulePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemCodeRulePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemCodeRuleRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemCodeRuleRow.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRuleRow.properties.status": [
+    "enabled",
+    "disabled"
+  ],
+  "components.schemas.SystemCodeRuleUpdateData.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRuleUpdateData.properties.status": [
+    "enabled",
+    "disabled"
+  ],
+  "components.schemas.SystemCodeSequencePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemCodeSequencePageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.SystemCodeSequenceRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.SystemDictItemExportBody.properties.format": [
     "csv",
     "xlsx"

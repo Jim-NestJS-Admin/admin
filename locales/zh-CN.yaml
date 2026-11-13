@@ -119,6 +119,7 @@ admin:
   accountPlaceholder: 请输入账号
   passwordPlaceholder: 请输入密码
 crud:
+  generatedHint: 保存后自动生成
   title: 数据列表
   add: 新增
   edit: 编辑
@@ -547,6 +548,7 @@ pageConfig:
   date: 修改时间
   confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。
 forms:
+  nameRequired: 请输入表单名称
   content: 表单内容
   settings: 表单设置
   addFieldHint: 表单中还没有字段。请到“设计表单”中拖入至少一个控件，再检查或保存。
@@ -645,6 +647,30 @@ forms:
     password: 密码
     email: 邮箱
     url: 网址
+codeRules:
+  configPreview: 检查格式与示例
+  configPreviewHint: 格式示例从起始值计算，不占用号码；实际后续编码请在详情中预览。
+  rules: 规则管理
+  bindings: 用途绑定
+  sequences: 序号监控
+  segmentHint: 最多4段，流水号必须放在最后；按周期重置时必须包含完整日期。
+  literal: 固定文本
+  date: 日期
+  sequence: 流水号
+  width: 流水位宽
+  up: 上移
+  down: 下移
+  start: 起始值
+  preview: 预览后续编码
+  history: 版本历史
+  previewHint: 预览不占用号码，最终编码以业务保存时为准。首次发号后不能修改格式。
+  bind: 保存绑定
+  bindConfirm: 确认保存用途绑定？规则首次绑定后不能被其他用途重新使用；换绑必须采用全新规则和未占用的前缀。
+  bindHint: 业务保存时自动使用所绑定的规则。换绑只允许全新规则与新前缀；已有编码保持不变。
+  selectRule: 搜索并选择启用的规则
+  bound: 当前规则
+  unbound: 尚未绑定
+  maxLength: 最长字符数
 platform:
   adminUsername: 管理员账号
   adminPassword: 管理员密码

@@ -1,0 +1,185 @@
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { api, type OperationResponse } from "@/api/client";
+import { permission } from "@/platform/system/resources";
+import { onSessionReset } from "@/platform/lifecycle";
+import { ElMessageBox } from "element-plus";
+import { ruleError } from "./messages";
+const { t } = useI18n();
+const usages = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>([]);
+const rules = ref<OperationResponse<"systemCodeRulePage">["data"]["list"]>([]);
+const selected = ref<Record<string, string>>({}),
+  busy = ref(false),
+  error = ref("");
+let pending: AbortController | undefined;
+let lastIntent = "",
+  mutationKey = "";
+async function load(keyword = "") {
+  pending?.abort();
+  const request = (pending = new AbortController());
+  busy.value = true;
+  error.value = "";
+  try {
+    const [a, b] = await Promise.all([
+      api.codeRuleUsageList({}, { signal: request.signal }),
+      api.systemCodeRulePage(
+        { body: { page: 1, size: 100, keyword, eq: { status: "enabled" } } },
+        { signal: request.signal }
+      )
+    ]);
+    if (request.signal.aborted) return;
+    usages.value = a.data.list;
+    rules.value = b.data.list;
+    if (!keyword)
+      selected.value = Object.fromEntries(
+        usages.value.map(u => [u.key, u.ruleId ?? ""])
+      );
+  } catch (reason) {
+    if (!request.signal.aborted) error.value = ruleError(reason);
+  } finally {
+    if (!request.signal.aborted) busy.value = false;
+  }
+}
+async function bind(key: string) {
+  const ruleId = selected.value[key];
+  if (!ruleId || busy.value) return;
+  pending?.abort();
+  const request = (pending = new AbortController());
+  busy.value = true;
+  try {
+    await ElMessageBox.confirm(
+      t("codeRules.bindConfirm"),
+      t("codeRules.bind"),
+      { type: "warning" }
+    );
+  } catch {
+    if (!request.signal.aborted) busy.value = false;
+    return;
+  }
+  if (request.signal.aborted) return;
+  busy.value = true;
+  error.value = "";
+  try {
+    const intent = JSON.stringify([key, ruleId]);
+    if (intent !== lastIntent) {
+      lastIntent = intent;
+      mutationKey = crypto.randomUUID();
+    }
+    await api.codeRuleBindingSet(
+      { body: { usageKey: key, ruleId } },
+      {
+        signal: request.signal,
+        headers: { "Idempotency-Key": mutationKey }
+      }
+    );
+    if (!request.signal.aborted) await load();
+  } catch (reason) {
+    if (!request.signal.aborted) error.value = ruleError(reason);
+  } finally {
+    if (!request.signal.aborted) busy.value = false;
+  }
+}
+const stop = onSessionReset(() => {
+  pending?.abort();
+  usages.value = [];
+  rules.value = [];
+  selected.value = {};
+  error.value = "";
+  busy.value = false;
+  lastIntent = "";
+  mutationKey = "";
+});
+onMounted(() => load());
+onBeforeUnmount(() => {
+  stop();
+  pending?.abort();
+});
+</script>
+<template>
+  <section v-loading="busy" class="bindings">
+    <el-alert :title="t('codeRules.bindHint')" type="info" :closable="false" />
+    <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+    <el-form label-position="top">
+      <el-form-item
+        v-for="usage in usages"
+        :key="usage.key"
+        :label="usage.name"
+        :error="usage.issue"
+      >
+        <div class="usage-row">
+          <el-select
+            v-model="selected[usage.key]"
+            filterable
+            remote
+            :remote-method="load"
+            :disabled="busy"
+            :placeholder="t('codeRules.selectRule')"
+          >
+            <el-option
+              v-if="usage.ruleId && !rules.some(r => r.id === usage.ruleId)"
+              :label="usage.ruleName ?? usage.ruleId"
+              :value="usage.ruleId"
+            />
+            <el-option
+              v-for="rule in rules"
+              :key="rule.id"
+              :label="`${rule.name} (${rule.code})`"
+              :value="rule.id"
+            />
+          </el-select>
+          <el-button
+            v-perm="permission('codeRuleBindingSet')"
+            type="primary"
+            :disabled="
+              busy ||
+              !selected[usage.key] ||
+              selected[usage.key] === usage.ruleId ||
+              Boolean(usage.ruleId && !usage.allowRuleSwitch)
+            "
+            @click="bind(usage.key)"
+            >{{ t("codeRules.bind") }}</el-button
+          >
+        </div>
+        <p>
+          {{ t("codeRules.bound") }}：{{
+            usage.ruleName ?? t("codeRules.unbound")
+          }}
+          · {{ t("codeRules.maxLength") }} {{ usage.maxLength }} ·
+          {{ usage.charset }}
+        </p>
+      </el-form-item>
+    </el-form>
+    <el-button :disabled="busy" @click="load()">{{
+      t("crud.reload")
+    }}</el-button>
+  </section>
+</template>
+<style scoped>
+.bindings {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  background: var(--el-bg-color);
+}
+
+.bindings .el-form {
+  max-width: 760px;
+}
+
+.usage-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.usage-row .el-select {
+  flex: 1;
+}
+
+.bindings p {
+  width: 100%;
+  margin: 8px 0 0;
+  color: var(--el-text-color-secondary);
+}
+</style>

@@ -19,6 +19,7 @@ export const navigationViews = new Map<string, () => Promise<unknown>>([
   ["system/dict-type", () => import("@/views/system/dict-type.vue")],
   ["system/dict-item", () => import("@/views/system/dict-item.vue")],
   ["system/parameter", () => import("@/views/system/parameter.vue")],
+  ["system/code-rule", () => import("@/views/system/code-rule.vue")],
   ["system/operation-log", () => import("@/views/system/operation-log.vue")],
   ["system/login-log", () => import("@/views/system/login-log.vue")],
   // 平台管理（阶段 2）：只有平台用户的菜单里会出现

@@ -772,6 +772,182 @@ export function createApiClient(
         config
       );
     },
+    systemCodeRuleAdd(
+      input: OperationInput<"systemCodeRuleAdd"> & {
+        body: OperationBody<"systemCodeRuleAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleAdd">>(
+        "post",
+        interpolate("/admin/system/code-rule/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleBindingSet(
+      input: OperationInput<"codeRuleBindingSet"> & {
+        body: OperationBody<"codeRuleBindingSet">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleBindingSet">>(
+        "post",
+        interpolate("/admin/system/code-rule/binding/set", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleDelete(
+      input: OperationInput<"systemCodeRuleDelete"> & {
+        body: OperationBody<"systemCodeRuleDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleDelete">>(
+        "post",
+        interpolate("/admin/system/code-rule/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleHistory(
+      input: OperationInput<"codeRuleHistory"> & {
+        body: OperationBody<"codeRuleHistory">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleHistory">>(
+        "post",
+        interpolate("/admin/system/code-rule/history", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleInfo(
+      input: OperationInput<"systemCodeRuleInfo"> & {
+        body: OperationBody<"systemCodeRuleInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleInfo">>(
+        "post",
+        interpolate("/admin/system/code-rule/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRulePage(
+      input: OperationInput<"systemCodeRulePage"> & {
+        body: OperationBody<"systemCodeRulePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRulePage">>(
+        "post",
+        interpolate("/admin/system/code-rule/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRulePreview(
+      input: OperationInput<"codeRulePreview"> & {
+        body: OperationBody<"codeRulePreview">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRulePreview">>(
+        "post",
+        interpolate("/admin/system/code-rule/preview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleSchema(
+      input: OperationInput<"systemCodeRuleSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleSchema">>(
+        "get",
+        interpolate("/admin/system/code-rule/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleUpdate(
+      input: OperationInput<"systemCodeRuleUpdate"> & {
+        body: OperationBody<"systemCodeRuleUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleUpdate">>(
+        "post",
+        interpolate("/admin/system/code-rule/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleUsageList(
+      input: OperationInput<"codeRuleUsageList"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleUsageList">>(
+        "post",
+        interpolate("/admin/system/code-rule/usage/list", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleValidate(
+      input: OperationInput<"codeRuleValidate"> & {
+        body: OperationBody<"codeRuleValidate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleValidate">>(
+        "post",
+        interpolate("/admin/system/code-rule/validate", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequenceInfo(
+      input: OperationInput<"systemCodeSequenceInfo"> & {
+        body: OperationBody<"systemCodeSequenceInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequenceInfo">>(
+        "post",
+        interpolate("/admin/system/code-sequence/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequencePage(
+      input: OperationInput<"systemCodeSequencePage"> & {
+        body: OperationBody<"systemCodeSequencePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequencePage">>(
+        "post",
+        interpolate("/admin/system/code-sequence/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequenceSchema(
+      input: OperationInput<"systemCodeSequenceSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequenceSchema">>(
+        "get",
+        interpolate("/admin/system/code-sequence/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemDictItemAdd(
       input: OperationInput<"systemDictItemAdd"> & {
         body: OperationBody<"systemDictItemAdd">;

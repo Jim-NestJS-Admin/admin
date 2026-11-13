@@ -195,7 +195,7 @@ const formItems = computed(
   () =>
     schema.value?.form.filter(item =>
       editor.mode === "add"
-        ? item.edit !== "none"
+        ? item.generated || item.edit !== "none"
         : editor.record &&
           readCell(editor.record, item.field).state !== "hidden"
     ) ?? []
@@ -894,7 +894,9 @@ defineExpose({ reload: view.initialize, refresh: view.load });
                     readCell(editor.record, item.field),
                     schema.dictionaries[item.dict]
                   )
-                : "—"
+                : item.generated
+                  ? item.generatedHint || t("crud.generatedHint")
+                  : "—"
             }}</span></template
           >
           <slot

@@ -119,6 +119,7 @@ admin:
   accountPlaceholder: Enter your account
   passwordPlaceholder: Enter your password
 crud:
+  generatedHint: Generated when saved
   title: Records
   add: Add
   edit: Edit
@@ -547,6 +548,7 @@ pageConfig:
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
 forms:
+  nameRequired: Please enter a form name
   content: Form content
   settings: Form settings
   addFieldHint: This form has no fields. Drag at least one control into Design before checking or saving.
@@ -645,6 +647,30 @@ forms:
     password: Password
     email: Email
     url: URL
+codeRules:
+  configPreview: Check format and examples
+  configPreviewHint: Examples start at the configured start value and consume no numbers. Preview actual next codes in details.
+  rules: Rules
+  bindings: Usage bindings
+  sequences: Sequences
+  segmentHint: Up to four segments. Sequence must be last. Periodic resets require a complete date.
+  literal: Fixed text
+  date: Date
+  sequence: Sequence
+  width: Sequence width
+  up: Move up
+  down: Move down
+  start: Start
+  preview: Preview next codes
+  history: Version history
+  previewHint: Preview does not consume numbers. Final codes are generated when saving. Format is frozen after first use.
+  bind: Save binding
+  bindConfirm: Save this binding? Rules cannot be reused for another usage. Switching requires a fresh rule and unused prefix.
+  bindHint: Business records use the bound rule automatically. Switching requires a fresh rule and new prefix. Existing codes remain unchanged.
+  selectRule: Search enabled rules
+  bound: Current rule
+  unbound: Not bound
+  maxLength: Maximum length
 platform:
   adminUsername: Admin account
   adminPassword: Admin password

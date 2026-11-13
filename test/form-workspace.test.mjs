@@ -204,7 +204,7 @@ test("真实生成客户端先检查再创建；原样重试使用同幂等键�
       writes[2].config.headers["Idempotency-Key"]
     );
     assert.deepEqual(writes[2].body, {
-      data: { code: "leave_request", name: "请假新版", designer: designer() }
+      data: { name: "请假新版", designer: designer() }
     });
     assert.equal(workspace.editor.mode, "view");
     assert.equal(calls[0].url, "/admin/form/definition/inspect");

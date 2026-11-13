@@ -199,7 +199,6 @@ export function useFormWorkspace(client = api) {
     editor.issues = [];
     editor.conflict = false;
     const capture = {
-      code: editor.code.trim(),
       name: editor.name.trim(),
       designer: copy(designer)
     };
@@ -223,7 +222,13 @@ export function useFormWorkspace(client = api) {
         mode === "create"
           ? await client.formDefinitionAdd({ body: { data: capture } }, options)
           : await client.formDefinitionRevise(
-              { body: { baseRevision: expected!, data: capture } },
+              {
+                body: {
+                  definitionId: editor.record!.id,
+                  baseRevision: expected!,
+                  data: capture
+                }
+              },
               options
             );
       if (request.signal.aborted) return false;

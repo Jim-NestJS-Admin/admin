@@ -967,6 +967,244 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/code-rule/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增编码规则 */
+    post: operations["systemCodeRuleAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/binding/set": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 建立或切换编码规则绑定 */
+    post: operations["codeRuleBindingSet"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除编码规则（整批成败） */
+    post: operations["systemCodeRuleDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 编码规则审计快照 */
+    post: operations["codeRuleHistory"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 编码规则详情 */
+    post: operations["systemCodeRuleInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 编码规则分页列表 */
+    post: operations["systemCodeRulePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 预览后续编码，不占用号码 */
+    post: operations["codeRulePreview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 编码规则页面描述 */
+    get: operations["systemCodeRuleSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改编码规则 */
+    post: operations["systemCodeRuleUpdate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/usage/list": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 已注册编码用途与绑定 */
+    post: operations["codeRuleUsageList"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-rule/validate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 校验规则与用途兼容性，不写入 */
+    post: operations["codeRuleValidate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-sequence/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 编码序号详情 */
+    post: operations["systemCodeSequenceInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-sequence/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 编码序号分页列表 */
+    post: operations["systemCodeSequencePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/system/code-sequence/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 编码序号页面描述 */
+    get: operations["systemCodeSequenceSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/dict-item/add": {
     parameters: {
       query?: never;
@@ -2725,6 +2963,60 @@ export type components = {
       password: string;
       version: number;
     };
+    CodeBindingBody: {
+      ruleId: string;
+      usageKey: string;
+    };
+    CodeHistoryItem: {
+      /** Format: date-time */
+      createdAt: string;
+      revision: number;
+      snapshot: {
+        [key: string]: unknown;
+      };
+    };
+    CodeHistoryResult: {
+      list: components["schemas"]["CodeHistoryItem"][];
+    };
+    CodePreviewBody: {
+      ruleId: string;
+      usageKey?: string;
+    };
+    CodePreviewResult: {
+      codes: string[];
+      consumes: boolean;
+      periodKey: string;
+    };
+    CodeRuleValidateBody: {
+      data: components["schemas"]["CodeRuleValidateInput"];
+      usageKey?: string;
+    };
+    CodeRuleValidateInput: {
+      resetPeriod: string;
+      segments: {
+        [key: string]: unknown;
+      }[];
+      start: string;
+      timezone: string;
+    };
+    CodeUsageItem: {
+      allowRuleSwitch: boolean;
+      /** @enum {string} */
+      charset: "upper_alnum" | "lower_slug" | "digits";
+      field: string;
+      issue: string;
+      key: string;
+      maxLength: number;
+      minLength?: number;
+      name: string;
+      resource: string;
+      ruleId: string | null;
+      ruleName: string | null;
+      uniqueScope: string;
+    };
+    CodeUsageResult: {
+      list: components["schemas"]["CodeUsageItem"][];
+    };
     CreateFormBody: {
       data: components["schemas"]["FormDefinitionInput"];
     };
@@ -2874,6 +3166,8 @@ export type components = {
        */
       edit: "both" | "add" | "none";
       field: string;
+      generated?: boolean;
+      generatedHint?: string;
       label: string;
       placeholder?: string;
       required: boolean;
@@ -3149,8 +3443,6 @@ export type components = {
       id: string;
     };
     FormDefinitionInput: {
-      /** @example leave_request */
-      code: string;
       designer: components["schemas"]["FormDesignerDto"];
       name: string;
     };
@@ -3809,6 +4101,8 @@ export type components = {
       /** @description 当前最新业务修订号，修订后加1 */
       baseRevision: number;
       data: components["schemas"]["FormDefinitionInput"];
+      /** @description 作为修订来源的固定表单版本编号 */
+      definitionId: string;
     };
     SaveBody: {
       /** @description 生成配置（契约 codegen.md 第 2 节） */
@@ -3970,6 +4264,260 @@ export type components = {
     SwitchOrgDto: {
       /** @description 要切换到的组织编号 */
       orgId: string;
+    };
+    SystemCodeRuleAddBody: {
+      data: components["schemas"]["SystemCodeRuleAddData"];
+    };
+    SystemCodeRuleAddData: {
+      /** @description 规则编码 */
+      code: string;
+      /** @description 说明 */
+      description?: string;
+      /** @description 规则名称 */
+      name: string;
+      /**
+       * @description 重置周期
+       * @enum {string}
+       */
+      resetPeriod: "never" | "year" | "month" | "day";
+      /** @description 编码段 */
+      segments: {
+        [key: string]: unknown;
+      }[];
+      /** @description 起始值 */
+      start: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status: "enabled" | "disabled";
+      /** @description 时区 */
+      timezone: string;
+    };
+    SystemCodeRuleDeleteBody: {
+      ids: string[];
+    };
+    SystemCodeRuleDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    SystemCodeRuleInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    SystemCodeRulePageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemCodeRulePageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemCodeRulePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    SystemCodeRulePageEq: {
+      /**
+       * @description 重置周期
+       * @enum {string}
+       */
+      resetPeriod?: "never" | "year" | "month" | "day";
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "enabled" | "disabled";
+    };
+    SystemCodeRulePageResult: {
+      list: components["schemas"]["SystemCodeRuleRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    SystemCodeRulePageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    SystemCodeRuleRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 规则编码 */
+      code?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 说明 */
+      description?: string;
+      /** @description 首次绑定时间 */
+      firstBoundAt?: Record<string, never>;
+      /** @description 首次绑定用途 */
+      firstBoundUsageKey?: Record<string, never>;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 规则名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /**
+       * @description 重置周期
+       * @enum {string}
+       */
+      resetPeriod?: "never" | "year" | "month" | "day";
+      /** @description 修订号 */
+      revision?: number;
+      /** @description 编码段 */
+      segments?: {
+        [key: string]: unknown;
+      }[];
+      /** @description 起始值 */
+      start?: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "enabled" | "disabled";
+      /** @description 时区 */
+      timezone?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    SystemCodeRuleUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["SystemCodeRuleUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    SystemCodeRuleUpdateData: {
+      /** @description 说明 */
+      description?: string;
+      /** @description 规则名称 */
+      name?: string;
+      /**
+       * @description 重置周期
+       * @enum {string}
+       */
+      resetPeriod?: "never" | "year" | "month" | "day";
+      /** @description 编码段 */
+      segments?: {
+        [key: string]: unknown;
+      }[];
+      /** @description 起始值 */
+      start?: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "enabled" | "disabled";
+      /** @description 时区 */
+      timezone?: string;
+    };
+    SystemCodeSequenceInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    SystemCodeSequencePageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["SystemCodeSequencePageEq"];
+      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["SystemCodeSequencePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    SystemCodeSequencePageEq: {
+      /** @description 周期 */
+      periodKey?: string;
+      /** @description 规则编号 */
+      ruleId?: string;
+    };
+    SystemCodeSequencePageResult: {
+      list: components["schemas"]["SystemCodeSequenceRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    SystemCodeSequencePageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    SystemCodeSequenceRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 当前序号 */
+      current?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 最近编码 */
+      lastCode?: Record<string, never>;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 周期 */
+      periodKey?: string;
+      /** @description 规则编号 */
+      ruleId?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
     };
     SystemDictItemAddBody: {
       data: components["schemas"]["SystemDictItemAddData"];
@@ -8606,6 +9154,580 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeRuleAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeRuleAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeRuleRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  codeRuleBindingSet: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodeBindingBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodeBindingBody"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeRuleDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeRuleDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeRuleDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  codeRuleHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodePreviewBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodeHistoryResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  systemCodeRuleInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeRuleInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeRuleRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeRulePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeRulePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeRulePageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  codeRulePreview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodePreviewBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodePreviewResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeRuleSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  systemCodeRuleUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeRuleUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeRuleRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  codeRuleUsageList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodeUsageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  codeRuleValidate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodeRuleValidateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodePreviewResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  systemCodeSequenceInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeSequenceInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeSequenceRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeSequencePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SystemCodeSequencePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SystemCodeSequencePageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemCodeSequenceSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
         };
       };
     };

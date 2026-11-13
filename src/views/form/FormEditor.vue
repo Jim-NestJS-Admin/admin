@@ -50,7 +50,14 @@ function designer(): Designer {
       : copy(editor.designer.rule)
   };
 }
+function checkName() {
+  if (editor.name.trim()) return true;
+  editor.error = "forms.nameRequired";
+  editor.issues = [{ field: "data.name", messages: [t("forms.nameRequired")] }];
+  return false;
+}
 async function check(openPreview = false) {
+  if (!checkName()) return;
   try {
     const result = await props.workspace.check(designer());
     if (result) {
@@ -68,6 +75,7 @@ async function check(openPreview = false) {
   }
 }
 async function save() {
+  if (!checkName()) return;
   try {
     const saved = await props.workspace.save(designer());
     if (saved) {
@@ -269,7 +277,6 @@ async function beforeTab(name: string) {
         /></el-form-item>
         <el-form-item
           :label="t('forms.code')"
-          required
           :error="
             editor.issues
               .filter(issue => issue.field === 'data.code')
@@ -278,9 +285,9 @@ async function beforeTab(name: string) {
           "
           ><el-input
             v-model="editor.code"
-            :disabled="editor.mode !== 'create'"
+            disabled
             maxlength="64"
-            :placeholder="t('forms.codeHint')"
+            :placeholder="t('crud.generatedHint')"
         /></el-form-item>
       </el-form>
       <el-tabs v-model="tab" :before-leave="beforeTab">
