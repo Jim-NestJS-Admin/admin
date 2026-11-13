@@ -2,10 +2,11 @@
 import { computed } from "vue";
 import { useMediaQuery } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
-import type { CrudRecord } from "@/components/Crud/types";
+import type { CrudRecord, CrudSchema } from "@/components/Crud/types";
 import type { components } from "@/api/schema";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import TimeZoneText from "./TimeZoneText.vue";
+import DictionaryValue from "@/components/Crud/DictionaryValue.vue";
 import RuleTools from "./RuleTools.vue";
 import { useRuleHistoryView } from "./rule-history";
 interface DetailItem {
@@ -18,6 +19,7 @@ interface DetailItem {
 const props = defineProps<{
   record: CrudRecord;
   items: DetailItem[];
+  dictionaries: CrudSchema["dictionaries"];
   display: (record: CrudRecord, item: DetailItem) => unknown;
 }>();
 const { t } = useI18n();
@@ -117,6 +119,12 @@ const segments = computed(() => {
             class="version-kind"
             >{{ t("codeRules.historyNotRecorded") }}</span
           >
+          <DictionaryValue
+            v-else-if="item.dict"
+            :cell="defaultCell(displayed, item.field)"
+            :options="dictionaries[item.dict]"
+            :text="display(displayed, item)"
+          />
           <template v-else>{{ display(displayed, item) }}</template>
         </el-descriptions-item>
       </el-descriptions>

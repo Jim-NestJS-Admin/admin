@@ -3172,6 +3172,8 @@ export type components = {
     };
     CrudSchemaDictItem: {
       label: string;
+      /** @enum {string} */
+      tagType?: "primary" | "success" | "info" | "warning" | "danger";
       value: string | number | boolean;
     };
     CrudSchemaFormItem: {
@@ -3258,6 +3260,8 @@ export type components = {
     };
     DictionaryOption: {
       label: string;
+      /** @enum {string} */
+      tagType?: "primary" | "success" | "info" | "warning" | "danger";
       value: string;
     };
     DictionaryOptions: {
@@ -4312,11 +4316,8 @@ export type components = {
       }[];
       /** @description 起始值 */
       start: string;
-      /**
-       * @description 状态
-       * @enum {string}
-       */
-      status: "enabled" | "disabled";
+      /** @description 状态 */
+      status: string;
       /** @description 时区 */
       timezone: string;
     };
@@ -4350,11 +4351,8 @@ export type components = {
        * @enum {string}
        */
       resetPeriod?: "never" | "year" | "month" | "day";
-      /**
-       * @description 状态
-       * @enum {string}
-       */
-      status?: "enabled" | "disabled";
+      /** @description 状态 */
+      status?: string;
     };
     SystemCodeRulePageResult: {
       list: components["schemas"]["SystemCodeRuleRow"][];
@@ -4417,11 +4415,8 @@ export type components = {
       }[];
       /** @description 起始值 */
       start?: string;
-      /**
-       * @description 状态
-       * @enum {string}
-       */
-      status?: "enabled" | "disabled";
+      /** @description 状态 */
+      status?: string;
       /** @description 时区 */
       timezone?: string;
       /**
@@ -4458,11 +4453,8 @@ export type components = {
       }[];
       /** @description 起始值 */
       start?: string;
-      /**
-       * @description 状态
-       * @enum {string}
-       */
-      status?: "enabled" | "disabled";
+      /** @description 状态 */
+      status?: string;
       /** @description 时区 */
       timezone?: string;
     };
@@ -4555,6 +4547,11 @@ export type components = {
       label: string;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 标签样式
+       * @enum {string|null}
+       */
+      tagType?: "primary" | "success" | "info" | "warning" | "danger" | null;
       /** @description 字典类型 */
       typeId: string;
       /** @description 字典值 */
@@ -4659,6 +4656,11 @@ export type components = {
       orgId: string | null;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 标签样式
+       * @enum {string|null}
+       */
+      tagType?: "primary" | "success" | "info" | "warning" | "danger" | null;
       /** @description 字典类型 */
       typeId?: string;
       /**
@@ -4688,6 +4690,11 @@ export type components = {
       label?: string;
       /** @description 排序 */
       rank?: number;
+      /**
+       * @description 标签样式
+       * @enum {string|null}
+       */
+      tagType?: "primary" | "success" | "info" | "warning" | "danger" | null;
       /** @description 字典值 */
       value?: string;
     };

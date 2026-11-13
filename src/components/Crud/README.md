@@ -4,6 +4,8 @@
 
 ## 已实现与适配边界
 
+- 字典项可提供 `tagType`（primary/success/info/warning/danger）；统一 `DictionaryValue` 在列表和详情按该元数据显示tag，未配置时保持普通文本。只读字段可显示tag，隐藏/脱敏字段不按原值匹配。`form-字段` 插槽获得同源字典options，专用状态switch也使用字典名称；业务枚举校验仍由后端强制执行。
+
 - `hideDetailFooter` 可隐藏只读详情底部按钮，右上角关闭和Esc保留；新增/编辑不受影响。
 
 - `detail-content` 仅在只读详情时替换默认描述列表，接收原始record、经过字段裁剪的items和统一display格式化函数；用于历史版本与当前版本联动查看。投影不得恢复隐藏字段、不得将历史查看写回editor或触发保存；编辑模式保持原统一表单。

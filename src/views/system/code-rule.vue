@@ -177,13 +177,19 @@ const defaults = {
           <RuleTools ref="draftTools" :draft="values" :show-actions="false" />
         </el-form-item>
       </template>
-      <template #form-status="{ values, disabled }">
+      <template #form-status="{ values, disabled, options }">
         <el-switch
           v-model="values.status as string"
           active-value="enabled"
           inactive-value="disabled"
-          :active-text="t('codeRules.enabled')"
-          :inactive-text="t('codeRules.disabled')"
+          :active-text="
+            options.find(item => item.value === 'enabled')?.label ??
+            t('codeRules.enabled')
+          "
+          :inactive-text="
+            options.find(item => item.value === 'disabled')?.label ??
+            t('codeRules.disabled')
+          "
           :disabled="disabled"
         />
       </template>
@@ -197,11 +203,12 @@ const defaults = {
           >{{ t("codeRules.configPreview") }}</el-button
         >
       </template>
-      <template #detail-content="{ record, items, display }">
+      <template #detail-content="{ record, items, display, dictionaries }">
         <RuleDetail
           :key="String(record.id) + ':' + String(record.version)"
           :record="record"
           :items="items"
+          :dictionaries="dictionaries"
           :display="display"
         />
       </template>

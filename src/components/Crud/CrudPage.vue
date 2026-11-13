@@ -30,6 +30,7 @@ import FilterIcon from "~icons/ri/filter-3-line";
 import RefreshIcon from "@/assets/table-bar/refresh.svg?component";
 import { useFillHeight } from "./useFillHeight";
 import { useHeadStyle } from "./useHeadStyle";
+import DictionaryValue from "./DictionaryValue.vue";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
@@ -651,13 +652,22 @@ defineExpose({
               >
                 <template #default="{ row }">
                   <slot
-                    v-if="readCell(row, column.field).state === 'visible'"
+                    v-if="
+                      ['visible', 'readonly'].includes(
+                        readCell(row, column.field).state
+                      )
+                    "
                     :name="`cell-${column.field}`"
                     :row="row"
                     :value="readCell(row, column.field).display"
                     :text="display(row, column)"
-                    ><el-tag
-                      v-if="
+                    ><DictionaryValue
+                      v-if="column.dict"
+                      :cell="readCell(row, column.field)"
+                      :options="schema.dictionaries[column.dict]"
+                      :text="display(row, column)"
+                    /><el-tag
+                      v-else-if="
                         column.type === 'boolean' &&
                         typeof readCell(row, column.field).display === 'boolean'
                       "
@@ -849,6 +859,7 @@ defineExpose({
           <template v-if="editor.readOnly && editor.record">
             <slot
               name="detail-content"
+              :dictionaries="schema.dictionaries"
               :record="editor.record"
               :items="infoItems"
               :display="display"
@@ -870,6 +881,12 @@ defineExpose({
                     :name="`detail-${item.field}`"
                     :record="editor.record"
                     :field="item.field"
+                  />
+                  <DictionaryValue
+                    v-else-if="item.dict"
+                    :cell="readCell(editor.record, item.field)"
+                    :options="schema.dictionaries[item.dict]"
+                    :text="display(editor.record, item)"
                   />
                   <el-tag
                     v-else-if="
@@ -942,6 +959,7 @@ defineExpose({
               <slot
                 v-else
                 :name="`form-${item.field}`"
+                :options="schema.dictionaries[item.dict] ?? []"
                 :values="editor.values"
                 :field="item.field"
                 :disabled="saving"

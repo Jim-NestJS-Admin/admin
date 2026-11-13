@@ -313,6 +313,13 @@ export const ENUMS = {
     "json",
     "reference"
   ],
+  "components.schemas.CrudSchemaDictItem.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.CrudSchemaFormItem.properties.component": [
     "input",
     "textarea",
@@ -350,6 +357,13 @@ export const ENUMS = {
     "date"
   ],
   "components.schemas.CrudSchemaSort.properties.order": ["asc", "desc"],
+  "components.schemas.DictionaryOption.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.FieldConfigurationChange.properties.delegable": [
     "editable",
     "readonly",
@@ -613,19 +627,11 @@ export const ENUMS = {
     "month",
     "day"
   ],
-  "components.schemas.SystemCodeRuleAddData.properties.status": [
-    "enabled",
-    "disabled"
-  ],
   "components.schemas.SystemCodeRulePageEq.properties.resetPeriod": [
     "never",
     "year",
     "month",
     "day"
-  ],
-  "components.schemas.SystemCodeRulePageEq.properties.status": [
-    "enabled",
-    "disabled"
   ],
   "components.schemas.SystemCodeRulePageSort.properties.field": [
     "id",
@@ -641,19 +647,11 @@ export const ENUMS = {
     "month",
     "day"
   ],
-  "components.schemas.SystemCodeRuleRow.properties.status": [
-    "enabled",
-    "disabled"
-  ],
   "components.schemas.SystemCodeRuleUpdateData.properties.resetPeriod": [
     "never",
     "year",
     "month",
     "day"
-  ],
-  "components.schemas.SystemCodeRuleUpdateData.properties.status": [
-    "enabled",
-    "disabled"
   ],
   "components.schemas.SystemCodeSequencePageSort.properties.field": [
     "id",
@@ -666,6 +664,13 @@ export const ENUMS = {
   ],
   "components.schemas.SystemCodeSequenceRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemDictItemAddData.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.SystemDictItemExportBody.properties.format": [
     "csv",
     "xlsx"
@@ -679,6 +684,20 @@ export const ENUMS = {
   "components.schemas.SystemDictItemPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemDictItemRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemDictItemRow.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
+  "components.schemas.SystemDictItemUpdateData.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.SystemDictTypeExportBody.properties.format": [
     "csv",
     "xlsx"
