@@ -6,7 +6,11 @@ import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
 import { ElMessageBox } from "element-plus";
 import { ruleError } from "./messages";
-const props = defineProps<{ ruleId?: string; ruleName?: string }>();
+const props = defineProps<{
+  ruleId?: string;
+  ruleName?: string;
+  ruleUnavailable?: boolean;
+}>();
 const emit = defineEmits<{ changed: [] }>();
 const { t } = useI18n();
 const usages = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>([]);
@@ -47,9 +51,29 @@ async function load(keyword = "") {
     if (!request.signal.aborted) busy.value = false;
   }
 }
+type Usage = OperationResponse<"codeRuleUsageList">["data"]["list"][number];
+type Rule = OperationResponse<"systemCodeRulePage">["data"]["list"][number];
+function ruleDisabled(rule: Rule) {
+  return (
+    rule.firstBoundAt !== null ||
+    usages.value.some(usage => usage.ruleId === rule.id)
+  );
+}
+function selectionDisabled(usage: Usage) {
+  if (usage.ruleId && !usage.allowRuleSwitch) return true;
+  if (props.ruleId)
+    return (
+      Boolean(props.ruleUnavailable) ||
+      usages.value.some(item => item.ruleId === props.ruleId)
+    );
+  const rule = rules.value.find(item => item.id === selected.value[usage.key]);
+  return !rule || ruleDisabled(rule);
+}
 async function bind(key: string) {
   const ruleId = selected.value[key];
   if (!ruleId || busy.value) return;
+  const usage = usages.value.find(item => item.key === key);
+  if (!usage || selectionDisabled(usage)) return;
   pending?.abort();
   const request = (pending = new AbortController());
   busy.value = true;
@@ -107,7 +131,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <section v-loading="busy" class="bindings">
-    <el-alert :title="t('codeRules.bindHint')" type="info" :closable="false" />
+    <p class="binding-hint">{{ t("codeRules.bindHint") }}</p>
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
     <el-form label-position="top">
       <el-form-item
@@ -122,7 +146,11 @@ onBeforeUnmount(() => {
             filterable
             remote
             :remote-method="load"
-            :disabled="busy || Boolean(ruleId)"
+            :disabled="
+              busy ||
+              Boolean(ruleId) ||
+              Boolean(usage.ruleId && !usage.allowRuleSwitch)
+            "
             :placeholder="t('codeRules.selectRule')"
           >
             <el-option
@@ -138,12 +166,14 @@ onBeforeUnmount(() => {
               "
               :label="usage.ruleName ?? usage.ruleId"
               :value="usage.ruleId"
+              disabled
             />
             <el-option
               v-for="rule in rules"
               :key="rule.id"
               :label="`${rule.name} (${rule.code})`"
               :value="rule.id"
+              :disabled="ruleDisabled(rule)"
             />
           </el-select>
           <el-space :size="12" wrap>
@@ -154,7 +184,7 @@ onBeforeUnmount(() => {
                 busy ||
                 !selected[usage.key] ||
                 selected[usage.key] === usage.ruleId ||
-                Boolean(usage.ruleId && !usage.allowRuleSwitch)
+                selectionDisabled(usage)
               "
               @click="bind(usage.key)"
               >{{ t("codeRules.bind") }}</el-button
@@ -184,7 +214,7 @@ onBeforeUnmount(() => {
 .bindings {
   display: grid;
   gap: 16px;
-  padding: 20px;
+  padding: 0;
   background: var(--el-bg-color);
 }
 

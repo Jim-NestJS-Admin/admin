@@ -213,45 +213,70 @@ const defaults = {
         />
       </template>
     </CrudPage>
+    <el-dialog
+      :model-value="panel === 'bindings'"
+      :title="t('codeRules.usageConfig')"
+      width="min(920px, 96vw)"
+      destroy-on-close
+      @update:model-value="panel = ''"
+    >
+      <template #header>
+        <div class="panel-heading">
+          <span>{{ t("codeRules.usageConfig") }}</span
+          ><el-tag v-if="active" effect="plain"
+            >{{ active.name }} ({{ active.code }})</el-tag
+          >
+        </div>
+      </template>
+      <UsageBindings
+        v-if="panel === 'bindings'"
+        :rule-id="active ? String(active.id) : undefined"
+        :rule-name="active ? String(active.name) : undefined"
+        :rule-unavailable="
+          Boolean(
+            active && (active.status !== '1' || active.firstBoundAt !== null)
+          )
+        "
+      />
+    </el-dialog>
     <el-drawer
-      :model-value="Boolean(panel)"
-      :title="
-        panel === 'sequences'
-          ? t('codeRules.sequenceRecords')
-          : t('codeRules.usageConfig')
-      "
+      :model-value="panel === 'sequences'"
+      :title="t('codeRules.sequenceRecords')"
       size="min(1000px, 96vw)"
       destroy-on-close
       @update:model-value="panel = ''"
     >
-      <template v-if="panel">
-        <el-alert
-          v-if="active"
-          :title="String(active.name) + ' (' + String(active.code) + ')'"
-          type="info"
-          :closable="false"
-        />
-        <UsageBindings
-          v-if="panel === 'bindings'"
-          :rule-id="active ? String(active.id) : undefined"
-          :rule-name="active ? String(active.name) : undefined"
-        />
-        <CrudPage
-          v-else-if="active"
-          :key="String(active.id)"
-          class="sequence-list"
-          :port="sequencePort"
-          :fill="false"
-          :page-key="'system:code-sequence:' + String(active.id)"
-          :permissions="sequences.permissions"
-        />
+      <template #header>
+        <div class="panel-heading">
+          <span>{{ t("codeRules.sequenceRecords") }}</span
+          ><el-tag v-if="active" effect="plain"
+            >{{ active.name }} ({{ active.code }})</el-tag
+          >
+        </div>
       </template>
+      <CrudPage
+        v-if="panel === 'sequences' && active"
+        :key="String(active.id)"
+        class="sequence-list"
+        :port="sequencePort"
+        :fill="false"
+        :page-key="'system:code-sequence:' + String(active.id)"
+        :permissions="sequences.permissions"
+      />
     </el-drawer>
   </div>
 </template>
 <style scoped>
 .code-rule-page {
   min-width: 0;
+}
+
+.panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding-right: 24px;
 }
 
 .sequence-list {
