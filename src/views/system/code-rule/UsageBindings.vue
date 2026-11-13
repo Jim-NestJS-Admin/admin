@@ -146,18 +146,23 @@ onBeforeUnmount(() => {
               :value="rule.id"
             />
           </el-select>
-          <el-button
-            v-perm="permission('codeRuleBindingSet')"
-            type="primary"
-            :disabled="
-              busy ||
-              !selected[usage.key] ||
-              selected[usage.key] === usage.ruleId ||
-              Boolean(usage.ruleId && !usage.allowRuleSwitch)
-            "
-            @click="bind(usage.key)"
-            >{{ t("codeRules.bind") }}</el-button
-          >
+          <el-space :size="12" wrap>
+            <el-button
+              v-perm="permission('codeRuleBindingSet')"
+              type="primary"
+              :disabled="
+                busy ||
+                !selected[usage.key] ||
+                selected[usage.key] === usage.ruleId ||
+                Boolean(usage.ruleId && !usage.allowRuleSwitch)
+              "
+              @click="bind(usage.key)"
+              >{{ t("codeRules.bind") }}</el-button
+            >
+            <el-button :disabled="busy" @click="load()">{{
+              t("crud.reload")
+            }}</el-button>
+          </el-space>
         </div>
         <p>
           {{ t("codeRules.bound") }}：{{
@@ -168,9 +173,11 @@ onBeforeUnmount(() => {
         </p>
       </el-form-item>
     </el-form>
-    <el-button :disabled="busy" @click="load()">{{
-      t("crud.reload")
-    }}</el-button>
+    <div v-if="!usages.length">
+      <el-button :disabled="busy" @click="load()">{{
+        t("crud.reload")
+      }}</el-button>
+    </div>
   </section>
 </template>
 <style scoped>
@@ -187,12 +194,14 @@ onBeforeUnmount(() => {
 
 .usage-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   width: 100%;
 }
 
 .usage-row .el-select {
-  flex: 1;
+  flex: 1 1 240px;
+  min-width: 0;
 }
 
 .bindings p {
