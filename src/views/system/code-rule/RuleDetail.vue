@@ -83,6 +83,11 @@ const segments = computed(() => {
               }}
             </el-tag>
           </el-space>
+          <span
+            v-else-if="selected && !Object.hasOwn(displayed, item.field)"
+            class="version-kind"
+            >{{ t("codeRules.historyNotRecorded") }}</span
+          >
           <template v-else>{{ display(displayed, item) }}</template>
         </el-descriptions-item>
       </el-descriptions>

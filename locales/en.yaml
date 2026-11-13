@@ -648,6 +648,7 @@ forms:
     email: Email
     url: URL
 codeRules:
+  historyNotRecorded: Not recorded in history
   currentVersion: Current version
   historicalVersion: Historical version · read-only
   returnCurrent: Back to current version

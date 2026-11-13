@@ -10,8 +10,8 @@ export function useRuleHistoryView(current: () => CrudRecord) {
     if (!selected.value) return current();
     return {
       ...Object.fromEntries(
-        Object.entries(selected.value.snapshot).filter(([field]) =>
-          Object.hasOwn(current(), field)
+        Object.entries(selected.value.snapshot).filter(
+          ([field]) => field === "_display" || Object.hasOwn(current(), field)
         )
       ),
       revision: selected.value.revision,
