@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import type { CrudRecord } from "@/components/Crud/types";
-import { api, type OperationResponse } from "@/api/client";
 import { onSessionReset } from "@/platform/lifecycle";
 import { scopedSequencePort, copyRuleDraft } from "./code-rule/rule-page";
 import { ruleError } from "./code-rule/messages";
@@ -22,23 +21,7 @@ const panel = ref<"bindings" | "sequences" | "">("");
 const active = ref<CrudRecord>();
 const error = ref("");
 const copying = ref(false);
-const usagesLoaded = ref(false);
-const usages = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>([]);
 let pending: AbortController | undefined;
-let usageRequest: AbortController | undefined;
-async function loadUsages() {
-  usageRequest?.abort();
-  const request = (usageRequest = new AbortController());
-  try {
-    const result = await api.codeRuleUsageList({}, { signal: request.signal });
-    if (!request.signal.aborted) {
-      usages.value = result.data.list;
-      usagesLoaded.value = true;
-    }
-  } catch (reason) {
-    if (!request.signal.aborted) error.value = ruleError(reason);
-  }
-}
 function openPanel(kind: "bindings" | "sequences", row?: CrudRecord) {
   active.value = row;
   panel.value = kind;
@@ -61,16 +44,12 @@ async function copy(row: CrudRecord) {
 }
 function resetPanels() {
   pending?.abort();
-  usageRequest?.abort();
   panel.value = "";
   active.value = undefined;
-  usages.value = [];
-  usagesLoaded.value = false;
   copying.value = false;
   error.value = "";
 }
 const stop = onSessionReset(resetPanels);
-onMounted(loadUsages);
 onBeforeUnmount(() => {
   stop();
   resetPanels();
@@ -111,19 +90,6 @@ const defaults = {
           @click="openPanel('bindings')"
           >{{ t("codeRules.usageConfig") }}</el-button
         >
-      </template>
-      <template #cell-name="{ text, row }">
-        <span>{{ text }}</span>
-        <div class="code-hint">
-          {{
-            usagesLoaded
-              ? usages
-                  .filter(u => u.ruleId === String(row.id))
-                  .map(u => u.name)
-                  .join("、") || t("codeRules.unbound")
-              : "—"
-          }}
-        </div>
       </template>
       <template #row-actions-extra="{ row, disabled }">
         <el-dropdown
@@ -239,7 +205,6 @@ const defaults = {
           v-if="panel === 'bindings'"
           :rule-id="active ? String(active.id) : undefined"
           :rule-name="active ? String(active.name) : undefined"
-          @changed="loadUsages"
         />
         <CrudPage
           v-else-if="active"
