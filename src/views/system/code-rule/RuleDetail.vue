@@ -4,7 +4,7 @@ import { useMediaQuery } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import type { CrudRecord } from "@/components/Crud/types";
 import type { components } from "@/api/schema";
-import { defaultCell, formatValue } from "@/components/Crud/model.mjs";
+import { defaultCell } from "@/components/Crud/model.mjs";
 import RuleTools from "./RuleTools.vue";
 import { useRuleHistoryView } from "./rule-history";
 interface DetailItem {
@@ -34,44 +34,25 @@ const segments = computed(() => {
     ? (cell.display as components["schemas"]["SystemCodeRuleAddData"]["segments"])
     : undefined;
 });
-const visibleItems = computed(() =>
-  selected.value
-    ? props.items.filter(item => Object.hasOwn(displayed.value, item.field))
-    : props.items
-);
 </script>
 <template>
   <div class="rule-detail">
     <section class="rule-detail-main">
       <div class="version-heading">
         <el-tag :type="selected ? 'warning' : 'primary'"
-          >{{
-            t(
-              selected
-                ? "codeRules.historicalVersion"
-                : "codeRules.currentVersion"
-            )
-          }}
-          · v{{ displayed.revision }}</el-tag
+          >v{{ displayed.revision }}</el-tag
         >
-        <el-button v-if="selected" link type="primary" @click="select()">{{
-          t("codeRules.returnCurrent")
-        }}</el-button>
+        <span class="version-kind">{{
+          t(
+            selected
+              ? "codeRules.historicalVersion"
+              : "codeRules.currentVersion"
+          )
+        }}</span>
       </div>
-      <el-alert
-        v-if="selected"
-        type="info"
-        :closable="false"
-        :title="t('codeRules.historyReadonlyHint')"
-      />
-      <p v-if="selected" class="version-time">
-        {{ t("codeRules.savedAt") }}：{{
-          formatValue(selected.createdAt, "datetime")
-        }}
-      </p>
       <el-descriptions class="crud-info" :column="mobile ? 1 : 2" border>
         <el-descriptions-item
-          v-for="item in visibleItems"
+          v-for="item in items"
           :key="item.field"
           :label="item.label"
           :span="(item.wide || item.field === 'segments') && !mobile ? 2 : 1"
@@ -140,8 +121,7 @@ const visibleItems = computed(() =>
   margin-bottom: 16px;
 }
 
-.version-time {
-  margin: 12px 0;
+.version-kind {
   color: var(--el-text-color-secondary);
 }
 
