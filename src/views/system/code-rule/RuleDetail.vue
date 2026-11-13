@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount } from "vue";
+import { computed } from "vue";
 import { useMediaQuery } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import type { CrudRecord } from "@/components/Crud/types";
 import type { components } from "@/api/schema";
 import { defaultCell } from "@/components/Crud/model.mjs";
-import { useTimeZones } from "./useTimeZones";
+import TimeZoneText from "./TimeZoneText.vue";
 import RuleTools from "./RuleTools.vue";
 import { useRuleHistoryView } from "./rule-history";
 interface DetailItem {
@@ -20,10 +20,7 @@ const props = defineProps<{
   items: DetailItem[];
   display: (record: CrudRecord, item: DetailItem) => unknown;
 }>();
-const { t, locale } = useI18n();
-const directory = useTimeZones();
-onMounted(directory.load);
-onBeforeUnmount(directory.dispose);
+const { t } = useI18n();
 const detailItems = computed(() =>
   props.items.filter(item => item.field !== "version")
 );
@@ -40,33 +37,6 @@ const segments = computed(() => {
     Array.isArray(cell.display)
     ? (cell.display as components["schemas"]["SystemCodeRuleAddData"]["segments"])
     : undefined;
-});
-const timeZoneLabel = computed(() => {
-  const cell = defaultCell(displayed.value, "timezone");
-  if (
-    cell.state === "hidden" ||
-    cell.state === "masked" ||
-    typeof cell.display !== "string"
-  )
-    return undefined;
-  const value = cell.display;
-  let canonical = value;
-  try {
-    canonical = new Intl.DateTimeFormat("en", {
-      timeZone: value
-    }).resolvedOptions().timeZone;
-  } catch {
-    /* 旧值保留，不改变保存值。 */
-  }
-  const option = directory.options.value.find(
-    item => item.value === value || item.value === canonical
-  );
-  if (option)
-    return locale.value.startsWith("zh") ? option.labelZh : option.labelEn;
-  if (directory.loading.value) return t("codeRules.timeZoneNameLoading");
-  if (directory.error.value)
-    return t("codeRules.timeZoneNameFailed") + "：" + value;
-  return value;
 });
 </script>
 <template>
@@ -102,9 +72,15 @@ const timeZoneLabel = computed(() => {
           :span="(item.wide || item.field === 'segments') && !mobile ? 2 : 1"
           label-class-name="crud-info-label"
         >
-          <template v-if="item.field === 'timezone' && timeZoneLabel">{{
-            timeZoneLabel
-          }}</template>
+          <TimeZoneText
+            v-if="
+              item.field === 'timezone' &&
+              ['visible', 'readonly'].includes(
+                defaultCell(displayed, item.field).state
+              )
+            "
+            :value="defaultCell(displayed, item.field).display"
+          />
           <template v-else-if="item.field === 'revision'"
             >v{{ displayed.revision }}</template
           >

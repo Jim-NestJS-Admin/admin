@@ -13,9 +13,12 @@ import SegmentEditor from "./code-rule/SegmentEditor.vue";
 import RuleDetail from "./code-rule/RuleDetail.vue";
 import RuleTools from "./code-rule/RuleTools.vue";
 import UsageBindings from "./code-rule/UsageBindings.vue";
+import { provideTimeZoneDirectory } from "./code-rule/time-zone-directory";
+import TimeZoneText from "./code-rule/TimeZoneText.vue";
 import TimeZoneSelect from "./code-rule/TimeZoneSelect.vue";
 defineOptions({ name: "SystemCodeRule" });
 const { t } = useI18n();
+provideTimeZoneDirectory();
 const page = ref<InstanceType<typeof CrudPage>>();
 const panel = ref<"bindings" | "sequences" | "">("");
 const active = ref<CrudRecord>();
@@ -84,6 +87,9 @@ const defaults = {
       :permissions="rules.permissions"
       :add-defaults="defaults"
     >
+      <template #cell-timezone="{ value }"
+        ><TimeZoneText :value="value"
+      /></template>
       <template #toolbar>
         <el-button
           v-perm="permission('codeRuleUsageList')"

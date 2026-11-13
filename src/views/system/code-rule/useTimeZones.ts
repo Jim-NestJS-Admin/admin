@@ -4,6 +4,22 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { ruleError } from "./messages";
 export type TimeZoneOption =
   OperationResponse<"codeRuleTimeZones">["data"]["list"][number];
+/** 所有选择/只读入口复用同一别名匹配和名称格式。 */
+export function findTimeZone(options: TimeZoneOption[], value: string) {
+  const exact = options.find(item => item.value === value);
+  if (exact) return exact;
+  try {
+    const canonical = new Intl.DateTimeFormat("en", {
+      timeZone: value
+    }).resolvedOptions().timeZone;
+    return options.find(item => item.value === canonical);
+  } catch {
+    return undefined;
+  }
+}
+export function timeZoneOptionLabel(option: TimeZoneOption, locale: string) {
+  return locale.startsWith("zh") ? option.labelZh : option.labelEn;
+}
 export function matchesTimeZone(item: TimeZoneOption, query: string) {
   const normalize = (value: string) =>
     value.toLowerCase().replaceAll("_", " ").trim();
