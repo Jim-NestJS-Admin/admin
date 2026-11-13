@@ -11,6 +11,7 @@ import CrudPage from "@/components/Crud/CrudPage.vue";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import SegmentEditor from "./code-rule/SegmentEditor.vue";
+import RuleDetail from "./code-rule/RuleDetail.vue";
 import RuleTools from "./code-rule/RuleTools.vue";
 import UsageBindings from "./code-rule/UsageBindings.vue";
 import TimeZoneSelect from "./code-rule/TimeZoneSelect.vue";
@@ -97,6 +98,7 @@ const defaults = {
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
     <CrudPage
       ref="page"
+      hide-detail-footer
       :row-actions-width="310"
       :port="rules.port"
       page-key="system:code-rule"
@@ -206,14 +208,14 @@ const defaults = {
           >{{ t("codeRules.configPreview") }}</el-button
         >
       </template>
-      <template #detail-aside="{ record }"
-        ><RuleTools :rule-id="String(record.id)" history-only
-      /></template>
-      <template #editor-related="{ record }"
-        ><RuleTools
-          :key="String(record.id) + String(record.version)"
-          :rule-id="String(record.id)"
-      /></template>
+      <template #detail-content="{ record, items, display }">
+        <RuleDetail
+          :key="String(record.id) + ':' + String(record.version)"
+          :record="record"
+          :items="items"
+          :display="display"
+        />
+      </template>
     </CrudPage>
     <el-drawer
       :model-value="Boolean(panel)"

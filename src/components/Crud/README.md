@@ -4,6 +4,10 @@
 
 ## 已实现与适配边界
 
+- `hideDetailFooter` 可隐藏只读详情底部按钮，右上角关闭和Esc保留；新增/编辑不受影响。
+
+- `detail-content` 仅在只读详情时替换默认描述列表，接收原始record、经过字段裁剪的items和统一display格式化函数；用于历史版本与当前版本联动查看。投影不得恢复隐藏字段、不得将历史查看写回editor或触发保存；编辑模式保持原统一表单。
+
 - `row-actions-extra` 在默认详情/编辑/删除后追加操作，保留默认权限和确认流程；`detail-aside` 仅在只读详情中显示右侧栏，窄屏自动上下排列。`cell-字段` 另提供 row，显示仍遵守逐字段裁剪，不能借此展示隐藏或脱敏原文。公开的 `create(values)` 打开新增草稿，不保存；复制业务须只提供可配置字段，保存仍经过统一 Schema 写白名单及后端校验。
 
 - `editor-footer` 插槽位于取消/关闭与默认保存按钮之间，接收values、record、readonly、disabled，供业务放置检查/预览等附加操作。表单组件由Schema的component选择，也可用form-字段名插槽适配；编码规则状态开关通过active-value/inactive-value映射enabled/disabled，不把字符串状态改成布尔值。

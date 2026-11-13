@@ -74,6 +74,8 @@ const props = withDefaults(
     addExtraFields?: readonly string[];
     /** 自定义行操作插槽的列宽；默认操作仍按按钮数量计算。 */
     rowActionsWidth?: number;
+    /** 只读详情可省略底部关闭，仍保留右上角关闭与Esc。 */
+    hideDetailFooter?: boolean;
   }>(),
   { fill: true }
 );
@@ -792,7 +794,9 @@ defineExpose({
       :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
       :width="
-        schema?.children?.length || slots['editor-related']
+        schema?.children?.length ||
+        slots['editor-related'] ||
+        slots['detail-content']
           ? 'min(1080px, 96vw)'
           : 'min(720px, 96vw)'
       "
@@ -810,7 +814,9 @@ defineExpose({
       :size="
         mobile
           ? '100%'
-          : schema?.children?.length || slots['editor-related']
+          : schema?.children?.length ||
+              slots['editor-related'] ||
+              slots['detail-content']
             ? 'min(1080px, 92vw)'
             : '560px'
       "
@@ -840,58 +846,66 @@ defineExpose({
       >
         <div class="crud-editor-main">
           <!-- 详情：两列描述列表（Pure / Element 的 Descriptions），值和列表显示一致 -->
-          <el-descriptions
-            v-if="editor.readOnly && editor.record"
-            class="crud-info"
-            :column="mobile ? 1 : 2"
-            border
-          >
-            <el-descriptions-item
-              v-for="item in infoItems"
-              :key="item.field"
-              :label="item.label"
-              :span="item.wide && !mobile ? 2 : 1"
-              label-class-name="crud-info-label"
+          <template v-if="editor.readOnly && editor.record">
+            <slot
+              name="detail-content"
+              :record="editor.record"
+              :items="infoItems"
+              :display="display"
             >
-              <slot
-                v-if="slots[`detail-${item.field}`]"
-                :name="`detail-${item.field}`"
-                :record="editor.record"
-                :field="item.field"
-              />
-              <el-tag
-                v-else-if="
-                  item.type === 'boolean' &&
-                  readCell(editor.record, item.field).state === 'visible' &&
-                  typeof readCell(editor.record, item.field).display ===
-                    'boolean'
-                "
-                size="small"
-                effect="light"
-                :type="
-                  readCell(editor.record, item.field).display
-                    ? 'success'
-                    : 'info'
-                "
-                >{{ display(editor.record, item) }}</el-tag
+              <el-descriptions
+                class="crud-info"
+                :column="mobile ? 1 : 2"
+                border
               >
-              <el-avatar
-                v-else-if="
-                  imageUrl(readCell(editor.record, item.field).display)
-                "
-                :size="40"
-                :src="imageUrl(readCell(editor.record, item.field).display)"
-              />
-              <span
-                v-else
-                :class="{
-                  'crud-muted':
-                    readCell(editor.record, item.field).state !== 'visible'
-                }"
-                >{{ display(editor.record, item) }}</span
-              >
-            </el-descriptions-item>
-          </el-descriptions>
+                <el-descriptions-item
+                  v-for="item in infoItems"
+                  :key="item.field"
+                  :label="item.label"
+                  :span="item.wide && !mobile ? 2 : 1"
+                  label-class-name="crud-info-label"
+                >
+                  <slot
+                    v-if="slots[`detail-${item.field}`]"
+                    :name="`detail-${item.field}`"
+                    :record="editor.record"
+                    :field="item.field"
+                  />
+                  <el-tag
+                    v-else-if="
+                      item.type === 'boolean' &&
+                      readCell(editor.record, item.field).state === 'visible' &&
+                      typeof readCell(editor.record, item.field).display ===
+                        'boolean'
+                    "
+                    size="small"
+                    effect="light"
+                    :type="
+                      readCell(editor.record, item.field).display
+                        ? 'success'
+                        : 'info'
+                    "
+                    >{{ display(editor.record, item) }}</el-tag
+                  >
+                  <el-avatar
+                    v-else-if="
+                      imageUrl(readCell(editor.record, item.field).display)
+                    "
+                    :size="40"
+                    :src="imageUrl(readCell(editor.record, item.field).display)"
+                  />
+                  <span
+                    v-else
+                    :class="{
+                      'crud-muted':
+                        readCell(editor.record, item.field).state !== 'visible'
+                    }"
+                    >{{ display(editor.record, item) }}</span
+                  >
+                </el-descriptions-item>
+              </el-descriptions>
+            </slot>
+          </template>
           <el-form
             v-else
             class="crud-editor-form"
@@ -1054,7 +1068,7 @@ defineExpose({
           <slot name="detail-aside" :record="editor.record" />
         </aside>
       </div>
-      <template #footer
+      <template v-if="!editor.readOnly || !hideDetailFooter" #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
           t(editor.readOnly ? "crud.close" : "crud.cancel")
         }}</el-button

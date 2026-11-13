@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, computed, ref, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { api, type OperationResponse, type OperationBody } from "@/api/client";
 import type { CrudRecord } from "@/components/Crud/types";
 import { permission } from "@/platform/system/resources";
 import { formatValue } from "@/components/Crud/model.mjs";
+import type { RuleHistoryEntry } from "./rule-history";
 import { ruleError } from "./messages";
 const props = withDefaults(
   defineProps<{
@@ -12,19 +13,17 @@ const props = withDefaults(
     draft?: CrudRecord;
     showActions?: boolean;
     historyOnly?: boolean;
+    activeRevision?: number;
   }>(),
   { showActions: true }
 );
+const emit = defineEmits<{ select: [entry: RuleHistoryEntry] }>();
 const { t } = useI18n();
 const previewPeriod = ref("");
 const codes = ref<string[]>([]),
   error = ref(""),
   busy = ref(false);
 const history = ref<OperationResponse<"codeRuleHistory">["data"]["list"]>([]);
-const selectedRevision = ref<number>();
-const selectedSnapshot = computed(() =>
-  history.value.find(item => item.revision === selectedRevision.value)
-);
 let pending: AbortController | undefined;
 async function load(kind: "preview" | "history") {
   pending?.abort();
@@ -64,7 +63,6 @@ async function load(kind: "preview" | "history") {
       );
       if (!request.signal.aborted) {
         history.value = res.data.list;
-        selectedRevision.value = history.value[0]?.revision;
       }
     }
   } catch (reason) {
@@ -73,49 +71,6 @@ async function load(kind: "preview" | "history") {
     if (!request.signal.aborted) busy.value = false;
   }
 }
-const snapshotFields = [
-  "code",
-  "name",
-  "description",
-  "timezone",
-  "resetPeriod",
-  "start",
-  "status",
-  "segments"
-] as const;
-const visibleSnapshotFields = computed(() =>
-  snapshotFields.filter(field =>
-    Object.hasOwn(selectedSnapshot.value?.snapshot ?? {}, field)
-  )
-);
-function periodText(value: unknown) {
-  return ["never", "year", "month", "day"].includes(String(value))
-    ? t("codeRules.period." + value)
-    : (value ?? "—");
-}
-function snapshotValue(field: (typeof snapshotFields)[number]) {
-  const value = selectedSnapshot.value?.snapshot[field];
-  if (Array.isArray(value))
-    return value
-      .map(s =>
-        s.type === "literal"
-          ? s.value
-          : s.type === "date"
-            ? s.format
-            : s.type === "timestamp"
-              ? t(
-                  s.unit === "seconds"
-                    ? "codeRules.seconds"
-                    : "codeRules.milliseconds"
-                )
-              : "#".repeat(Number(s.width))
-      )
-      .join("");
-  if (field === "status" && (value === "enabled" || value === "disabled"))
-    return t(value === "enabled" ? "codeRules.enabled" : "codeRules.disabled");
-  if (field === "resetPeriod") return periodText(value);
-  return value ?? "—";
-}
 watch(
   () => props.ruleId,
   () => {
@@ -123,7 +78,7 @@ watch(
     history.value = [];
     codes.value = [];
     previewPeriod.value = "";
-    selectedRevision.value = undefined;
+
     if (props.historyOnly && props.ruleId) void load("history");
   },
   { immediate: true }
@@ -180,55 +135,16 @@ watch(
         :key="item.revision"
         :timestamp="formatValue(item.createdAt, 'datetime')"
       >
-        <el-button link type="primary" @click="selectedRevision = item.revision"
+        <el-button
+          link
+          type="primary"
+          :aria-pressed="activeRevision === item.revision"
+          :class="{ 'is-selected': activeRevision === item.revision }"
+          @click="emit('select', item)"
           >v{{ item.revision }} · {{ item.snapshot.name }}</el-button
         >
-        <p>
-          {{ item.snapshot.timezone }} ·
-          {{ periodText(item.snapshot.resetPeriod) }} ·
-          {{ t("codeRules.start") }} {{ item.snapshot.start }}
-        </p>
-        <p>
-          {{
-            Array.isArray(item.snapshot.segments)
-              ? item.snapshot.segments
-                  .map(s =>
-                    s.type === "literal"
-                      ? s.value
-                      : s.type === "date"
-                        ? s.format
-                        : s.type === "timestamp"
-                          ? t(
-                              s.unit === "seconds"
-                                ? "codeRules.seconds"
-                                : "codeRules.milliseconds"
-                            )
-                          : "#".repeat(Number(s.width))
-                  )
-                  .join("")
-              : "—"
-          }}
-        </p>
       </el-timeline-item>
     </el-timeline>
-    <el-button v-if="historyOnly" :loading="busy" @click="load('history')">{{
-      t("crud.reload")
-    }}</el-button>
-    <template v-if="historyOnly && selectedSnapshot">
-      <el-tag
-        >v{{ selectedSnapshot.revision }} ·
-        {{ t("codeRules.snapshotReadonly") }}</el-tag
-      >
-      <el-descriptions :column="1" border>
-        <el-descriptions-item
-          v-for="field in visibleSnapshotFields"
-          :key="field"
-          :label="t('codeRules.snapshot.' + field)"
-        >
-          {{ snapshotValue(field) }}
-        </el-descriptions-item>
-      </el-descriptions>
-    </template>
   </section>
 </template>
 <style scoped>
@@ -240,14 +156,20 @@ watch(
   margin-top: 20px;
 }
 
-.rule-tools.is-draft {
+.rule-tools.is-draft,
+.rule-tools:has(h3) {
   margin-top: 0;
 }
 
 .rule-tools :deep(.el-timeline) {
-  max-height: 280px;
+  max-height: 60vh;
   padding-left: 16px;
   overflow-y: auto;
+}
+
+.rule-tools .is-selected {
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 .rule-tools p {

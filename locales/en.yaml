@@ -648,6 +648,11 @@ forms:
     email: Email
     url: URL
 codeRules:
+  currentVersion: Current version
+  historicalVersion: Historical version · read-only
+  returnCurrent: Back to current version
+  historyReadonlyHint: Viewing historical information does not modify or restore the current rule.
+  savedAt: Version saved at
   previewPeriod: Preview period
   snapshot:
     code: Rule code

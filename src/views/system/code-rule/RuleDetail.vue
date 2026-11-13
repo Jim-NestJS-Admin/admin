@@ -1,0 +1,165 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useMediaQuery } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
+import type { CrudRecord } from "@/components/Crud/types";
+import type { components } from "@/api/schema";
+import { defaultCell, formatValue } from "@/components/Crud/model.mjs";
+import RuleTools from "./RuleTools.vue";
+import { useRuleHistoryView } from "./rule-history";
+interface DetailItem {
+  field: string;
+  label: string;
+  dict?: string;
+  type?: string;
+  wide: boolean;
+}
+const props = defineProps<{
+  record: CrudRecord;
+  items: DetailItem[];
+  display: (record: CrudRecord, item: DetailItem) => unknown;
+}>();
+const { t } = useI18n();
+const mobile = useMediaQuery("(max-width: 760px)");
+const {
+  selected,
+  record: displayed,
+  select
+} = useRuleHistoryView(() => props.record);
+const segments = computed(() => {
+  const cell = defaultCell(displayed.value, "segments");
+  return cell.state !== "hidden" &&
+    cell.state !== "masked" &&
+    Array.isArray(cell.display)
+    ? (cell.display as components["schemas"]["SystemCodeRuleAddData"]["segments"])
+    : undefined;
+});
+const visibleItems = computed(() =>
+  selected.value
+    ? props.items.filter(item => Object.hasOwn(displayed.value, item.field))
+    : props.items
+);
+</script>
+<template>
+  <div class="rule-detail">
+    <section class="rule-detail-main">
+      <div class="version-heading">
+        <el-tag :type="selected ? 'warning' : 'primary'"
+          >{{
+            t(
+              selected
+                ? "codeRules.historicalVersion"
+                : "codeRules.currentVersion"
+            )
+          }}
+          · v{{ displayed.revision }}</el-tag
+        >
+        <el-button v-if="selected" link type="primary" @click="select()">{{
+          t("codeRules.returnCurrent")
+        }}</el-button>
+      </div>
+      <el-alert
+        v-if="selected"
+        type="info"
+        :closable="false"
+        :title="t('codeRules.historyReadonlyHint')"
+      />
+      <p v-if="selected" class="version-time">
+        {{ t("codeRules.savedAt") }}：{{
+          formatValue(selected.createdAt, "datetime")
+        }}
+      </p>
+      <el-descriptions class="crud-info" :column="mobile ? 1 : 2" border>
+        <el-descriptions-item
+          v-for="item in visibleItems"
+          :key="item.field"
+          :label="item.label"
+          :span="(item.wide || item.field === 'segments') && !mobile ? 2 : 1"
+          label-class-name="crud-info-label"
+        >
+          <el-space v-if="item.field === 'segments' && segments" wrap>
+            <el-tag
+              v-for="(segment, index) in segments"
+              :key="index"
+              effect="plain"
+            >
+              {{
+                segment.type === "literal"
+                  ? t("codeRules.literal") + "：" + segment.value
+                  : segment.type === "date"
+                    ? t("codeRules.date") + "：" + segment.format
+                    : segment.type === "timestamp"
+                      ? t(
+                          segment.unit === "seconds"
+                            ? "codeRules.seconds"
+                            : "codeRules.milliseconds"
+                        )
+                      : t("codeRules.sequence") +
+                        "：" +
+                        segment.width +
+                        " " +
+                        t("codeRules.digits")
+              }}
+            </el-tag>
+          </el-space>
+          <template v-else>{{ display(displayed, item) }}</template>
+        </el-descriptions-item>
+      </el-descriptions>
+      <RuleTools
+        v-if="!selected"
+        :key="String(record.id) + ':' + String(record.version)"
+        :rule-id="String(record.id)"
+      />
+    </section>
+    <aside class="rule-detail-history">
+      <RuleTools
+        :rule-id="String(record.id)"
+        :active-revision="Number(displayed.revision)"
+        history-only
+        @select="select"
+      />
+    </aside>
+  </div>
+</template>
+<style scoped>
+.rule-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+}
+
+.rule-detail-main {
+  min-width: 0;
+}
+
+.version-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.version-time {
+  margin: 12px 0;
+  color: var(--el-text-color-secondary);
+}
+
+.rule-detail-history {
+  min-width: 0;
+  padding-left: 20px;
+  border-left: 1px solid var(--el-border-color-lighter);
+}
+
+@media (width <= 760px) {
+  .rule-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rule-detail-history {
+    padding: 20px 0 0;
+    border-top: 1px solid var(--el-border-color-lighter);
+    border-left: 0;
+  }
+}
+</style>
