@@ -648,6 +648,26 @@ forms:
     email: Email
     url: URL
 codeRules:
+  validation:
+    emptySegments: Add at least one segment and place the sequence last.
+    tooManySegments: Use no more than four segments.
+    invalidSegment: Select a supported segment type.
+    sequenceLast: Include exactly one sequence segment and place it last.
+    duplicateSegment: Use at most one date and one timestamp segment.
+    literal: Literal segment {index} must contain 1–16 letters, digits, underscores or hyphens.
+    date: Select a valid date format for segment {index}.
+    timestamp: Select seconds or milliseconds for timestamp segment {index}.
+    width: Sequence width must be an integer from 1 to 12.
+    length: Total code length must not exceed 64 characters.
+    start: Start must be a positive integer with up to 12 digits and no leading zero.
+    overflow: Start must not exceed {maximum} for a {width}-digit sequence.
+    period: Select a valid reset period.
+    coverage: "Include the complete reset period in the date segment: yyyy for year, yyyyMM for month, yyyyMMdd for day."
+    timezone: Select a valid system time zone.
+    code: Rule code must be 2–64 characters, start with a lowercase letter, and contain only lowercase letters, digits and underscores.
+    name: Enter a non-blank rule name with no more than 100 characters.
+    description: Description must not exceed 500 characters.
+    status: Select enabled or disabled.
   businessVersion: Rule version
   historicalInactive: Historical version · not used for allocation
   savedStatus: Status when saved

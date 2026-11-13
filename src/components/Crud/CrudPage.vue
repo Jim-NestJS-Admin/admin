@@ -388,6 +388,7 @@ async function confirmRecycle(action: "restore" | "purge") {
 defineExpose({
   reload: view.initialize,
   refresh: view.load,
+  validate: view.validateEditor,
   async create(values: CrudRecord = {}) {
     await view.edit();
     if (editor.mode === "add" && editor.open && !saving.value)

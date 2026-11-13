@@ -6,6 +6,7 @@ import type { CrudRecord } from "@/components/Crud/types";
 import { permission } from "@/platform/system/resources";
 import { formatValue } from "@/components/Crud/model.mjs";
 import type { RuleHistoryEntry } from "./rule-history";
+import { validateRuleDraft } from "./validate-rule";
 import { ruleError } from "./messages";
 const props = withDefaults(
   defineProps<{
@@ -27,6 +28,18 @@ const history = ref<OperationResponse<"codeRuleHistory">["data"]["list"]>([]);
 let pending: AbortController | undefined;
 async function load(kind: "preview" | "history") {
   pending?.abort();
+  if (kind === "preview" && props.draft) {
+    const issues = validateRuleDraft(props.draft, (key, params) =>
+      t(key, params ?? {})
+    );
+    if (Object.keys(issues).length) {
+      error.value = Object.values(issues)[0][0];
+      codes.value = [];
+      previewPeriod.value = "";
+      busy.value = false;
+      return;
+    }
+  }
   const request = (pending = new AbortController());
   busy.value = true;
   error.value = "";

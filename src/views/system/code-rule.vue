@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref } from "vue";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import { onSessionReset } from "@/platform/lifecycle";
+import { validateRuleDraft } from "./code-rule/validate-rule";
 import { scopedSequencePort, copyRuleDraft } from "./code-rule/rule-page";
 import { ruleError } from "./code-rule/messages";
 import { useI18n } from "vue-i18n";
@@ -62,6 +63,28 @@ const rules = generatedCrud("systemCodeRule"),
   sequences = generatedCrud("systemCodeSequence");
 const rulePort: CrudPort = {
   ...rules.port,
+  validate: (values, context) => {
+    const draft = { ...context.record, ...values };
+    // 被字段权限隐藏/脱敏的依赖不能在浏览器补猜，交由服务端基于原记录校验。
+    if (
+      context.mode === "update" &&
+      ["segments", "start", "timezone", "resetPeriod"].some(
+        field =>
+          !Object.hasOwn(draft, field) ||
+          ["hidden", "masked"].includes(
+            (
+              context.record?._fieldState as Record<string, string> | undefined
+            )?.[field] ?? ""
+          )
+      )
+    )
+      return {};
+    return validateRuleDraft(
+      draft,
+      (key, params) => t(key, params ?? {}),
+      true
+    );
+  },
   async describe(signal) {
     const schema = await rules.port.describe(signal);
     return {
@@ -77,6 +100,9 @@ const rulePort: CrudPort = {
 const sequencePort = computed(() =>
   scopedSequencePort(sequences.port, String(active.value?.id ?? ""))
 );
+function previewDraft() {
+  if (page.value?.validate()) void draftTools.value?.preview();
+}
 const defaults = {
   description: "",
   timezone: "Asia/Shanghai",
@@ -199,7 +225,7 @@ const defaults = {
           v-perm="permission('codeRuleValidate')"
           :disabled="disabled"
           :loading="draftTools?.busy"
-          @click="draftTools?.preview()"
+          @click="previewDraft"
           >{{ t("codeRules.configPreview") }}</el-button
         >
       </template>

@@ -648,6 +648,26 @@ forms:
     email: 邮箱
     url: 网址
 codeRules:
+  validation:
+    emptySegments: 请至少添加一个编码段，并将流水号放在最后。
+    tooManySegments: 编码段最多只能配置4段。
+    invalidSegment: 存在不支持的编码段，请重新选择。
+    sequenceLast: 必须包含一个流水号，且流水号必须放在最后。
+    duplicateSegment: 日期段和时间戳段各只能添加一个。
+    literal: 第{index}段固定文本须为1–16位字母、数字、下划线或短横线。
+    date: 请选择第{index}段的有效日期格式。
+    timestamp: 请选择第{index}段使用秒级还是毫秒级时间戳。
+    width: 流水位宽必须是1–12之间的整数。
+    length: 编码总长度不能超过64位。
+    start: 起始值必须为大于或等于1的整数，最多12位，不能以0开头。
+    overflow: 起始值不能超过{width}位流水号的最大值{maximum}。
+    period: 请选择有效的重置周期。
+    coverage: 日期段须完整包含重置周期：年用yyyy，月用yyyyMM，日用yyyyMMdd。
+    timezone: 请选择有效的系统时区。
+    code: 规则编码须为2–64位，以小写字母开头，只能包含小写字母、数字和下划线。
+    name: 请填写规则名称，最多100个字符，不能全部为空格。
+    description: 说明不能超过500个字符。
+    status: 请选择启用或停用。
   businessVersion: 规则版本
   historicalInactive: 历史版本不参与发号
   savedStatus: 保存时状态

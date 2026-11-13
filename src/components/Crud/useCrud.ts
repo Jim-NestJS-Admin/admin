@@ -379,6 +379,37 @@ export function useCrud(
       intent = { fingerprint, key: crypto.randomUUID() };
     return intent.key;
   }
+  function validateEditor() {
+    if (!schema.value || !editor.open || editor.readOnly || saving.value)
+      return false;
+    editorError.value = "";
+    const missing = requiredFields(
+      schema.value,
+      editor.mode,
+      editor.values,
+      editor.record,
+      cell
+    );
+    fields.value = {
+      ...port.validate?.(editor.values, {
+        mode: editor.mode,
+        record: editor.record
+      }),
+      ...Object.fromEntries(missing.map(field => [field, ["crud.required"]]))
+    };
+    rowIssues.value = childIssues(
+      schema.value.children ?? [],
+      editor.related,
+      groupCell
+    );
+    const valid = !Object.keys(fields.value).length && !rowIssues.value.length;
+    if (!valid)
+      editorError.value =
+        Object.values(fields.value)[0]?.[0] ??
+        rowIssues.value[0]?.message ??
+        "";
+    return valid;
+  }
   async function save() {
     if (
       saving.value ||
@@ -390,23 +421,7 @@ export function useCrud(
     if (recycledView.value || editor.readOnly) return;
     const method = editor.mode === "add" ? port.create : port.update;
     if (!method) return;
-    editorError.value = "";
-    const missing = requiredFields(
-      schema.value,
-      editor.mode,
-      editor.values,
-      editor.record,
-      cell
-    );
-    fields.value = Object.fromEntries(
-      missing.map(field => [field, ["crud.required"]])
-    );
-    rowIssues.value = childIssues(
-      schema.value.children ?? [],
-      editor.related,
-      groupCell
-    );
-    if (missing.length || rowIssues.value.length) return;
+    if (!validateEditor()) return;
     const changes = JSON.parse(
       JSON.stringify(
         relatedChanges(schema.value.children ?? [], editor.related, groupCell)
@@ -596,6 +611,7 @@ export function useCrud(
     sort,
     edit,
     closeEditor,
+    validateEditor,
     save,
     remove,
     showRecycled,

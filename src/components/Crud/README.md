@@ -4,6 +4,8 @@
 
 ## 已实现与适配边界
 
+- `CrudPort.validate(values, { mode, record })` 为同步业务预校验入口，返回字段→消息数组；与统一必填、子表校验合并，失败时仅更新editorError/字段提示并阻止保存请求。公开`validate()`供预览等按钮复用。编辑时record仅供校验依赖，不因此扩大写白名单；前端不可见的校验上下文仍交后端处理。
+
 - 编辑器错误独立使用editorError：新增/修改失败只在编辑器内展示，保留字段/子表错误及草稿，关闭或重新打开时清空；列表加载、删除、导出和偏好失败仍在列表显示，不重复渲染进dialog，也不清除正在编辑的字段提示。
 
 - 字典项可提供 `tagType`（primary/success/info/warning/danger）；统一 `DictionaryValue` 在列表和详情按该元数据显示tag，未配置时保持普通文本。只读字段可显示tag，隐藏/脱敏字段不按原值匹配。`form-字段` 插槽获得同源字典options，专用状态switch也使用字典名称；业务枚举校验仍由后端强制执行。

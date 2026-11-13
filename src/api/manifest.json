@@ -1,6 +1,6 @@
 {
   "generator": "openapi-typescript",
-  "revision": "bc7aef690d99eb05a12e352883ea149240edeebe",
+  "revision": "9355daa3c359b8bc54307f465c531214bc49e571",
   "source": "../server/openapi/admin.json",
   "schemaSha256": "2ffbba86b5f19aaceb2c212df16ea038bd2d54e2daca62cd9cd417d20e265803",
   "operationCount": 172,
