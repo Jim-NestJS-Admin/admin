@@ -648,6 +648,11 @@ forms:
     email: Email
     url: URL
 codeRules:
+  businessVersion: Rule version
+  historicalInactive: Historical version · not used for allocation
+  savedStatus: Status when saved
+  timeZoneNameLoading: Loading time zone name…
+  timeZoneNameFailed: Failed to load time zone name
   historyNotRecorded: Not recorded in history
   currentVersion: Current version
   historicalVersion: Historical version · read-only

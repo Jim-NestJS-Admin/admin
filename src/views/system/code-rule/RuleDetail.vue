@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, onBeforeUnmount } from "vue";
 import { useMediaQuery } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import type { CrudRecord } from "@/components/Crud/types";
 import type { components } from "@/api/schema";
 import { defaultCell } from "@/components/Crud/model.mjs";
+import { useTimeZones } from "./useTimeZones";
 import RuleTools from "./RuleTools.vue";
 import { useRuleHistoryView } from "./rule-history";
 interface DetailItem {
@@ -19,7 +20,13 @@ const props = defineProps<{
   items: DetailItem[];
   display: (record: CrudRecord, item: DetailItem) => unknown;
 }>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const directory = useTimeZones();
+onMounted(directory.load);
+onBeforeUnmount(directory.dispose);
+const detailItems = computed(() =>
+  props.items.filter(item => item.field !== "version")
+);
 const mobile = useMediaQuery("(max-width: 760px)");
 const {
   selected,
@@ -33,6 +40,33 @@ const segments = computed(() => {
     Array.isArray(cell.display)
     ? (cell.display as components["schemas"]["SystemCodeRuleAddData"]["segments"])
     : undefined;
+});
+const timeZoneLabel = computed(() => {
+  const cell = defaultCell(displayed.value, "timezone");
+  if (
+    cell.state === "hidden" ||
+    cell.state === "masked" ||
+    typeof cell.display !== "string"
+  )
+    return undefined;
+  const value = cell.display;
+  let canonical = value;
+  try {
+    canonical = new Intl.DateTimeFormat("en", {
+      timeZone: value
+    }).resolvedOptions().timeZone;
+  } catch {
+    /* 旧值保留，不改变保存值。 */
+  }
+  const option = directory.options.value.find(
+    item => item.value === value || item.value === canonical
+  );
+  if (option)
+    return locale.value.startsWith("zh") ? option.labelZh : option.labelEn;
+  if (directory.loading.value) return t("codeRules.timeZoneNameLoading");
+  if (directory.error.value)
+    return t("codeRules.timeZoneNameFailed") + "：" + value;
+  return value;
 });
 </script>
 <template>
@@ -52,13 +86,31 @@ const segments = computed(() => {
       </div>
       <el-descriptions class="crud-info" :column="mobile ? 1 : 2" border>
         <el-descriptions-item
-          v-for="item in items"
+          v-for="item in detailItems"
           :key="item.field"
-          :label="item.label"
+          :label="
+            item.field === 'revision'
+              ? t('codeRules.businessVersion')
+              : item.label
+          "
           :span="(item.wide || item.field === 'segments') && !mobile ? 2 : 1"
           label-class-name="crud-info-label"
         >
-          <el-space v-if="item.field === 'segments' && segments" wrap>
+          <template v-if="item.field === 'timezone' && timeZoneLabel">{{
+            timeZoneLabel
+          }}</template>
+          <template v-else-if="item.field === 'revision'"
+            >v{{ displayed.revision }}</template
+          >
+          <el-space v-else-if="selected && item.field === 'status'" wrap>
+            <el-tag type="info">{{ t("codeRules.historicalInactive") }}</el-tag>
+            <span class="version-kind"
+              >{{ t("codeRules.savedStatus") }}：{{
+                display(displayed, item)
+              }}</span
+            >
+          </el-space>
+          <el-space v-else-if="item.field === 'segments' && segments" wrap>
             <el-tag
               v-for="(segment, index) in segments"
               :key="index"
