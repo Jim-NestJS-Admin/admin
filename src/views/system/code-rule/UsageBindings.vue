@@ -29,7 +29,7 @@ async function load(keyword = "") {
         ? Promise.resolve({ data: { list: [] } })
         : api.systemCodeRulePage(
             {
-              body: { page: 1, size: 100, keyword, eq: { status: "enabled" } }
+              body: { page: 1, size: 100, keyword, eq: { status: "1" } }
             },
             { signal: request.signal }
           )

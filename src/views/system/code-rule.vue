@@ -82,7 +82,7 @@ const defaults = {
   timezone: "Asia/Shanghai",
   resetPeriod: "never",
   start: "1",
-  status: "enabled",
+  status: "1",
   segments: [
     { type: "literal", value: "form_" },
     { type: "sequence", width: 6 }
@@ -180,14 +180,14 @@ const defaults = {
       <template #form-status="{ values, disabled, options }">
         <el-switch
           v-model="values.status as string"
-          active-value="enabled"
-          inactive-value="disabled"
+          active-value="1"
+          inactive-value="0"
           :active-text="
-            options.find(item => item.value === 'enabled')?.label ??
+            options.find(item => item.value === '1')?.label ??
             t('codeRules.enabled')
           "
           :inactive-text="
-            options.find(item => item.value === 'disabled')?.label ??
+            options.find(item => item.value === '0')?.label ??
             t('codeRules.disabled')
           "
           :disabled="disabled"
