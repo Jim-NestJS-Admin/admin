@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { ENUMS } from "@/api/constants";
 import { useI18n } from "vue-i18n";
 import FcDesigner, { type Config, type DragRule } from "@form-create/designer";
 import type { Rule as FcRule } from "@form-create/element-ui";
@@ -22,11 +23,18 @@ const menu = computed(() => [
   {
     name: "safe",
     title: t("forms.availableFields"),
-    list: componentTypes.map(type => ({
-      name: type,
-      label: t(`forms.components.${type}`),
-      icon: "icon-input"
-    }))
+    list: [
+      {
+        name: "autoCode",
+        label: t("autoCodes.dynamicField"),
+        icon: "icon-input"
+      },
+      ...componentTypes.map(type => ({
+        name: type,
+        label: t(`forms.components.${type}`),
+        icon: "icon-input"
+      }))
+    ]
   }
 ]);
 const field = (
@@ -67,7 +75,14 @@ const config: Config &
     field("formCreateInfo", "input", "forms.fieldHint"),
     field("formCreate$required", "switch", "forms.required"),
     field("formCreateMeta>multilingual", "switch", "forms.multilingual"),
-    field("formCreateMeta>queryable", "switch", "forms.queryable")
+    field("formCreateMeta>queryable", "switch", "forms.queryable"),
+    field("formCreateMeta>generated", "switch", "autoCodes.dynamicField"),
+    field("formCreateMeta>codeCharset", "select", "autoCodes.charset", {
+      options: ENUMS[
+        "components.schemas.FormFieldDto.properties.codeCharset"
+      ].map(value => ({ value, label: t(`autoCodes.charsets.${value}`) })),
+      info: t("autoCodes.designerHint")
+    })
   ]
 };
 function componentProps(type: string): FcRule[] {
@@ -139,7 +154,22 @@ function blockPaste(event: ClipboardEvent) {
 }
 onMounted(() => {
   document.addEventListener("paste", blockPaste, true);
-  designer.value!.addComponent(componentTypes.map(template));
+  const autoCode = template("input");
+  autoCode.name = "autoCode";
+  autoCode.label = t("autoCodes.dynamicField");
+  const inputRule = autoCode.rule;
+  autoCode.rule = options => ({
+    ...inputRule(options),
+    title: t("autoCodes.dynamicField"),
+    meta: {
+      generated: true,
+      codeCharset: "lower_slug",
+      multilingual: false,
+      queryable: true
+    },
+    props: { maxlength: 64 }
+  });
+  designer.value!.addComponent([...componentTypes.map(template), autoCode]);
   designer.value!.setRule(JSON.parse(JSON.stringify(props.initial.rule)));
 });
 onBeforeUnmount(() => document.removeEventListener("paste", blockPaste, true));

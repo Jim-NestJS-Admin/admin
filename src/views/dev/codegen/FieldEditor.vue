@@ -4,6 +4,7 @@
  * 选中一行，右边属性面板设属性名、显示名称、字典、唯一、字段权限。类型只给后端字段类型目录里的那十几种。
  * 错误按后端返回的路径挂到单元格上：格子标红，悬停看原因。
  */
+import { ENUMS } from "@/api/constants";
 import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -38,6 +39,18 @@ const props = defineProps<{
   focusKey?: string;
 }>();
 const { t } = useI18n();
+const codeCharsets =
+  ENUMS["components.schemas.SpecField.properties.codeCharset"];
+function autoCodeChanged() {
+  const field = selected.value;
+  if (field?.codeCharset) {
+    field.nullable = false;
+    field.unique = true;
+    field.length = Math.min(field.length ?? 64, 64);
+    field.defaultText = "";
+    field.dictCode = "";
+  }
+}
 
 const selectedKey = ref(fields.value[0]?.key ?? "");
 const selected = computed(() =>
@@ -470,6 +483,26 @@ const dictName = (code: string) =>
             >
               {{ t("codegen.dictUnknown") }}
             </div>
+          </el-form-item>
+          <el-form-item
+            v-if="selected.type === 'string'"
+            :label="t('autoCodes.fieldMode')"
+            :error="cellError(selected, 'codeCharset')"
+          >
+            <el-select
+              v-model="selected.codeCharset"
+              clearable
+              :placeholder="t('autoCodes.manual')"
+              @change="autoCodeChanged"
+            >
+              <el-option
+                v-for="value in codeCharsets"
+                :key="value"
+                :value="value"
+                :label="t(`autoCodes.charsets.${value}`)"
+              />
+            </el-select>
+            <div class="panel-tip">{{ t("autoCodes.codegenHint") }}</div>
           </el-form-item>
           <el-form-item :error="cellError(selected, 'unique')">
             <el-checkbox

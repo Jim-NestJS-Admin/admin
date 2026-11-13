@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   comparisonValue,
@@ -18,12 +19,20 @@ const emit = defineEmits<{
   refresh: [];
 }>();
 const { t } = useI18n();
+const sources = computed(() =>
+  props.fields.filter(
+    (field, i) =>
+      !field.generated &&
+      !field.multiple &&
+      props.fields.slice(i + 1).some(next => !next.generated)
+  )
+);
 const sourceOf = (rule: Linkage) =>
   props.fields.find(field => field.field === rule.source);
 const targets = (rule: Linkage) =>
-  props.fields.slice(
-    props.fields.findIndex(field => field.field === rule.source) + 1
-  );
+  props.fields
+    .slice(props.fields.findIndex(field => field.field === rule.source) + 1)
+    .filter(field => !field.generated);
 const targetOf = (rule: Linkage) =>
   props.fields.find(field => field.field === rule.target);
 function change(index: number, changes: Partial<Linkage>) {
@@ -32,11 +41,11 @@ function change(index: number, changes: Partial<Linkage>) {
   emit("update:modelValue", rules);
 }
 function add() {
-  const source = props.fields.find(
-    (field, index) => !field.multiple && index < props.fields.length - 1
-  );
+  const source = sources.value[0];
   if (!source) return;
-  const target = props.fields[props.fields.indexOf(source) + 1];
+  const target = props.fields
+    .slice(props.fields.indexOf(source) + 1)
+    .find(field => !field.generated)!;
   emit("update:modelValue", [
     ...copy(props.modelValue),
     {
@@ -128,9 +137,7 @@ function subset(
               })
             "
             ><el-option
-              v-for="field in fields.filter(
-                (item, i) => !item.multiple && i < fields.length - 1
-              )"
+              v-for="field in sources"
               :key="field.field"
               :label="`${field.title} (${field.field})`"
               :value="field.field" /></el-select
@@ -243,7 +250,7 @@ function subset(
       </el-form>
     </el-card>
     <el-button
-      :disabled="disabled || fields.length < 2 || modelValue.length >= 200"
+      :disabled="disabled || !sources.length || modelValue.length >= 200"
       @click="add"
       >{{ t("forms.addCondition") }}</el-button
     >

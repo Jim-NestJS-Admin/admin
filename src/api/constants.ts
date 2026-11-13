@@ -13,6 +13,9 @@ export const PERMISSIONS = [
   "form:definition:page",
   "form:definition:update",
   "form:definition:validate",
+  "form:submission:add",
+  "form:submission:info",
+  "form:submission:page",
   "platform:package:add",
   "platform:package:delete",
   "platform:package:export",
@@ -151,6 +154,10 @@ export const OPERATION_PERMISSIONS = {
   formDefinitionRevise: ["form:definition:update"],
   formDefinitionSchema: ["form:definition:page"],
   formDefinitionValidate: ["form:definition:validate"],
+  formSubmissionAdd: ["form:submission:add"],
+  formSubmissionInfo: ["form:submission:info"],
+  formSubmissionPage: ["form:submission:page"],
+  formSubmissionSchema: ["form:submission:page"],
   platformPackageAdd: ["platform:package:add"],
   platformPackageDelete: ["platform:package:delete"],
   platformPackageExport: ["platform:package:export"],
@@ -492,6 +499,11 @@ export const ENUMS = {
   "components.schemas.FormDefinitionRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
   "components.schemas.FormDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.FormFieldDto.properties.codeCharset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits"
+  ],
   "components.schemas.FormFieldDto.properties.component": [
     "input",
     "inputNumber",
@@ -514,6 +526,14 @@ export const ENUMS = {
     "options"
   ],
   "components.schemas.FormLinkageDto.properties.operator": ["eq", "ne", "in"],
+  "components.schemas.FormSubmissionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.FormSubmissionPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.FormSubmissionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.FormValidationDto.properties.format": ["email", "url"],
   "components.schemas.FormValidationResult.properties.valid": [true],
   "components.schemas.MaskRuleDto.properties.code": [
@@ -579,6 +599,11 @@ export const ENUMS = {
     "notNull"
   ],
   "components.schemas.QueryGroupDto.properties.op": ["and", "or"],
+  "components.schemas.SpecField.properties.codeCharset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits"
+  ],
   "components.schemas.SpecField.properties.type": [
     "string",
     "text",

@@ -47,6 +47,7 @@ export interface FieldDraft {
   defaultText: string;
   comment: string;
   unique: boolean;
+  codeCharset: NonNullable<SpecField["codeCharset"]> | "";
   dictCode: string;
   permDefault: PermState;
   mask: MaskRule | "";
@@ -146,6 +147,7 @@ export function newField(
     defaultText: "",
     comment: "",
     unique: false,
+    codeCharset: "",
     dictCode: "",
     permDefault: "editable",
     mask: "",
@@ -184,6 +186,7 @@ export function changeType(
   if (field.type === type) return;
   const info = catalog.find(item => item.type === type);
   field.type = type;
+  if (type !== "string") field.codeCharset = "";
   field.length = info?.options.includes("length")
     ? info.defaultLength
     : undefined;
@@ -246,6 +249,7 @@ function readField(field: SpecField): FieldDraft {
     defaultText: defaultText(field),
     comment: field.comment ?? "",
     unique: field.unique === true,
+    codeCharset: field.codeCharset ?? "",
     dictCode: field.dictCode ?? "",
     permDefault: field.fieldPerm?.default ?? "editable",
     mask: field.fieldPerm?.mask ?? "",
@@ -273,6 +277,7 @@ function writeField(field: FieldDraft): SpecField {
   if (Object.hasOwn(parsed, "value")) result.defaultValue = parsed.value;
   if (field.comment.trim()) result.comment = field.comment.trim();
   if (field.unique) result.unique = true;
+  if (field.codeCharset) result.codeCharset = field.codeCharset;
   if (field.dictCode.trim()) result.dictCode = field.dictCode.trim();
   if (field.permDefault !== "editable" || field.mask)
     result.fieldPerm = {

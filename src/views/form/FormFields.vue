@@ -18,7 +18,11 @@ const { t } = useI18n();
     />
     <el-table-column :label="t('forms.component')" min-width="110"
       ><template #default="{ row }">{{
-        t(`forms.components.${row.component}`)
+        t(
+          row.generated
+            ? "autoCodes.dynamicField"
+            : `forms.components.${row.component}`
+        )
       }}</template></el-table-column
     >
     <el-table-column :label="t('forms.required')" width="90"

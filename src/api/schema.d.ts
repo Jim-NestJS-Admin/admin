@@ -590,6 +590,74 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/form/submission/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增表单提交记录 */
+    post: operations["formSubmissionAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/submission/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 表单提交记录详情 */
+    post: operations["formSubmissionInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/submission/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 表单提交记录分页列表 */
+    post: operations["formSubmissionPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/form/submission/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 表单提交记录页面描述 */
+    get: operations["formSubmissionSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/platform/package/add": {
     parameters: {
       query?: never;
@@ -3177,6 +3245,7 @@ export type components = {
       value: string | number | boolean;
     };
     CrudSchemaFormItem: {
+      codeUsageKey?: string;
       /** @enum {string} */
       component:
         | "input"
@@ -3570,6 +3639,8 @@ export type components = {
     };
     FormFieldDto: {
       /** @enum {string} */
+      codeCharset?: "upper_alnum" | "lower_slug" | "digits";
+      /** @enum {string} */
       component:
         | "input"
         | "inputNumber"
@@ -3579,6 +3650,8 @@ export type components = {
         | "checkbox"
         | "datePicker";
       field: string;
+      /** @description 保存时由编码规则生成，不接受用户填写 */
+      generated?: boolean;
       multilingual: boolean;
       multiple: boolean;
       options: components["schemas"]["FormOptionDto"][];
@@ -3617,6 +3690,110 @@ export type components = {
     FormOptionDto: {
       label: string;
       value: string | number | boolean;
+    };
+    FormSubmissionAddBody: {
+      data: components["schemas"]["FormSubmissionAddData"];
+    };
+    FormSubmissionAddData: {
+      /** @description 表单版本编号 */
+      definitionId?: string;
+      /** @description 填写内容 */
+      values?: {
+        [key: string]: unknown;
+      };
+    };
+    FormSubmissionInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    FormSubmissionPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["FormSubmissionPageEq"];
+      /** @description 搜索框，模糊匹配：name、code */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["FormSubmissionPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    FormSubmissionPageEq: {
+      /** @description 表单编码 */
+      code?: string;
+      /** @description 表单版本编号 */
+      definitionId?: string;
+      /** @description 表单版本 */
+      revision?: number;
+    };
+    FormSubmissionPageResult: {
+      list: components["schemas"]["FormSubmissionRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    FormSubmissionPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    FormSubmissionRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 表单编码 */
+      code?: string;
+      /** @description 自动编号 */
+      codes?: {
+        [key: string]: string;
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 表单版本编号 */
+      definitionId?: string;
+      /** @description 字段名称 */
+      fieldTitles?: {
+        [key: string]: string;
+      };
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 表单名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 表单版本 */
+      revision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 填写内容 */
+      values?: {
+        [key: string]: unknown;
+      };
+      /** @description 版本号，修改时原样带回 */
+      version: number;
     };
     FormValidationDto: {
       /** @enum {string} */
@@ -4178,6 +4355,11 @@ export type components = {
       path: string;
     };
     SpecField: {
+      /**
+       * @description 自动编码字段字符集，保存时生成
+       * @enum {string}
+       */
+      codeCharset?: "upper_alnum" | "lower_slug" | "digits";
       column: string;
       comment?: string;
       defaultValue?: (string | number | boolean) | null;
@@ -8210,6 +8392,154 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formSubmissionAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FormSubmissionAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormSubmissionRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formSubmissionInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FormSubmissionInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormSubmissionRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formSubmissionPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FormSubmissionPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormSubmissionPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formSubmissionSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
         };
       };
     };

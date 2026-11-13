@@ -24,8 +24,12 @@ const props = defineProps<{
   designer: Designer;
   fields: Field[];
   definitionId?: string;
+  submit?: boolean;
 }>();
+const emit = defineEmits<{ submitted: [] }>();
 const { t } = useI18n();
+let mutationIntent = "",
+  mutationKey = "";
 const FormCreate = formCreate.$form();
 const formApi = shallowRef<Api>();
 const values = ref<Record<string, unknown>>({}),
@@ -106,16 +110,36 @@ async function validate() {
   issues.value = [];
   valid.value = false;
   try {
+    if (formApi.value && !(await formApi.value.validate().catch(() => false))) {
+      error.value = "autoCodes.correctFields";
+      return;
+    }
     const effective = previewRules(props.designer, props.fields, values.value);
-    await api.formDefinitionValidate(
-      {
-        body: {
-          definitionId: props.definitionId,
-          data: cleanPreviewValues(effective.fields, values.value)
-        }
-      },
-      { signal: current.signal }
-    );
+    if (props.submit) {
+      const data = {
+        definitionId: props.definitionId,
+        values: cleanPreviewValues(effective.fields, values.value)
+      };
+      const intent = fingerprint(data);
+      if (intent !== mutationIntent) {
+        mutationIntent = intent;
+        mutationKey = crypto.randomUUID();
+      }
+      await api.formSubmissionAdd(
+        { body: { data } },
+        { signal: current.signal, headers: { "Idempotency-Key": mutationKey } }
+      );
+      if (!current.signal.aborted) emit("submitted");
+    } else
+      await api.formDefinitionValidate(
+        {
+          body: {
+            definitionId: props.definitionId,
+            data: cleanPreviewValues(effective.fields, values.value)
+          }
+        },
+        { signal: current.signal }
+      );
     if (!current.signal.aborted) valid.value = true;
   } catch (reason) {
     if (!current.signal.aborted) {
@@ -142,7 +166,15 @@ onBeforeUnmount(() => request?.abort());
 <template>
   <section class="form-preview">
     <el-alert
-      :title="t(definitionId ? 'forms.testHint' : 'forms.unsavedPreview')"
+      :title="
+        t(
+          submit
+            ? 'autoCodes.submitHint'
+            : definitionId
+              ? 'forms.testHint'
+              : 'forms.unsavedPreview'
+        )
+      "
       type="info"
       :closable="false"
     />
@@ -174,11 +206,15 @@ onBeforeUnmount(() => request?.abort());
     </div>
     <div v-if="definitionId" class="preview-actions">
       <el-button
-        v-perm="permission('formDefinitionValidate')"
+        v-perm="
+          permission(submit ? 'formSubmissionAdd' : 'formDefinitionValidate')
+        "
         type="primary"
         :loading="busy"
         @click="validate"
-        >{{ t("forms.validateValues") }}</el-button
+        >{{
+          t(submit ? "autoCodes.submit" : "forms.validateValues")
+        }}</el-button
       >
     </div>
   </section>

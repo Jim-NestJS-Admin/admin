@@ -496,6 +496,56 @@ export function createApiClient(
         config
       );
     },
+    formSubmissionAdd(
+      input: OperationInput<"formSubmissionAdd"> & {
+        body: OperationBody<"formSubmissionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionAdd">>(
+        "post",
+        interpolate("/admin/form/submission/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionInfo(
+      input: OperationInput<"formSubmissionInfo"> & {
+        body: OperationBody<"formSubmissionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionInfo">>(
+        "post",
+        interpolate("/admin/form/submission/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionPage(
+      input: OperationInput<"formSubmissionPage"> & {
+        body: OperationBody<"formSubmissionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionPage">>(
+        "post",
+        interpolate("/admin/form/submission/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionSchema(
+      input: OperationInput<"formSubmissionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionSchema">>(
+        "get",
+        interpolate("/admin/form/submission/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     platformPackageAdd(
       input: OperationInput<"platformPackageAdd"> & {
         body: OperationBody<"platformPackageAdd">;

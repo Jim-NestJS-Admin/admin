@@ -758,3 +758,25 @@ platform:
   menuHint: Tick the menus and buttons this package can use; platform-only menus are not listed
   menuCount: "{count} selected"
   loadFailed: Failed to load, reopen to retry
+
+autoCodes:
+  correctFields: Complete the required fields and correct the highlighted values.
+  target: Target field
+  bindFields: Field numbering rules
+  noFields: No automatic code fields. Save the form design or register a business module first.
+  fieldMode: Automatic numbering
+  manual: Enter manually
+  charset: Code character set
+  dynamicField: Automatic code (plain text only)
+  designerHint: Generated when saved; up to 64 characters. Save the design then bind a rule. Defaults and conditions are unsupported.
+  codegenHint: Makes the field non-null and unique, up to 64 characters. Register the generated module then bind a rule in its list.
+  submit: Submit and save
+  submitHint: Saves the form and generates codes in one transaction. Saved values and codes are immutable.
+  submissions: Submissions
+  fill: Fill and submit
+  saved: Submission saved
+  values: Form values
+  charsets:
+    upper_alnum: Uppercase letters, digits and separators
+    lower_slug: Lowercase letters, digits and underscores
+    digits: Digits only

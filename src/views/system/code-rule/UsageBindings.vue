@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { api, type OperationResponse } from "@/api/client";
 import { permission } from "@/platform/system/resources";
@@ -7,6 +7,9 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { ElMessageBox } from "element-plus";
 import { ruleError } from "./messages";
 const props = defineProps<{
+  usageKeys?: string[];
+  fields?: string[];
+  resource?: string;
   ruleId?: string;
   ruleName?: string;
   ruleUnavailable?: boolean;
@@ -18,6 +21,14 @@ const rules = ref<OperationResponse<"systemCodeRulePage">["data"]["list"]>([]);
 const selected = ref<Record<string, string>>({}),
   busy = ref(false),
   error = ref("");
+const visibleUsages = computed(() =>
+  usages.value.filter(
+    usage =>
+      (!props.resource || usage.resource === props.resource) &&
+      (!props.fields || props.fields.includes(usage.field)) &&
+      (!props.usageKeys || props.usageKeys.includes(usage.key))
+  )
+);
 let pending: AbortController | undefined;
 let lastIntent = "",
   mutationKey = "";
@@ -135,7 +146,7 @@ onBeforeUnmount(() => {
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
     <el-form label-position="top">
       <el-form-item
-        v-for="usage in usages"
+        v-for="usage in visibleUsages"
         :key="usage.key"
         :label="usage.name"
         :error="usage.issue"
@@ -195,6 +206,9 @@ onBeforeUnmount(() => {
           </el-space>
         </div>
         <p>
+          {{ t("autoCodes.target") }}：{{ usage.resource }} · {{ usage.field }}
+        </p>
+        <p>
           {{ t("codeRules.bound") }}：{{
             usage.ruleName ?? t("codeRules.unbound")
           }}
@@ -203,7 +217,8 @@ onBeforeUnmount(() => {
         </p>
       </el-form-item>
     </el-form>
-    <div v-if="!usages.length">
+    <div v-if="!visibleUsages.length">
+      <el-empty :description="t('autoCodes.noFields')" :image-size="64" />
       <el-button :disabled="busy" @click="load()">{{
         t("crud.reload")
       }}</el-button>

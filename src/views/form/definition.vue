@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref } from "vue";
+import { api } from "@/api/client";
+import { ElMessage } from "element-plus";
+import { onSessionReset } from "@/platform/lifecycle";
+import type { FormRecord } from "./model";
+
+import FormSubmissions from "./FormSubmissions.vue";
+import UsageBindings from "@/views/system/code-rule/UsageBindings.vue";
+import { requestText } from "./useFormWorkspace";
+import { defineAsyncComponent, nextTick, onBeforeUnmount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import AddIcon from "~icons/ri/add-circle-line";
 import ViewIcon from "~icons/ri/eye-line";
 import EditIcon from "~icons/ri/edit-line";
@@ -13,6 +22,7 @@ import FormEditor from "./FormEditor.vue";
 import { useFormWorkspace } from "./useFormWorkspace";
 
 defineOptions({ name: "FormDefinitionPage" });
+const FormPreview = defineAsyncComponent(() => import("./FormPreview.vue"));
 const { t } = useI18n();
 const generated = generatedCrud("formDefinition");
 // 版本快照只开放列表读取；创建和修订由设计工作区办理。
@@ -26,6 +36,41 @@ const workspace = useFormWorkspace();
 const { busy, listError, editor } = workspace;
 const list = ref<InstanceType<typeof CrudPage>>();
 const editorKey = ref(0);
+const targetForm = ref<FormRecord>();
+const action = ref<"" | "bind" | "fill" | "records">("");
+const actionError = ref("");
+let actionRequest: AbortController | undefined;
+async function openAction(row: CrudRecord, mode: "bind" | "fill" | "records") {
+  if (typeof row.id !== "string") return;
+  actionRequest?.abort();
+  const request = (actionRequest = new AbortController());
+  actionError.value = "";
+  try {
+    const response = await api.formDefinitionInfo(
+      { body: { id: row.id } },
+      { signal: request.signal }
+    );
+    if (request.signal.aborted) return;
+    targetForm.value = response.data;
+    action.value = mode;
+  } catch (reason) {
+    if (!request.signal.aborted) actionError.value = requestText(reason);
+  }
+}
+const stopSession = onSessionReset(() => {
+  actionRequest?.abort();
+  action.value = "";
+  targetForm.value = undefined;
+  actionError.value = "";
+});
+onBeforeUnmount(() => {
+  stopSession();
+  actionRequest?.abort();
+});
+function submitted() {
+  action.value = "";
+  ElMessage.success(t("autoCodes.saved"));
+}
 async function open(
   record: CrudRecord | null,
   mode: "create" | "view" | "revise"
@@ -63,11 +108,17 @@ onBeforeUnmount(workspace.dispose);
         role="alert"
         class="list-error"
       />
+      <el-alert
+        v-if="actionError"
+        :title="t(actionError)"
+        type="error"
+        :closable="false"
+      />
       <CrudPage
         ref="list"
         :port="port"
         page-key="form:definition"
-        :row-actions-width="250"
+        :row-actions-width="300"
       >
         <template #toolbar>
           <el-button
@@ -101,12 +152,97 @@ onBeforeUnmount(workspace.dispose);
             @click="open(row, 'revise')"
             >{{ t("forms.newRevision") }}</el-button
           >
+          <el-dropdown
+            class="form-more"
+            trigger="click"
+            :disabled="disabled || busy"
+          >
+            <el-button link type="primary" :disabled="disabled || busy"
+              >{{ t("codeRules.more") }}<ArrowDownIcon class="more-arrow"
+            /></el-button>
+            <template #dropdown
+              ><el-dropdown-menu>
+                <el-dropdown-item
+                  v-perm="permission('codeRuleUsageList')"
+                  @click="openAction(row, 'bind')"
+                  >{{ t("autoCodes.bindFields") }}</el-dropdown-item
+                >
+                <el-dropdown-item
+                  v-perm="permission('formSubmissionAdd')"
+                  @click="openAction(row, 'fill')"
+                  >{{ t("autoCodes.fill") }}</el-dropdown-item
+                >
+                <el-dropdown-item
+                  v-perm="permission('formSubmissionPage')"
+                  @click="openAction(row, 'records')"
+                  >{{ t("autoCodes.submissions") }}</el-dropdown-item
+                >
+              </el-dropdown-menu></template
+            >
+          </el-dropdown>
         </template>
       </CrudPage>
     </div>
+    <el-dialog
+      :model-value="Boolean(action)"
+      width="min(1080px, 96vw)"
+      append-to-body
+      destroy-on-close
+      :close-on-click-modal="false"
+      @update:model-value="action = ''"
+    >
+      <template #header
+        ><el-space wrap
+          ><span>{{
+            t(
+              action === "bind"
+                ? "autoCodes.bindFields"
+                : action === "fill"
+                  ? "autoCodes.fill"
+                  : "autoCodes.submissions"
+            )
+          }}</span
+          ><el-tag v-if="targetForm"
+            >{{ targetForm.name }} · v{{ targetForm.revision }}</el-tag
+          ></el-space
+        ></template
+      >
+      <UsageBindings
+        v-if="action === 'bind' && targetForm"
+        :resource="`form/${targetForm.code}`"
+        :fields="
+          targetForm.fields
+            .filter(field => field.generated)
+            .map(field => field.field)
+        "
+      />
+      <FormPreview
+        v-else-if="action === 'fill' && targetForm"
+        :definition-id="targetForm.id"
+        :fields="targetForm.fields"
+        :designer="targetForm.designer"
+        submit
+        @submitted="submitted"
+      />
+      <FormSubmissions
+        v-else-if="action === 'records' && targetForm"
+        :definition-id="targetForm.id"
+      />
+    </el-dialog>
   </div>
 </template>
 <style scoped>
+.form-more {
+  margin-left: 12px;
+  vertical-align: middle;
+}
+
+.more-arrow {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
+
 .list-hint {
   font-size: 13px;
   color: var(--el-text-color-secondary);

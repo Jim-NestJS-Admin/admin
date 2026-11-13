@@ -121,7 +121,15 @@ export function previewRules(
       if (field) {
         rule.hidden = !field.visible;
         rule.display = field.visible;
-        rule.$required = field.required;
+        rule.$required = field.generated ? false : field.required;
+        if (field.generated)
+          rule.props = {
+            ...((rule.props && typeof rule.props === "object"
+              ? rule.props
+              : {}) as Record<string, unknown>),
+            disabled: true,
+            placeholder: "保存时自动生成"
+          };
         // 旧validate.required不能抵消联动后的必填设置。
         rule.validate = (Array.isArray(rule.validate) ? rule.validate : []).map(
           value => {
@@ -143,7 +151,12 @@ export function cleanPreviewValues(
 ) {
   const out: Record<string, unknown> = {};
   for (const field of fields) {
-    if (!field.visible || !Object.hasOwn(values, field.field)) continue;
+    if (
+      field.generated ||
+      !field.visible ||
+      !Object.hasOwn(values, field.field)
+    )
+      continue;
     const value = values[field.field];
     if (
       field.options.length &&

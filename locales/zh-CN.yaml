@@ -758,3 +758,25 @@ platform:
   menuHint: 勾选这个套餐可用的菜单和按钮；平台专用菜单不会出现在这里
   menuCount: 已选 {count} 项
   loadFailed: 加载失败，可重新打开
+
+autoCodes:
+  correctFields: 请先补全必填项，并修正标红字段。
+  target: 目标字段
+  bindFields: 字段编码规则
+  noFields: 当前没有可绑定的自动编码字段，请先保存表单设计或部署声明了自动编码字段的业务模块。
+  fieldMode: 自动编码
+  manual: 手动填写
+  charset: 编号字符集
+  dynamicField: 自动编号（仅普通文本）
+  designerHint: 保存时生成；最多64位。保存设计后，请在字段编码规则中完成绑定。自动编号不能设默认值或参与联动。
+  codegenHint: 自动设为非空、唯一文本，长度最多64位。生成模块并注册后，在该模块列表中绑定规则。
+  submit: 提交并保存
+  submitHint: 正式保存填写内容，自动编号在同一事务中生成；提交后内容与编号保持不变。
+  submissions: 提交记录
+  fill: 填写提交
+  saved: 提交已保存
+  values: 填写内容
+  charsets:
+    upper_alnum: 大写字母、数字及分隔符
+    lower_slug: 小写字母、数字及下划线
+    digits: 纯数字
