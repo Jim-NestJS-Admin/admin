@@ -1103,6 +1103,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/code-rule/timezones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 系统维护的IANA时区目录，含中文城市名 */
+    post: operations["codeRuleTimeZones"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/code-rule/update": {
     parameters: {
       query?: never;
@@ -2998,6 +3015,15 @@ export type components = {
       }[];
       start: string;
       timezone: string;
+    };
+    CodeTimeZoneItem: {
+      common: boolean;
+      labelEn: string;
+      labelZh: string;
+      value: string;
+    };
+    CodeTimeZoneResult: {
+      list: components["schemas"]["CodeTimeZoneItem"][];
     };
     CodeUsageItem: {
       allowRuleSwitch: boolean;
@@ -9505,6 +9531,31 @@ export interface operations {
             /** @enum {integer} */
             code: 1000;
             data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  codeRuleTimeZones: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CodeTimeZoneResult"];
             /** @example ok */
             message: string;
           };

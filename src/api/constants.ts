@@ -119,6 +119,7 @@ export const OPERATION_PERMISSIONS = {
   codeRuleBindingSet: ["system:code-rule:bind"],
   codeRuleHistory: ["system:code-rule:info"],
   codeRulePreview: ["system:code-rule:preview"],
+  codeRuleTimeZones: ["system:code-rule:page"],
   codeRuleUsageList: ["system:code-rule:page"],
   codeRuleValidate: ["system:code-rule:preview"],
   devCodegenDelete: ["dev:codegen:delete"],

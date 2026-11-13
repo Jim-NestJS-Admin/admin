@@ -648,6 +648,24 @@ forms:
     email: Email
     url: URL
 codeRules:
+  timeZoneSearch: Search city names or IANA identifiers
+  commonTimeZones: Common time zones
+  allTimeZones: Other time zones
+  savedTimeZone: Saved value
+  legacyTimeZone: This saved time zone is not in the current catalog. It is preserved until you select a replacement.
+  retryTimeZones: Reload time zones
+  previewLabel: Format preview
+  timestamp: Timestamp
+  seconds: Unix seconds
+  milliseconds: Unix milliseconds
+  enabled: Enabled
+  disabled: Disabled
+  dragHint: Drag the left handle or focus it and use arrow keys. Sequence stays last. Up to four segments; resets require a complete date.
+  dragSegment: Drag to reorder, or use up and down arrow keys
+  sequenceFixed: Sequence stays last
+  digits: digits
+  codeHint: 2–64 characters. Start with a lowercase letter; use lowercase letters, digits and underscores only. Cannot be changed after saving.
+  codeExample: e.g. test_code
   configPreview: Check format and examples
   configPreviewHint: Examples start at the configured start value and consume no numbers. Preview actual next codes in details.
   rules: Rules

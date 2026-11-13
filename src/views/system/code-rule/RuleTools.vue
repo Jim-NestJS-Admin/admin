@@ -6,7 +6,10 @@ import type { CrudRecord } from "@/components/Crud/types";
 import { permission } from "@/platform/system/resources";
 import { formatValue } from "@/components/Crud/model.mjs";
 import { ruleError } from "./messages";
-const props = defineProps<{ ruleId?: string; draft?: CrudRecord }>();
+const props = withDefaults(
+  defineProps<{ ruleId?: string; draft?: CrudRecord; showActions?: boolean }>(),
+  { showActions: true }
+);
 const { t } = useI18n();
 const codes = ref<string[]>([]),
   error = ref(""),
@@ -55,6 +58,7 @@ async function load(kind: "preview" | "history") {
   }
 }
 onBeforeUnmount(() => pending?.abort());
+defineExpose({ preview: () => load("preview"), busy });
 watch(
   () => props.draft,
   () => {
@@ -67,7 +71,7 @@ watch(
 );
 </script>
 <template>
-  <section class="rule-tools">
+  <section class="rule-tools" :class="{ 'is-draft': draft }">
     <el-alert
       :title="
         t(draft ? 'codeRules.configPreviewHint' : 'codeRules.previewHint')
@@ -75,7 +79,7 @@ watch(
       type="info"
       :closable="false"
     />
-    <div>
+    <div v-if="showActions">
       <el-button
         v-perm="permission('codeRulePreview')"
         :loading="busy"
@@ -93,7 +97,7 @@ watch(
       >
     </div>
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
-    <el-space wrap
+    <el-space v-if="codes.length" wrap
       ><el-tag v-for="code in codes" :key="code" size="large">{{
         code
       }}</el-tag></el-space
@@ -118,7 +122,13 @@ watch(
                       ? s.value
                       : s.type === "date"
                         ? s.format
-                        : "#".repeat(Number(s.width))
+                        : s.type === "timestamp"
+                          ? t(
+                              s.unit === "seconds"
+                                ? "codeRules.seconds"
+                                : "codeRules.milliseconds"
+                            )
+                          : "#".repeat(Number(s.width))
                   )
                   .join("")
               : "—"
@@ -132,7 +142,13 @@ watch(
 .rule-tools {
   display: grid;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
   margin-top: 20px;
+}
+
+.rule-tools.is-draft {
+  margin-top: 0;
 }
 
 .rule-tools p {

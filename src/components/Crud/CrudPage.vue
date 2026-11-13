@@ -1020,7 +1020,14 @@ defineExpose({ reload: view.initialize, refresh: view.load });
         ><el-button :disabled="saving" @click="view.closeEditor">{{
           t(editor.readOnly ? "crud.close" : "crud.cancel")
         }}</el-button
-        ><el-button
+        ><slot
+          name="editor-footer"
+          :values="editor.values"
+          :record="editor.record"
+          :readonly="editor.readOnly"
+          :disabled="saving"
+        />
+        <el-button
           v-if="!editor.readOnly"
           type="primary"
           :loading="saving"

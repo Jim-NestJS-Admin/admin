@@ -874,6 +874,17 @@ export function createApiClient(
         config
       );
     },
+    codeRuleTimeZones(
+      input: OperationInput<"codeRuleTimeZones"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleTimeZones">>(
+        "post",
+        interpolate("/admin/system/code-rule/timezones", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemCodeRuleUpdate(
       input: OperationInput<"systemCodeRuleUpdate"> & {
         body: OperationBody<"systemCodeRuleUpdate">;

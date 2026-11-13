@@ -648,6 +648,24 @@ forms:
     email: 邮箱
     url: 网址
 codeRules:
+  timeZoneSearch: 搜索中文城市、英文名称或IANA标识
+  commonTimeZones: 常用时区
+  allTimeZones: 其他时区
+  savedTimeZone: 当前保存值
+  legacyTimeZone: 当前时区不在目录中，保留原值；如需更改，请选择系统目录中的时区。
+  retryTimeZones: 重新加载时区
+  previewLabel: 格式预览
+  timestamp: 时间戳
+  seconds: 秒级时间戳
+  milliseconds: 毫秒级时间戳
+  enabled: 启用
+  disabled: 禁用
+  dragHint: 拖动左侧手柄调整顺序，也可聚焦手柄后按上下方向键；流水号固定在最后。最多4段，周期重置须包含完整日期。
+  dragSegment: 拖动排序；上下方向键也可移动
+  sequenceFixed: 流水号固定在最后
+  digits: 位
+  codeHint: 2–64位，以小写字母开头，只能包含小写字母、数字和下划线。保存后不可修改。
+  codeExample: 例如 test_code
   configPreview: 检查格式与示例
   configPreviewHint: 格式示例从起始值计算，不占用号码；实际后续编码请在详情中预览。
   rules: 规则管理
