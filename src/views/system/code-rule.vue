@@ -6,6 +6,7 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { scopedSequencePort, copyRuleDraft } from "./code-rule/rule-page";
 import { ruleError } from "./code-rule/messages";
 import { useI18n } from "vue-i18n";
+import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
@@ -123,10 +124,14 @@ const defaults = {
         </div>
       </template>
       <template #row-actions-extra="{ row, disabled }">
-        <el-dropdown trigger="click" :disabled="disabled || copying">
-          <el-button link type="primary" :disabled="disabled || copying">{{
-            t("codeRules.more")
-          }}</el-button>
+        <el-dropdown
+          class="rule-more"
+          trigger="click"
+          :disabled="disabled || copying"
+        >
+          <el-button link type="primary" :disabled="disabled || copying">
+            {{ t("codeRules.more") }}<ArrowDownIcon class="more-arrow" />
+          </el-button>
           <template #dropdown
             ><el-dropdown-menu>
               <el-dropdown-item
@@ -255,6 +260,17 @@ const defaults = {
 .sequence-list {
   height: calc(100dvh - 190px);
   min-height: 320px;
+}
+
+.rule-more {
+  margin-left: 12px;
+  vertical-align: middle;
+}
+
+.more-arrow {
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
 }
 
 .code-field {
