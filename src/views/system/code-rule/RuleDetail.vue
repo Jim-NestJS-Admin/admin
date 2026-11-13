@@ -84,10 +84,16 @@ const timeZoneLabel = computed(() => {
           )
         }}</span>
       </div>
-      <el-descriptions class="crud-info" :column="mobile ? 1 : 2" border>
+      <el-descriptions
+        class="crud-info"
+        :column="mobile ? 1 : 2"
+        :label-width="mobile ? 92 : 112"
+        border
+      >
         <el-descriptions-item
           v-for="item in detailItems"
           :key="item.field"
+          :width="mobile ? 'calc(100% - 92px)' : 'calc(50% - 112px)'"
           :label="
             item.field === 'revision'
               ? t('codeRules.businessVersion')
@@ -102,14 +108,9 @@ const timeZoneLabel = computed(() => {
           <template v-else-if="item.field === 'revision'"
             >v{{ displayed.revision }}</template
           >
-          <el-space v-else-if="selected && item.field === 'status'" wrap>
-            <el-tag type="info">{{ t("codeRules.historicalInactive") }}</el-tag>
-            <span class="version-kind"
-              >{{ t("codeRules.savedStatus") }}：{{
-                display(displayed, item)
-              }}</span
-            >
-          </el-space>
+          <el-tag v-else-if="selected && item.field === 'status'" type="info">{{
+            t("codeRules.historicalInactive")
+          }}</el-tag>
           <el-space v-else-if="item.field === 'segments' && segments" wrap>
             <el-tag
               v-for="(segment, index) in segments"
@@ -164,6 +165,15 @@ const timeZoneLabel = computed(() => {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
   gap: 24px;
+}
+
+.crud-info :deep(.el-descriptions__table) {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.crud-info :deep(.el-descriptions__content) {
+  overflow-wrap: anywhere;
 }
 
 .rule-detail-main {

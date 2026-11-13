@@ -649,7 +649,7 @@ forms:
     url: 网址
 codeRules:
   businessVersion: 规则版本
-  historicalInactive: 历史版本，不参与发号
+  historicalInactive: 历史版本不参与发号
   savedStatus: 保存时状态
   timeZoneNameLoading: 正在加载时区名称…
   timeZoneNameFailed: 时区名称加载失败
