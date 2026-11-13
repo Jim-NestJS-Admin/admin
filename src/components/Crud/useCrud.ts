@@ -46,7 +46,8 @@ export function useCrud(
   const total = ref(0),
     loading = ref(false),
     saving = ref(false),
-    error = ref("");
+    error = ref(""),
+    editorError = ref("");
   const fields = ref<Record<string, string[]>>({});
   const rowIssues = ref<
     { group: string; key: string; field: string; message: string }[]
@@ -113,6 +114,7 @@ export function useCrud(
     saving.value = false;
     fields.value = {};
     error.value = "";
+    editorError.value = "";
     intent = undefined;
     retryUntil.value = 0;
   }
@@ -125,9 +127,23 @@ export function useCrud(
   const stopConfigEvents = onPageConfigChanged(resource => {
     if (schema.value?.permPrefix === resource) void initialize();
   });
-  function failure(reason: unknown) {
-    error.value =
+  function failure(reason: unknown, scope: "page" | "editor" = "page") {
+    (scope === "editor" ? editorError : error).value =
       reason instanceof RequestFailure ? reason.message : "crud.requestFailed";
+    if (reason instanceof RequestFailure && reason.failure.status === 429) {
+      const seconds = Number(
+        (reason.failure.data as { retryAfterSeconds?: number })
+          ?.retryAfterSeconds
+      );
+      retryUntil.value =
+        Date.now() +
+        (Number.isFinite(seconds)
+          ? Math.min(3600, Math.max(1, Math.ceil(seconds)))
+          : 1) *
+          1000;
+    }
+    // 列表错误不改写编辑器的字段错误，表单错误不污染列表。
+    if (scope !== "editor") return;
     const data =
       reason instanceof RequestFailure
         ? (reason.failure.data as {
@@ -183,18 +199,6 @@ export function useCrud(
           }));
       }
     );
-    if (reason instanceof RequestFailure && reason.failure.status === 429) {
-      const seconds = Number(
-        (reason.failure.data as { retryAfterSeconds?: number })
-          ?.retryAfterSeconds
-      );
-      retryUntil.value =
-        Date.now() +
-        (Number.isFinite(seconds)
-          ? Math.min(3600, Math.max(1, Math.ceil(seconds)))
-          : 1) *
-          1000;
-    }
   }
   async function load() {
     if (!schema.value) return;
@@ -308,7 +312,7 @@ export function useCrud(
   }
   async function edit(row?: CrudRecord, readOnly = false) {
     if (saving.value || !schema.value || recycledView.value) return;
-    error.value = "";
+    editorError.value = "";
     fields.value = {};
     rowIssues.value = [];
     intent = undefined;
@@ -361,6 +365,8 @@ export function useCrud(
     if (!saving.value) {
       detailSequence++;
       editor.open = false;
+      editorError.value = "";
+      fields.value = {};
       editor.values = {};
       editor.record = undefined;
       editor.related = [];
@@ -384,6 +390,7 @@ export function useCrud(
     if (recycledView.value || editor.readOnly) return;
     const method = editor.mode === "add" ? port.create : port.update;
     if (!method) return;
+    editorError.value = "";
     const missing = requiredFields(
       schema.value,
       editor.mode,
@@ -429,7 +436,7 @@ export function useCrud(
     const context = generation,
       request = start();
     saving.value = true;
-    error.value = "";
+    editorError.value = "";
     try {
       const options = {
         signal: request.signal,
@@ -447,7 +454,7 @@ export function useCrud(
       rowIssues.value = [];
       await load();
     } catch (reason) {
-      if (context === generation) failure(reason);
+      if (context === generation) failure(reason, "editor");
     } finally {
       pending.delete(request);
       if (context === generation) saving.value = false;
@@ -572,6 +579,7 @@ export function useCrud(
     loading,
     saving,
     error,
+    editorError,
     fields,
     rowIssues,
     recycledView,

@@ -120,6 +120,7 @@ const {
   loading,
   saving,
   error,
+  editorError,
   fields,
   rowIssues,
   recycledView,
@@ -842,7 +843,12 @@ defineExpose({
         }
       "
     >
-      <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+      <el-alert
+        v-if="editorError"
+        :title="t(editorError)"
+        type="error"
+        :closable="false"
+      />
       <el-alert
         v-if="retrySeconds"
         :title="t('admin.retryAfter', { seconds: retrySeconds })"
