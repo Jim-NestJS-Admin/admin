@@ -243,6 +243,7 @@ const defaults = {
       :model-value="panel === 'sequences'"
       :title="t('codeRules.sequenceRecords')"
       size="min(1000px, 96vw)"
+      body-class="code-sequence-drawer-body"
       destroy-on-close
       @update:model-value="panel = ''"
     >
@@ -279,9 +280,16 @@ const defaults = {
   padding-right: 24px;
 }
 
+:global(.code-sequence-drawer-body) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .sequence-list {
-  height: calc(100dvh - 190px);
-  min-height: 320px;
+  flex: 1;
+  min-height: 0;
 }
 
 .rule-more {
