@@ -695,6 +695,15 @@ codeRules:
     month: 每月
     day: 每天
   usageConfig: 用途配置
+  selectRuleLabel: 编码规则
+  selectTarget: 搜索并选择业务及目标字段
+  bindingLocation: 绑定位置
+  noCurrentBinding: 当前未绑定
+  bindingsLoadFailed: 绑定信息加载失败，请刷新
+  ruleAlreadyBound: 已绑定到“{target}”，不能再绑定其他字段。
+  ruleUnavailable: 该规则已停用或曾经绑定过，不能作为新绑定规则。请选择或新建一条启用的全新规则。
+  bindSelectionConfirm: 确认将规则“{rule}”绑定到“{target}”？如该字段已有规则，将进行换绑；已有编码保持不变，新规则必须从未绑定且使用新前缀。
+  bindSaved: 绑定已保存
   more: 更多
   copy: 复制规则
   sequenceRecords: 序号记录
@@ -768,8 +777,8 @@ autoCodes:
   manual: 手动填写
   charset: 编号字符集
   dynamicField: 自动编号（仅普通文本）
-  designerHint: 保存时生成；最多64位。保存设计后，请在字段编码规则中完成绑定。自动编号不能设默认值或参与联动。
-  codegenHint: 自动设为非空、唯一文本，长度最多64位。生成模块并注册后，在该模块列表中绑定规则。
+  designerHint: 保存时生成；最多64位。保存设计后，由管理员在“编码规则→用途配置”选择该表单字段并绑定规则。自动编号不能设默认值或参与联动。
+  codegenHint: 自动设为非空、唯一文本，长度最多64位。“不限制字符集”仍遵循编码规则本身的格式约束。生成模块并注册后，由管理员在“编码规则→用途配置”选择业务字段并绑定规则。
   submit: 提交并保存
   submitHint: 正式保存填写内容，自动编号在同一事务中生成；提交后内容与编号保持不变。
   submissions: 提交记录
@@ -777,6 +786,7 @@ autoCodes:
   saved: 提交已保存
   values: 填写内容
   charsets:
+    unrestricted: 不限制字符集
     upper_alnum: 大写字母、数字及分隔符
     lower_slug: 小写字母、数字及下划线
     digits: 纯数字

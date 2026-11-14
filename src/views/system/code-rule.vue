@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from "vue";
+import { api, type OperationResponse } from "@/api/client";
+import { useUserStoreHook } from "@/store/modules/user";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import { onSessionReset } from "@/platform/lifecycle";
 import { validateRuleDraft } from "./code-rule/validate-rule";
@@ -10,6 +12,7 @@ import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
+import { Perms } from "@/components/RePerms";
 import SegmentEditor from "./code-rule/SegmentEditor.vue";
 import RuleDetail from "./code-rule/RuleDetail.vue";
 import RuleTools from "./code-rule/RuleTools.vue";
@@ -19,6 +22,14 @@ import TimeZoneText from "./code-rule/TimeZoneText.vue";
 import TimeZoneSelect from "./code-rule/TimeZoneSelect.vue";
 defineOptions({ name: "SystemCodeRule" });
 const { t } = useI18n();
+const user = useUserStoreHook();
+const canReadBindings = computed(() =>
+  user.permissions.includes(permission("codeRuleUsageList"))
+);
+const bindings = ref<OperationResponse<"codeRuleUsageList">["data"]["list"]>(
+  []
+);
+const bindingsFailed = ref(false);
 provideTimeZoneDirectory();
 const page = ref<InstanceType<typeof CrudPage>>();
 const panel = ref<"bindings" | "sequences" | "">("");
@@ -52,6 +63,8 @@ function resetPanels() {
   active.value = undefined;
   copying.value = false;
   error.value = "";
+  bindings.value = [];
+  bindingsFailed.value = false;
 }
 const stop = onSessionReset(resetPanels);
 onBeforeUnmount(() => {
@@ -63,6 +76,29 @@ const rules = generatedCrud("systemCodeRule"),
   sequences = generatedCrud("systemCodeSequence");
 const rulePort: CrudPort = {
   ...rules.port,
+  async list(query, signal) {
+    const bindingRequest = canReadBindings.value
+      ? api.codeRuleUsageList({}, { signal }).then(
+          response => {
+            if (!signal.aborted) {
+              bindings.value = response.data.list;
+              bindingsFailed.value = false;
+            }
+          },
+          () => {
+            if (!signal.aborted) {
+              bindings.value = [];
+              bindingsFailed.value = true;
+            }
+          }
+        )
+      : Promise.resolve();
+    const [result] = await Promise.all([
+      rules.port.list(query, signal),
+      bindingRequest
+    ]);
+    return result;
+  },
   validate: (values, context) => {
     const draft = { ...context.record, ...values };
     // 被字段权限隐藏/脱敏的依赖不能在浏览器补猜，交由服务端基于原记录校验。
@@ -133,6 +169,26 @@ const defaults = {
       <template #cell-timezone="{ value }"
         ><TimeZoneText :value="value"
       /></template>
+      <template #table-columns>
+        <el-table-column
+          v-if="canReadBindings"
+          :label="t('codeRules.bindingLocation')"
+          min-width="240"
+          show-overflow-tooltip
+        >
+          <template #default="{ row }">
+            <span v-if="bindingsFailed">{{
+              t("codeRules.bindingsLoadFailed")
+            }}</span>
+            <el-tag
+              v-else-if="bindings.some(item => item.ruleId === row.id)"
+              effect="plain"
+              >{{ bindings.find(item => item.ruleId === row.id)?.name }}</el-tag
+            >
+            <span v-else>{{ t("codeRules.noCurrentBinding") }}</span>
+          </template>
+        </el-table-column>
+      </template>
       <template #toolbar>
         <el-button
           v-perm="permission('codeRuleUsageList')"
@@ -151,21 +207,21 @@ const defaults = {
           </el-button>
           <template #dropdown
             ><el-dropdown-menu>
-              <el-dropdown-item
-                v-perm="rules.permissions.create"
-                @click="copy(row)"
-                >{{ t("codeRules.copy") }}</el-dropdown-item
-              >
-              <el-dropdown-item
-                v-perm="permission('codeRuleBindingSet')"
-                @click="openPanel('bindings', row)"
-                >{{ t("codeRules.bindings") }}</el-dropdown-item
-              >
-              <el-dropdown-item
-                v-perm="permission('systemCodeSequencePage')"
-                @click="openPanel('sequences', row)"
-                >{{ t("codeRules.sequenceRecords") }}</el-dropdown-item
-              >
+              <Perms :value="rules.permissions.create">
+                <el-dropdown-item @click="copy(row)">{{
+                  t("codeRules.copy")
+                }}</el-dropdown-item>
+              </Perms>
+              <Perms :value="permission('codeRuleBindingSet')">
+                <el-dropdown-item @click="openPanel('bindings', row)">{{
+                  t("codeRules.bindings")
+                }}</el-dropdown-item>
+              </Perms>
+              <Perms :value="permission('systemCodeSequencePage')">
+                <el-dropdown-item @click="openPanel('sequences', row)">{{
+                  t("codeRules.sequenceRecords")
+                }}</el-dropdown-item>
+              </Perms>
             </el-dropdown-menu></template
           >
         </el-dropdown>
@@ -242,7 +298,7 @@ const defaults = {
     <el-dialog
       :model-value="panel === 'bindings'"
       :title="t('codeRules.usageConfig')"
-      width="min(920px, 96vw)"
+      width="min(680px, 96vw)"
       destroy-on-close
       @update:model-value="panel = ''"
     >
@@ -263,6 +319,7 @@ const defaults = {
             active && (active.status !== '1' || active.firstBoundAt !== null)
           )
         "
+        @changed="page?.refresh()"
       />
     </el-dialog>
     <el-drawer

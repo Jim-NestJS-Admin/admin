@@ -296,7 +296,8 @@ export const ENUMS = {
   "components.schemas.CodeUsageItem.properties.charset": [
     "upper_alnum",
     "lower_slug",
-    "digits"
+    "digits",
+    "unrestricted"
   ],
   "components.schemas.CrudSchema.properties.api.items": [
     "page",
@@ -502,7 +503,8 @@ export const ENUMS = {
   "components.schemas.FormFieldDto.properties.codeCharset": [
     "upper_alnum",
     "lower_slug",
-    "digits"
+    "digits",
+    "unrestricted"
   ],
   "components.schemas.FormFieldDto.properties.component": [
     "input",
@@ -602,7 +604,8 @@ export const ENUMS = {
   "components.schemas.SpecField.properties.codeCharset": [
     "upper_alnum",
     "lower_slug",
-    "digits"
+    "digits",
+    "unrestricted"
   ],
   "components.schemas.SpecField.properties.type": [
     "string",

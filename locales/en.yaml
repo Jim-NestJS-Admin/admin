@@ -695,6 +695,15 @@ codeRules:
     month: Monthly
     day: Daily
   usageConfig: Usage configuration
+  selectRuleLabel: Code rule
+  selectTarget: Search and select a business field
+  bindingLocation: Bound to
+  noCurrentBinding: No current binding
+  bindingsLoadFailed: Could not load bindings. Refresh to retry.
+  ruleAlreadyBound: "Already bound to “{target}”; another field cannot use this rule."
+  ruleUnavailable: This rule is disabled or has been bound before. Choose or create a fresh enabled rule.
+  bindSelectionConfirm: "Bind “{rule}” to “{target}”? This replaces any existing rule for the field. Existing codes stay unchanged; a replacement rule must be fresh and use a new prefix."
+  bindSaved: Binding saved
   more: More
   copy: Copy rule
   sequenceRecords: Sequence records
@@ -768,8 +777,8 @@ autoCodes:
   manual: Enter manually
   charset: Code character set
   dynamicField: Automatic code (plain text only)
-  designerHint: Generated when saved; up to 64 characters. Save the design then bind a rule. Defaults and conditions are unsupported.
-  codegenHint: Makes the field non-null and unique, up to 64 characters. Register the generated module then bind a rule in its list.
+  designerHint: Generated when saved; up to 64 characters. After saving the design, an administrator binds the field under Code rules → Usage configuration. Defaults and conditions are unsupported.
+  codegenHint: Makes the field non-null and unique, up to 64 characters. No additional character restrictions still follows the rule format. Register the generated module, then an administrator binds the business field under Code rules → Usage configuration.
   submit: Submit and save
   submitHint: Saves the form and generates codes in one transaction. Saved values and codes are immutable.
   submissions: Submissions
@@ -777,6 +786,7 @@ autoCodes:
   saved: Submission saved
   values: Form values
   charsets:
+    unrestricted: No additional character restrictions
     upper_alnum: Uppercase letters, digits and separators
     lower_slug: Lowercase letters, digits and underscores
     digits: Digits only

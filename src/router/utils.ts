@@ -3,8 +3,7 @@ import {
   type RouteRecordRaw,
   type RouteComponent,
   createWebHistory,
-  createWebHashHistory,
-  RouterView
+  createWebHashHistory
 } from "vue-router";
 import { router } from "./index";
 import { isProxy, toRaw } from "vue";
@@ -274,8 +273,8 @@ function addAsyncRoutes(arrRoutes: Array<RouteRecordRaw>) {
     route.meta ??= { title: "" };
     route.meta.backstage = true;
     if (route.children?.length) {
-      // 动态目录已挂在首页布局内，只承载子路由，避免重复渲染导航栏。
-      route.component = RouterView;
+      // 目录只分组，不渲染RouterView；由布局的插槽直接缓存、过渡实际业务页。
+      delete route.component;
       route.redirect ??= route.children[0].path;
       addAsyncRoutes(route.children);
     } else {

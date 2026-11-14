@@ -3096,7 +3096,7 @@ export type components = {
     CodeUsageItem: {
       allowRuleSwitch: boolean;
       /** @enum {string} */
-      charset: "upper_alnum" | "lower_slug" | "digits";
+      charset: "upper_alnum" | "lower_slug" | "digits" | "unrestricted";
       field: string;
       issue: string;
       key: string;
@@ -3639,7 +3639,7 @@ export type components = {
     };
     FormFieldDto: {
       /** @enum {string} */
-      codeCharset?: "upper_alnum" | "lower_slug" | "digits";
+      codeCharset?: "upper_alnum" | "lower_slug" | "digits" | "unrestricted";
       /** @enum {string} */
       component:
         | "input"
@@ -4359,7 +4359,7 @@ export type components = {
        * @description 自动编码字段字符集，保存时生成
        * @enum {string}
        */
-      codeCharset?: "upper_alnum" | "lower_slug" | "digits";
+      codeCharset?: "upper_alnum" | "lower_slug" | "digits" | "unrestricted";
       column: string;
       comment?: string;
       defaultValue?: (string | number | boolean) | null;

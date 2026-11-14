@@ -5,7 +5,6 @@ import { onSessionReset } from "@/platform/lifecycle";
 import type { FormRecord } from "./model";
 
 import FormSubmissions from "./FormSubmissions.vue";
-import UsageBindings from "@/views/system/code-rule/UsageBindings.vue";
 import { requestText } from "./useFormWorkspace";
 import { defineAsyncComponent, nextTick, onBeforeUnmount, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -18,6 +17,7 @@ import ViewIcon from "~icons/ri/eye-line";
 import EditIcon from "~icons/ri/edit-line";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
+import { Perms } from "@/components/RePerms";
 import FormEditor from "./FormEditor.vue";
 import { useFormWorkspace } from "./useFormWorkspace";
 
@@ -37,10 +37,10 @@ const { busy, listError, editor } = workspace;
 const list = ref<InstanceType<typeof CrudPage>>();
 const editorKey = ref(0);
 const targetForm = ref<FormRecord>();
-const action = ref<"" | "bind" | "fill" | "records">("");
+const action = ref<"" | "fill" | "records">("");
 const actionError = ref("");
 let actionRequest: AbortController | undefined;
-async function openAction(row: CrudRecord, mode: "bind" | "fill" | "records") {
+async function openAction(row: CrudRecord, mode: "fill" | "records") {
   if (typeof row.id !== "string") return;
   actionRequest?.abort();
   const request = (actionRequest = new AbortController());
@@ -162,21 +162,16 @@ onBeforeUnmount(workspace.dispose);
             /></el-button>
             <template #dropdown
               ><el-dropdown-menu>
-                <el-dropdown-item
-                  v-perm="permission('codeRuleUsageList')"
-                  @click="openAction(row, 'bind')"
-                  >{{ t("autoCodes.bindFields") }}</el-dropdown-item
-                >
-                <el-dropdown-item
-                  v-perm="permission('formSubmissionAdd')"
-                  @click="openAction(row, 'fill')"
-                  >{{ t("autoCodes.fill") }}</el-dropdown-item
-                >
-                <el-dropdown-item
-                  v-perm="permission('formSubmissionPage')"
-                  @click="openAction(row, 'records')"
-                  >{{ t("autoCodes.submissions") }}</el-dropdown-item
-                >
+                <Perms :value="permission('formSubmissionAdd')">
+                  <el-dropdown-item @click="openAction(row, 'fill')">{{
+                    t("autoCodes.fill")
+                  }}</el-dropdown-item>
+                </Perms>
+                <Perms :value="permission('formSubmissionPage')">
+                  <el-dropdown-item @click="openAction(row, 'records')">{{
+                    t("autoCodes.submissions")
+                  }}</el-dropdown-item>
+                </Perms>
               </el-dropdown-menu></template
             >
           </el-dropdown>
@@ -194,30 +189,15 @@ onBeforeUnmount(workspace.dispose);
       <template #header
         ><el-space wrap
           ><span>{{
-            t(
-              action === "bind"
-                ? "autoCodes.bindFields"
-                : action === "fill"
-                  ? "autoCodes.fill"
-                  : "autoCodes.submissions"
-            )
+            t(action === "fill" ? "autoCodes.fill" : "autoCodes.submissions")
           }}</span
           ><el-tag v-if="targetForm"
             >{{ targetForm.name }} · v{{ targetForm.revision }}</el-tag
           ></el-space
         ></template
       >
-      <UsageBindings
-        v-if="action === 'bind' && targetForm"
-        :resource="`form/${targetForm.code}`"
-        :fields="
-          targetForm.fields
-            .filter(field => field.generated)
-            .map(field => field.field)
-        "
-      />
       <FormPreview
-        v-else-if="action === 'fill' && targetForm"
+        v-if="action === 'fill' && targetForm"
         :definition-id="targetForm.id"
         :fields="targetForm.fields"
         :designer="targetForm.designer"

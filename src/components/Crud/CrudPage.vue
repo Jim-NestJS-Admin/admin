@@ -7,8 +7,6 @@ import {
   useSlots,
   watch
 } from "vue";
-import UsageBindings from "@/views/system/code-rule/UsageBindings.vue";
-import { permission } from "@/platform/system/resources";
 import { useI18n } from "vue-i18n";
 import { useElementSize, useMediaQuery, useNow } from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
@@ -85,13 +83,6 @@ const props = withDefaults(
 const { t } = useI18n();
 const slots = useSlots();
 const fill = computed(() => props.fill);
-const codeBindingsOpen = ref(false);
-const codeUsageKeys = computed(() =>
-  [
-    ...(schema.value?.form ?? []),
-    ...(schema.value?.children ?? []).flatMap(c => c.form)
-  ].flatMap(f => (f.codeUsageKey ? [f.codeUsageKey] : []))
-);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
@@ -107,7 +98,6 @@ const compact = computed(
 const treeOpen = ref(false);
 const activeChild = ref("");
 const stopReset = onSessionReset(() => {
-  codeBindingsOpen.value = false;
   treeOpen.value = false;
 });
 onBeforeUnmount(stopReset);
@@ -454,12 +444,6 @@ defineExpose({
               >
               <slot name="toolbar" :query="query" :reload="view.load" />
               <el-button
-                v-if="codeUsageKeys.length"
-                v-perm="permission('codeRuleUsageList')"
-                @click="codeBindingsOpen = true"
-                >{{ t("autoCodes.bindFields") }}</el-button
-              >
-              <el-button
                 v-if="
                   port.remove && schema.api.includes('delete') && !recycledView
                 "
@@ -704,6 +688,7 @@ defineExpose({
                   }}</span>
                 </template>
               </el-table-column>
+              <slot name="table-columns" />
               <el-table-column
                 v-if="recycledView"
                 prop="deletedAt"
@@ -1130,15 +1115,6 @@ defineExpose({
         ></template
       >
     </component>
-    <el-dialog
-      v-model="codeBindingsOpen"
-      :title="t('autoCodes.bindFields')"
-      width="min(900px, 96vw)"
-      append-to-body
-      destroy-on-close
-    >
-      <UsageBindings v-if="codeBindingsOpen" :usage-keys="codeUsageKeys" />
-    </el-dialog>
   </section>
 </template>
 
