@@ -1,9 +1,9 @@
 {
   "generator": "openapi-typescript",
-  "revision": "6b61e4567190a58ff11a4183daa92538fa3385be",
+  "revision": "157a4feabe9e03f0aa34eef2bdb5d53d9a752d38",
   "source": "../server/openapi/admin.json",
-  "schemaSha256": "1759df0c5ceda248166c37aa45df5ba2da3ce734482fcad18d00a3a1e8506cd4",
-  "operationCount": 205,
+  "schemaSha256": "4cd6007fc063484a40b03806f013c4160187d65c48cefb258ecfcd402d9286c2",
+  "operationCount": 206,
   "permissionsProvided": true,
   "files": ["schema.d.ts", "client.ts", "constants.ts", "manifest.json"]
 }

@@ -318,6 +318,7 @@ export const OPERATION_PERMISSIONS = {
   workflowDefinitionPublish: ["workflow:definition:publish"],
   workflowDefinitionRevise: ["workflow:definition:update"],
   workflowDefinitionSchema: ["workflow:definition:page"],
+  workflowDirectoryOrganizations: ["workflow:directory:page"],
   workflowDirectoryPage: ["workflow:directory:page"],
   workflowInstanceAttachment: ["workflow:instance:info"],
   workflowInstanceDocument: ["workflow:instance:info"],

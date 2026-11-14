@@ -5,6 +5,8 @@ import { api } from "@/api/client";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { date } from "./model";
+import MemberPicker from "@/components/MemberPicker/index.vue";
+import { workflowMemberDirectory } from "./member-directory";
 const props = defineProps<{
   modelValue?: string | string[];
   kind: "users" | "roles" | "orgs" | "forms" | "workflows" | "submissions";
@@ -25,13 +27,16 @@ let request: AbortController | undefined,
   page = 1,
   keyword = "",
   timer: ReturnType<typeof setTimeout> | undefined;
+let loaded = false;
 const ids = () =>
   Array.isArray(props.modelValue)
     ? props.modelValue
     : props.modelValue
       ? [props.modelValue]
       : [];
-async function load(search: string, append = false) {
+async function load(search: string, append = false, force = false) {
+  if (props.kind === "users") return;
+  if (!force && !append && search === keyword && (busy.value || loaded)) return;
   request?.abort();
   const current = (request = new AbortController());
   busy.value = true;
@@ -39,7 +44,6 @@ async function load(search: string, append = false) {
   if (!append) {
     page = 1;
     keyword = search;
-    options.value = [];
   }
   try {
     let rows: { id: string; label: string }[], total: number;
@@ -48,6 +52,7 @@ async function load(search: string, append = false) {
         {
           body: {
             kind: props.kind as "users" | "roles" | "orgs",
+            includeChildren: false,
             keyword,
             page,
             size: 20
@@ -110,6 +115,7 @@ async function load(search: string, append = false) {
     if (!current.signal.aborted) {
       options.value = append ? [...options.value, ...rows] : rows;
       more.value = page * 20 < total;
+      loaded = true;
       cache();
     }
   } catch (e) {
@@ -134,6 +140,7 @@ function search(value: string) {
   timer = setTimeout(() => void load(value), 200);
 }
 async function hydrate() {
+  if (props.kind === "users") return;
   cache();
   const missing = ids().filter(id => !selected.value.some(x => x.id === id));
   if (!missing.length) return;
@@ -147,6 +154,7 @@ async function hydrate() {
           {
             body: {
               kind: props.kind as "users" | "roles" | "orgs",
+              includeChildren: false,
               ids: missing,
               keyword: "",
               page: 1,
@@ -209,7 +217,14 @@ async function hydrate() {
 watch(
   () => [props.kind, props.definitionId, props.published],
   () => {
+    request?.abort();
+    selectedRequest?.abort();
+    clearTimeout(timer);
+    busy.value = false;
+    loaded = false;
+    options.value = [];
     selected.value = [];
+    error.value = "";
     void load("");
     void hydrate();
   },
@@ -227,6 +242,8 @@ function reset() {
   options.value = [];
   selected.value = [];
   error.value = "";
+  loaded = false;
+  busy.value = false;
 }
 const stop = onSessionReset(reset);
 onBeforeUnmount(() => {
@@ -236,7 +253,16 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="resource-select">
+    <MemberPicker
+      v-if="kind === 'users'"
+      :model-value="modelValue"
+      :source="workflowMemberDirectory"
+      :multiple="multiple"
+      :disabled="disabled"
+      @update:model-value="emit('update:modelValue', $event)"
+    />
     <el-select
+      v-else
       :model-value="modelValue"
       :multiple="multiple"
       :multiple-limit="50"
@@ -247,7 +273,7 @@ onBeforeUnmount(() => {
       :remote-method="search"
       :loading="busy"
       :placeholder="t('workflow.searchChoice')"
-      @visible-change="$event && load('')"
+      @visible-change="$event && !loaded && load(keyword)"
       @update:model-value="
         emit('update:modelValue', $event || (multiple ? [] : ''))
       "
@@ -275,7 +301,7 @@ onBeforeUnmount(() => {
     </el-select>
     <small v-if="error" class="resource-error" role="alert"
       >{{ t(error) }}
-      <el-button link @click="load(keyword)">{{
+      <el-button link @click="load(keyword, false, true)">{{
         t("workflow.retry")
       }}</el-button></small
     >

@@ -2403,6 +2403,19 @@ export function createApiClient(
         config
       );
     },
+    workflowDirectoryOrganizations(
+      input: OperationInput<"workflowDirectoryOrganizations"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowDirectoryOrganizations">
+      >(
+        "post",
+        interpolate("/admin/workflow/directory/organizations", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowDirectoryPage(
       input: OperationInput<"workflowDirectoryPage"> & {
         body: OperationBody<"workflowDirectoryPage">;

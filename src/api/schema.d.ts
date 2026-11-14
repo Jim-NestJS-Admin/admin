@@ -3160,6 +3160,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/workflow/directory/organizations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 成员选择器的同租户启用组织树，只返回编号、名称和父级 */
+    post: operations["workflowDirectoryOrganizations"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/workflow/directory/page": {
     parameters: {
       query?: never;
@@ -7520,10 +7537,14 @@ export type components = {
     };
     WorkflowDirectoryBody: {
       ids?: string[];
+      /** @default false */
+      includeChildren: boolean;
       /** @default  */
       keyword: string;
       /** @enum {string} */
       kind: "users" | "roles" | "orgs";
+      /** @description 按成员的组织角色归属筛选，仅用于成员目录 */
+      orgId?: string;
       /** @default 1 */
       page: number;
       /** @default 20 */
@@ -7532,6 +7553,14 @@ export type components = {
     WorkflowDirectoryOption: {
       id: string;
       label: string;
+    };
+    WorkflowDirectoryOrganization: {
+      id: string;
+      label: string;
+      parentId: string | null;
+    };
+    WorkflowDirectoryOrganizations: {
+      list: components["schemas"]["WorkflowDirectoryOrganization"][];
     };
     WorkflowDirectoryResult: {
       list: components["schemas"]["WorkflowDirectoryOption"][];
@@ -16259,6 +16288,31 @@ export interface operations {
             /** @enum {integer} */
             code: 1000;
             data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  workflowDirectoryOrganizations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDirectoryOrganizations"];
             /** @example ok */
             message: string;
           };
