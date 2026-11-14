@@ -119,11 +119,16 @@ export const PERMISSIONS = [
   "workflow:instance:add",
   "workflow:instance:info",
   "workflow:instance:page",
+  "workflow:instance:resubmit",
+  "workflow:instance:urge",
+  "workflow:instance:withdraw",
   "workflow:record:info",
   "workflow:record:page",
   "workflow:task:approve",
   "workflow:task:info",
-  "workflow:task:page"
+  "workflow:task:page",
+  "workflow:task:reject",
+  "workflow:task:transfer"
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const OPERATION_PERMISSIONS = {
@@ -310,17 +315,24 @@ export const OPERATION_PERMISSIONS = {
   workflowDefinitionPublish: ["workflow:definition:publish"],
   workflowDefinitionRevise: ["workflow:definition:update"],
   workflowDefinitionSchema: ["workflow:definition:page"],
+  workflowInstanceAttachment: ["workflow:instance:info"],
+  workflowInstanceDocument: ["workflow:instance:info"],
   workflowInstanceInfo: ["workflow:instance:info"],
   workflowInstancePage: ["workflow:instance:page"],
+  workflowInstanceResubmit: ["workflow:instance:resubmit"],
   workflowInstanceSchema: ["workflow:instance:page"],
   workflowInstanceStart: ["workflow:instance:add"],
+  workflowInstanceUrge: ["workflow:instance:urge"],
+  workflowInstanceWithdraw: ["workflow:instance:withdraw"],
   workflowRecordInfo: ["workflow:record:info"],
   workflowRecordPage: ["workflow:record:page"],
   workflowRecordSchema: ["workflow:record:page"],
   workflowTaskApprove: ["workflow:task:approve"],
   workflowTaskInfo: ["workflow:task:info"],
   workflowTaskPage: ["workflow:task:page"],
-  workflowTaskSchema: ["workflow:task:page"]
+  workflowTaskReject: ["workflow:task:reject"],
+  workflowTaskSchema: ["workflow:task:page"],
+  workflowTaskTransfer: ["workflow:task:transfer"]
 } as const;
 export const SCOPES = [] as const;
 export const ENUMS = {
@@ -1070,13 +1082,19 @@ export const ENUMS = {
     "published"
   ],
   "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.WorkflowFormView.properties.fieldStates.additionalProperties":
+    ["editable", "readonly", "masked", "hidden"],
   "components.schemas.WorkflowInstance.properties.status": [
     "running",
-    "approved"
+    "approved",
+    "returned",
+    "withdrawn"
   ],
   "components.schemas.WorkflowInstancePageEq.properties.status": [
     "running",
-    "approved"
+    "approved",
+    "returned",
+    "withdrawn"
   ],
   "components.schemas.WorkflowInstancePageSort.properties.field": [
     "id",
@@ -1091,12 +1109,36 @@ export const ENUMS = {
     ["readonly", "masked", "hidden"],
   "components.schemas.WorkflowInstanceRow.properties.status": [
     "running",
-    "approved"
+    "approved",
+    "returned",
+    "withdrawn"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.status": [
+    "waiting",
+    "pending",
+    "approved",
+    "cancelled",
+    "returned",
+    "copied",
+    "taken"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.type": [
+    "approve",
+    "copy",
+    "condition",
+    "parallel"
   ],
   "components.schemas.WorkflowRecordPageEq.properties.action": [
     "start",
     "approve",
-    "empty_pass"
+    "empty_pass",
+    "repeat_pass",
+    "reject",
+    "transfer",
+    "withdraw",
+    "resubmit",
+    "urge",
+    "timeout"
   ],
   "components.schemas.WorkflowRecordPageSort.properties.field": [
     "id",
@@ -1109,12 +1151,23 @@ export const ENUMS = {
   "components.schemas.WorkflowRecordRow.properties.action": [
     "start",
     "approve",
-    "empty_pass"
+    "empty_pass",
+    "repeat_pass",
+    "reject",
+    "transfer",
+    "withdraw",
+    "resubmit",
+    "urge",
+    "timeout"
   ],
+  "components.schemas.WorkflowTaskPageEq.properties.kind": ["approve", "copy"],
   "components.schemas.WorkflowTaskPageEq.properties.status": [
     "pending",
     "approved",
-    "cancelled"
+    "cancelled",
+    "rejected",
+    "transferred",
+    "copied"
   ],
   "components.schemas.WorkflowTaskPageSort.properties.field": [
     "id",
@@ -1124,9 +1177,13 @@ export const ENUMS = {
   "components.schemas.WorkflowTaskPageSort.properties.order": ["asc", "desc"],
   "components.schemas.WorkflowTaskRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowTaskRow.properties.kind": ["approve", "copy"],
   "components.schemas.WorkflowTaskRow.properties.status": [
     "pending",
     "approved",
-    "cancelled"
+    "cancelled",
+    "rejected",
+    "transferred",
+    "copied"
   ]
 } as const;

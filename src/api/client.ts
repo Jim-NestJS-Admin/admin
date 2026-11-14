@@ -2375,6 +2375,32 @@ export function createApiClient(
         config
       );
     },
+    workflowInstanceAttachment(
+      input: OperationInput<"workflowInstanceAttachment"> & {
+        body: OperationBody<"workflowInstanceAttachment">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceAttachment">>(
+        "post",
+        interpolate("/admin/workflow/instance/attachment", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    workflowInstanceDocument(
+      input: OperationInput<"workflowInstanceDocument"> & {
+        body: OperationBody<"workflowInstanceDocument">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDocument">>(
+        "post",
+        interpolate("/admin/workflow/instance/document", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowInstanceInfo(
       input: OperationInput<"workflowInstanceInfo"> & {
         body: OperationBody<"workflowInstanceInfo">;
@@ -2401,6 +2427,19 @@ export function createApiClient(
         config
       );
     },
+    workflowInstanceResubmit(
+      input: OperationInput<"workflowInstanceResubmit"> & {
+        body: OperationBody<"workflowInstanceResubmit">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceResubmit">>(
+        "post",
+        interpolate("/admin/workflow/instance/resubmit", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowInstanceSchema(
       input: OperationInput<"workflowInstanceSchema"> = {},
       config: PureHttpRequestConfig = {}
@@ -2421,6 +2460,32 @@ export function createApiClient(
       return transport.request<OperationResponse<"workflowInstanceStart">>(
         "post",
         interpolate("/admin/workflow/instance/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceUrge(
+      input: OperationInput<"workflowInstanceUrge"> & {
+        body: OperationBody<"workflowInstanceUrge">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceUrge">>(
+        "post",
+        interpolate("/admin/workflow/instance/urge", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceWithdraw(
+      input: OperationInput<"workflowInstanceWithdraw"> & {
+        body: OperationBody<"workflowInstanceWithdraw">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceWithdraw">>(
+        "post",
+        interpolate("/admin/workflow/instance/withdraw", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -2501,6 +2566,19 @@ export function createApiClient(
         config
       );
     },
+    workflowTaskReject(
+      input: OperationInput<"workflowTaskReject"> & {
+        body: OperationBody<"workflowTaskReject">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskReject">>(
+        "post",
+        interpolate("/admin/workflow/task/reject", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowTaskSchema(
       input: OperationInput<"workflowTaskSchema"> = {},
       config: PureHttpRequestConfig = {}
@@ -2508,6 +2586,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"workflowTaskSchema">>(
         "get",
         interpolate("/admin/workflow/task/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskTransfer(
+      input: OperationInput<"workflowTaskTransfer"> & {
+        body: OperationBody<"workflowTaskTransfer">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskTransfer">>(
+        "post",
+        interpolate("/admin/workflow/task/transfer", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
