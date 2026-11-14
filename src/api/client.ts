@@ -2374,6 +2374,143 @@ export function createApiClient(
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
+    },
+    workflowInstanceInfo(
+      input: OperationInput<"workflowInstanceInfo"> & {
+        body: OperationBody<"workflowInstanceInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceInfo">>(
+        "post",
+        interpolate("/admin/workflow/instance/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstancePage(
+      input: OperationInput<"workflowInstancePage"> & {
+        body: OperationBody<"workflowInstancePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstancePage">>(
+        "post",
+        interpolate("/admin/workflow/instance/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceSchema(
+      input: OperationInput<"workflowInstanceSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceSchema">>(
+        "get",
+        interpolate("/admin/workflow/instance/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceStart(
+      input: OperationInput<"workflowInstanceStart"> & {
+        body: OperationBody<"workflowInstanceStart">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceStart">>(
+        "post",
+        interpolate("/admin/workflow/instance/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordInfo(
+      input: OperationInput<"workflowRecordInfo"> & {
+        body: OperationBody<"workflowRecordInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordInfo">>(
+        "post",
+        interpolate("/admin/workflow/record/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordPage(
+      input: OperationInput<"workflowRecordPage"> & {
+        body: OperationBody<"workflowRecordPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordPage">>(
+        "post",
+        interpolate("/admin/workflow/record/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordSchema(
+      input: OperationInput<"workflowRecordSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordSchema">>(
+        "get",
+        interpolate("/admin/workflow/record/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskApprove(
+      input: OperationInput<"workflowTaskApprove"> & {
+        body: OperationBody<"workflowTaskApprove">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskApprove">>(
+        "post",
+        interpolate("/admin/workflow/task/approve", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskInfo(
+      input: OperationInput<"workflowTaskInfo"> & {
+        body: OperationBody<"workflowTaskInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskInfo">>(
+        "post",
+        interpolate("/admin/workflow/task/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskPage(
+      input: OperationInput<"workflowTaskPage"> & {
+        body: OperationBody<"workflowTaskPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskPage">>(
+        "post",
+        interpolate("/admin/workflow/task/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskSchema(
+      input: OperationInput<"workflowTaskSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskSchema">>(
+        "get",
+        interpolate("/admin/workflow/task/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
     }
   };
 }

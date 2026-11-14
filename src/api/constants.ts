@@ -115,7 +115,15 @@ export const PERMISSIONS = [
   "workflow:definition:info",
   "workflow:definition:page",
   "workflow:definition:publish",
-  "workflow:definition:update"
+  "workflow:definition:update",
+  "workflow:instance:add",
+  "workflow:instance:info",
+  "workflow:instance:page",
+  "workflow:record:info",
+  "workflow:record:page",
+  "workflow:task:approve",
+  "workflow:task:info",
+  "workflow:task:page"
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const OPERATION_PERMISSIONS = {
@@ -301,7 +309,18 @@ export const OPERATION_PERMISSIONS = {
   workflowDefinitionPage: ["workflow:definition:page"],
   workflowDefinitionPublish: ["workflow:definition:publish"],
   workflowDefinitionRevise: ["workflow:definition:update"],
-  workflowDefinitionSchema: ["workflow:definition:page"]
+  workflowDefinitionSchema: ["workflow:definition:page"],
+  workflowInstanceInfo: ["workflow:instance:info"],
+  workflowInstancePage: ["workflow:instance:page"],
+  workflowInstanceSchema: ["workflow:instance:page"],
+  workflowInstanceStart: ["workflow:instance:add"],
+  workflowRecordInfo: ["workflow:record:info"],
+  workflowRecordPage: ["workflow:record:page"],
+  workflowRecordSchema: ["workflow:record:page"],
+  workflowTaskApprove: ["workflow:task:approve"],
+  workflowTaskInfo: ["workflow:task:info"],
+  workflowTaskPage: ["workflow:task:page"],
+  workflowTaskSchema: ["workflow:task:page"]
 } as const;
 export const SCOPES = [] as const;
 export const ENUMS = {
@@ -1050,5 +1069,64 @@ export const ENUMS = {
     "draft",
     "published"
   ],
-  "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1]
+  "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.WorkflowInstance.properties.status": [
+    "running",
+    "approved"
+  ],
+  "components.schemas.WorkflowInstancePageEq.properties.status": [
+    "running",
+    "approved"
+  ],
+  "components.schemas.WorkflowInstancePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowInstancePageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.WorkflowInstanceRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowInstanceRow.properties.status": [
+    "running",
+    "approved"
+  ],
+  "components.schemas.WorkflowRecordPageEq.properties.action": [
+    "start",
+    "approve",
+    "empty_pass"
+  ],
+  "components.schemas.WorkflowRecordPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowRecordPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.WorkflowRecordRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowRecordRow.properties.action": [
+    "start",
+    "approve",
+    "empty_pass"
+  ],
+  "components.schemas.WorkflowTaskPageEq.properties.status": [
+    "pending",
+    "approved",
+    "cancelled"
+  ],
+  "components.schemas.WorkflowTaskPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowTaskPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.WorkflowTaskRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowTaskRow.properties.status": [
+    "pending",
+    "approved",
+    "cancelled"
+  ]
 } as const;
