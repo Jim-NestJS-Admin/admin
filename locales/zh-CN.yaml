@@ -548,6 +548,7 @@ pageConfig:
   date: 修改时间
   confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。
 forms:
+  unsupportedRichText: "当前表单不支持富文本控件"
   nameRequired: 请输入表单名称
   content: 表单内容
   settings: 表单设置

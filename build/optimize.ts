@@ -25,6 +25,7 @@ const include = [
  * 在预构建中强制排除的依赖项
  * 温馨提示：平台推荐的使用方式是哪里需要哪里引入而且都是单个的引入，不需要预构建，直接让浏览器加载就好
  */
-const exclude = ["@iconify/json"];
+// 设计器走Vue源码转换；避免预构建回到内嵌旧富文本编辑器的dist入口。
+const exclude = ["@iconify/json", "@form-create/designer"];
 
 export { include, exclude };

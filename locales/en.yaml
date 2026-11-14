@@ -548,6 +548,7 @@ pageConfig:
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
 forms:
+  unsupportedRichText: "Rich text fields are not supported in this form"
   nameRequired: Please enter a form name
   content: Form content
   settings: Form settings

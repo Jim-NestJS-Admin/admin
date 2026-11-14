@@ -131,6 +131,11 @@
     "pnpm": ">=9"
   },
   "pnpm": {
+    "overrides": {
+      "@form-create/designer>@form-create/component-wangeditor": "-",
+      "minimatch@>=9.0.0 <9.0.9": "9.0.9",
+      "brace-expansion@>=2.0.0 <2.1.8": "2.1.8"
+    },
     "allowedDeprecatedVersions": {
       "are-we-there-yet": "*",
       "sourcemap-codec": "*",
