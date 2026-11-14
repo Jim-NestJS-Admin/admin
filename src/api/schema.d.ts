@@ -3007,6 +3007,125 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/workflow/definition/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 创建流程第一版不可变草稿 */
+    post: operations["workflowDefinitionAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 流程定义详情 */
+    post: operations["workflowDefinitionInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/inspect": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 校验安全流程树及依赖并编译BPMN，不保存或分配编码 */
+    post: operations["workflowDefinitionInspect"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 流程定义分页列表 */
+    post: operations["workflowDefinitionPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/publish": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 复核依赖并发布固定流程修订，不发起审批 */
+    post: operations["workflowDefinitionPublish"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/revise": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 追加流程新版本，不修改旧修订或进行中实例 */
+    post: operations["workflowDefinitionRevise"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/workflow/definition/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 流程定义页面描述 */
+    get: operations["workflowDefinitionSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -3151,6 +3270,9 @@ export type components = {
       packageId: string;
       /** @description 备注 */
       remark?: Record<string, never> | null;
+    };
+    CreateWorkflowBody: {
+      data: components["schemas"]["WorkflowDefinitionInput"];
     };
     CrudSchema: {
       actions: components["schemas"]["CrudSchemaActions"];
@@ -3838,6 +3960,10 @@ export type components = {
       designer: components["schemas"]["FormDesignerDto"];
       fields: components["schemas"]["FormFieldDto"][];
     };
+    InspectWorkflowBody: {
+      designer: components["schemas"]["WorkflowDesignerDto"];
+      formDefinitionId: string;
+    };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
       captchaCode?: string;
@@ -4261,6 +4387,10 @@ export type components = {
       nickname: string;
       username: string;
     };
+    PublishWorkflowBody: {
+      id: string;
+      version: number;
+    };
     QueryConditionDto: {
       /** @description 可筛选字段（页面描述 query[].field） */
       field: string;
@@ -4309,6 +4439,11 @@ export type components = {
       baseRevision: number;
       data: components["schemas"]["FormDefinitionInput"];
       /** @description 作为修订来源的固定表单版本编号 */
+      definitionId: string;
+    };
+    ReviseWorkflowBody: {
+      baseRevision: number;
+      data: components["schemas"]["WorkflowDefinitionInput"];
       definitionId: string;
     };
     SaveBody: {
@@ -6662,6 +6797,185 @@ export type components = {
        */
       resource: string;
       version: number;
+    };
+    WorkflowDefinition: {
+      /** @description BPMN */
+      bpmn?: string;
+      /** @description 流程编码 */
+      code?: string;
+      /** @description 编译器版本 */
+      compilerVersion?: number;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 说明 */
+      description?: string;
+      /** @description 流程设计 */
+      designer?: components["schemas"]["WorkflowDesignerDto"];
+      /** @description 编译摘要 */
+      digest?: string;
+      /** @description 固定表单版本 */
+      formDefinitionId?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 流程名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 发布时间 */
+      publishedAt?: Record<string, never> | null;
+      /** @description 发布人 */
+      publishedBy?: Record<string, never> | null;
+      /** @description 流程版本 */
+      revision?: number;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "draft" | "published";
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    WorkflowDefinitionInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    WorkflowDefinitionInput: {
+      /** @default  */
+      description: string;
+      designer: components["schemas"]["WorkflowDesignerDto"];
+      formDefinitionId: string;
+      name: string;
+    };
+    WorkflowDefinitionPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["WorkflowDefinitionPageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["WorkflowDefinitionPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    WorkflowDefinitionPageEq: {
+      /** @description 流程编码 */
+      code?: string;
+      /** @description 固定表单版本 */
+      formDefinitionId?: string;
+      /** @description 流程版本 */
+      revision?: number;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "draft" | "published";
+    };
+    WorkflowDefinitionPageResult: {
+      list: components["schemas"]["WorkflowDefinitionRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    WorkflowDefinitionPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt" | "revision";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    WorkflowDefinitionRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description BPMN */
+      bpmn?: string;
+      /** @description 流程编码 */
+      code?: string;
+      /** @description 编译器版本 */
+      compilerVersion?: number;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 说明 */
+      description?: string;
+      /** @description 流程设计 */
+      designer?: components["schemas"]["WorkflowDesignerDto"];
+      /** @description 编译摘要 */
+      digest?: string;
+      /** @description 固定表单版本 */
+      formDefinitionId?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 流程名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 发布时间 */
+      publishedAt?: Record<string, never> | null;
+      /** @description 发布人 */
+      publishedBy?: Record<string, never> | null;
+      /** @description 流程版本 */
+      revision?: number;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "draft" | "published";
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    WorkflowDesignerDto: {
+      /** @description 安全流程节点树，结构见docs/contracts/workflow.md；不接收BPMN或脚本 */
+      nodes: {
+        [key: string]: unknown;
+      }[];
+      /** @enum {number} */
+      schemaVersion: 1;
+    };
+    WorkflowInspection: {
+      /** @description 仅由服务端生成的BPMN模板，执行需T38运行时服务 */
+      bpmn: string;
+      designer: components["schemas"]["WorkflowDesignerDto"];
+      digest: string;
+      nodeCount: number;
     };
     WriteBody: {
       id: string;
@@ -14468,6 +14782,367 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateWorkflowBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WorkflowDefinitionInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDefinitionRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionInspect: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["InspectWorkflowBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowInspection"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["WorkflowDefinitionPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDefinitionPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionPublish: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PublishWorkflowBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionRevise: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReviseWorkflowBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["WorkflowDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  workflowDefinitionSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
         };
       };
     };

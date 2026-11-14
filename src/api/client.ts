@@ -2285,6 +2285,95 @@ export function createApiClient(
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
+    },
+    workflowDefinitionAdd(
+      input: OperationInput<"workflowDefinitionAdd"> & {
+        body: OperationBody<"workflowDefinitionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionAdd">>(
+        "post",
+        interpolate("/admin/workflow/definition/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionInfo(
+      input: OperationInput<"workflowDefinitionInfo"> & {
+        body: OperationBody<"workflowDefinitionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionInfo">>(
+        "post",
+        interpolate("/admin/workflow/definition/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionInspect(
+      input: OperationInput<"workflowDefinitionInspect"> & {
+        body: OperationBody<"workflowDefinitionInspect">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionInspect">>(
+        "post",
+        interpolate("/admin/workflow/definition/inspect", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionPage(
+      input: OperationInput<"workflowDefinitionPage"> & {
+        body: OperationBody<"workflowDefinitionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionPage">>(
+        "post",
+        interpolate("/admin/workflow/definition/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionPublish(
+      input: OperationInput<"workflowDefinitionPublish"> & {
+        body: OperationBody<"workflowDefinitionPublish">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionPublish">>(
+        "post",
+        interpolate("/admin/workflow/definition/publish", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionRevise(
+      input: OperationInput<"workflowDefinitionRevise"> & {
+        body: OperationBody<"workflowDefinitionRevise">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionRevise">>(
+        "post",
+        interpolate("/admin/workflow/definition/revise", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionSchema(
+      input: OperationInput<"workflowDefinitionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionSchema">>(
+        "get",
+        interpolate("/admin/workflow/definition/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
     }
   };
 }

@@ -110,7 +110,12 @@ export const PERMISSIONS = [
   "system:user:info",
   "system:user:page",
   "system:user:reset-password",
-  "system:user:update"
+  "system:user:update",
+  "workflow:definition:add",
+  "workflow:definition:info",
+  "workflow:definition:page",
+  "workflow:definition:publish",
+  "workflow:definition:update"
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const OPERATION_PERMISSIONS = {
@@ -289,7 +294,14 @@ export const OPERATION_PERMISSIONS = {
   systemUserSupervisorPage: ["system:user-supervisor:page"],
   systemUserSupervisorSchema: ["system:user-supervisor:page"],
   systemUserSupervisorUpdate: ["system:user-supervisor:update"],
-  systemUserUpdate: ["system:user:update"]
+  systemUserUpdate: ["system:user:update"],
+  workflowDefinitionAdd: ["workflow:definition:add"],
+  workflowDefinitionInfo: ["workflow:definition:info"],
+  workflowDefinitionInspect: ["workflow:definition:info"],
+  workflowDefinitionPage: ["workflow:definition:page"],
+  workflowDefinitionPublish: ["workflow:definition:publish"],
+  workflowDefinitionRevise: ["workflow:definition:update"],
+  workflowDefinitionSchema: ["workflow:definition:page"]
 } as const;
 export const SCOPES = [] as const;
 export const ENUMS = {
@@ -1013,5 +1025,30 @@ export const ENUMS = {
   "components.schemas.SystemUserSupervisorRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
   "components.schemas.TenantHintResult.properties.mode": ["domain", "code"],
-  "components.schemas.TokenResult.properties.tokenType": ["Bearer"]
+  "components.schemas.TokenResult.properties.tokenType": ["Bearer"],
+  "components.schemas.WorkflowDefinition.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDefinitionPageEq.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDefinitionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "components.schemas.WorkflowDefinitionPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.WorkflowDefinitionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowDefinitionRow.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1]
 } as const;
