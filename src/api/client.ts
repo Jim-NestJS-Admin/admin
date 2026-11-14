@@ -522,6 +522,19 @@ export function createApiClient(
         config
       );
     },
+    formSubmissionMine(
+      input: OperationInput<"formSubmissionMine"> & {
+        body: OperationBody<"formSubmissionMine">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionMine">>(
+        "post",
+        interpolate("/admin/form/submission/mine", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     formSubmissionPage(
       input: OperationInput<"formSubmissionPage"> & {
         body: OperationBody<"formSubmissionPage">;
@@ -2299,6 +2312,21 @@ export function createApiClient(
         config
       );
     },
+    workflowDefinitionAvailable(
+      input: OperationInput<"workflowDefinitionAvailable"> & {
+        body: OperationBody<"workflowDefinitionAvailable">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowDefinitionAvailable">
+      >(
+        "post",
+        interpolate("/admin/workflow/definition/available", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowDefinitionInfo(
       input: OperationInput<"workflowDefinitionInfo"> & {
         body: OperationBody<"workflowDefinitionInfo">;
@@ -2375,6 +2403,19 @@ export function createApiClient(
         config
       );
     },
+    workflowDirectoryPage(
+      input: OperationInput<"workflowDirectoryPage"> & {
+        body: OperationBody<"workflowDirectoryPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDirectoryPage">>(
+        "post",
+        interpolate("/admin/workflow/directory/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowInstanceAttachment(
       input: OperationInput<"workflowInstanceAttachment"> & {
         body: OperationBody<"workflowInstanceAttachment">;
@@ -2423,6 +2464,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"workflowInstancePage">>(
         "post",
         interpolate("/admin/workflow/instance/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstancePreview(
+      input: OperationInput<"workflowInstancePreview"> & {
+        body: OperationBody<"workflowInstancePreview">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstancePreview">>(
+        "post",
+        interpolate("/admin/workflow/instance/preview", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

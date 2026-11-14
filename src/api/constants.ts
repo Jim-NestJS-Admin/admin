@@ -116,6 +116,7 @@ export const PERMISSIONS = [
   "workflow:definition:page",
   "workflow:definition:publish",
   "workflow:definition:update",
+  "workflow:directory:page",
   "workflow:instance:add",
   "workflow:instance:info",
   "workflow:instance:page",
@@ -174,6 +175,7 @@ export const OPERATION_PERMISSIONS = {
   formDefinitionValidate: ["form:definition:validate"],
   formSubmissionAdd: ["form:submission:add"],
   formSubmissionInfo: ["form:submission:info"],
+  formSubmissionMine: ["form:submission:page"],
   formSubmissionPage: ["form:submission:page"],
   formSubmissionSchema: ["form:submission:page"],
   platformPackageAdd: ["platform:package:add"],
@@ -309,16 +311,19 @@ export const OPERATION_PERMISSIONS = {
   systemUserSupervisorUpdate: ["system:user-supervisor:update"],
   systemUserUpdate: ["system:user:update"],
   workflowDefinitionAdd: ["workflow:definition:add"],
+  workflowDefinitionAvailable: ["workflow:instance:add"],
   workflowDefinitionInfo: ["workflow:definition:info"],
   workflowDefinitionInspect: ["workflow:definition:info"],
   workflowDefinitionPage: ["workflow:definition:page"],
   workflowDefinitionPublish: ["workflow:definition:publish"],
   workflowDefinitionRevise: ["workflow:definition:update"],
   workflowDefinitionSchema: ["workflow:definition:page"],
+  workflowDirectoryPage: ["workflow:directory:page"],
   workflowInstanceAttachment: ["workflow:instance:info"],
   workflowInstanceDocument: ["workflow:instance:info"],
   workflowInstanceInfo: ["workflow:instance:info"],
   workflowInstancePage: ["workflow:instance:page"],
+  workflowInstancePreview: ["workflow:instance:info"],
   workflowInstanceResubmit: ["workflow:instance:resubmit"],
   workflowInstanceSchema: ["workflow:instance:page"],
   workflowInstanceStart: ["workflow:instance:add"],
@@ -1057,6 +1062,30 @@ export const ENUMS = {
     ["readonly", "masked", "hidden"],
   "components.schemas.TenantHintResult.properties.mode": ["domain", "code"],
   "components.schemas.TokenResult.properties.tokenType": ["Bearer"],
+  "components.schemas.WorkflowActor.properties.type": [
+    "users",
+    "roles",
+    "department_leader",
+    "supervisor",
+    "self_select",
+    "applicant"
+  ],
+  "components.schemas.WorkflowConditionGroup.properties.logic": ["all", "any"],
+  "components.schemas.WorkflowConditionValue.properties.operator": [
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "not_in"
+  ],
+  "components.schemas.WorkflowConditionValue.properties.source": [
+    "field",
+    "applicant_org",
+    "applicant_role"
+  ],
   "components.schemas.WorkflowDefinition.properties.status": [
     "draft",
     "published"
@@ -1082,6 +1111,11 @@ export const ENUMS = {
     "published"
   ],
   "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.WorkflowDirectoryBody.properties.kind": [
+    "users",
+    "roles",
+    "orgs"
+  ],
   "components.schemas.WorkflowFormView.properties.fieldStates.additionalProperties":
     ["editable", "readonly", "masked", "hidden"],
   "components.schemas.WorkflowInstance.properties.status": [
@@ -1112,6 +1146,25 @@ export const ENUMS = {
     "approved",
     "returned",
     "withdrawn"
+  ],
+  "components.schemas.WorkflowNode.properties.empty": [
+    "pass",
+    "administrator",
+    "stop"
+  ],
+  "components.schemas.WorkflowNode.properties.fieldPermissions.additionalProperties":
+    ["editable", "readonly", "masked", "hidden"],
+  "components.schemas.WorkflowNode.properties.mode": [
+    "sequential",
+    "all",
+    "any"
+  ],
+  "components.schemas.WorkflowNode.properties.rejectTo": ["applicant"],
+  "components.schemas.WorkflowNode.properties.type": [
+    "approve",
+    "copy",
+    "condition",
+    "parallel"
   ],
   "components.schemas.WorkflowProgressNode.properties.status": [
     "waiting",
@@ -1185,5 +1238,9 @@ export const ENUMS = {
     "rejected",
     "transferred",
     "copied"
+  ],
+  "components.schemas.WorkflowTimeout.properties.action": [
+    "remind",
+    "supervisor"
   ]
 } as const;

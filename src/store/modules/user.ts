@@ -20,6 +20,7 @@ export const useUserStore = defineStore("admin-user", {
   state: () => ({
     avatar: "",
     username: "",
+    userId: "",
     nickname: "",
     roles: [] as string[],
     superAdmin: false,
@@ -64,6 +65,7 @@ export const useUserStore = defineStore("admin-user", {
       this.accessToken = session.accessToken;
       this.expiresAt = session.expiresAt;
       this.username = session.user.username;
+      this.userId = session.user.id;
       this.nickname = session.user.nickname ?? "";
       this.superAdmin = session.superAdmin === true;
       this.tenant = session.tenant ?? null;
@@ -84,6 +86,7 @@ export const useUserStore = defineStore("admin-user", {
       this.accessToken = "";
       this.expiresAt = 0;
       this.username = "";
+      this.userId = "";
       this.nickname = "";
       this.roles = [];
       this.superAdmin = false;

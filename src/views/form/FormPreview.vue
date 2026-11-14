@@ -7,6 +7,7 @@ import formCreate, {
   type Rule as FcRule
 } from "@form-create/element-ui";
 import { api } from "@/api/client";
+import type { components } from "@/api/schema";
 import { permission } from "@/platform/system/resources";
 import {
   cleanPreviewValues,
@@ -26,7 +27,9 @@ const props = defineProps<{
   definitionId?: string;
   submit?: boolean;
 }>();
-const emit = defineEmits<{ submitted: [] }>();
+const emit = defineEmits<{
+  submitted: [record: components["schemas"]["FormSubmissionRow"]];
+}>();
 const { t } = useI18n();
 let mutationIntent = "",
   mutationKey = "";
@@ -125,11 +128,11 @@ async function validate() {
         mutationIntent = intent;
         mutationKey = crypto.randomUUID();
       }
-      await api.formSubmissionAdd(
+      const response = await api.formSubmissionAdd(
         { body: { data } },
         { signal: current.signal, headers: { "Idempotency-Key": mutationKey } }
       );
-      if (!current.signal.aborted) emit("submitted");
+      if (!current.signal.aborted) emit("submitted", response.data);
     } else
       await api.formDefinitionValidate(
         {
