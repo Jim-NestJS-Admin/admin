@@ -119,6 +119,7 @@ admin:
   accountPlaceholder: 请输入账号
   passwordPlaceholder: 请输入密码
 crud:
+  generatedHint: 保存后自动生成
   title: 数据列表
   add: 新增
   edit: 编辑
@@ -546,6 +547,209 @@ pageConfig:
   changedBy: 修改人
   date: 修改时间
   confirmChange: 确定应用此配置变更吗？当前版本会保留在历史中。
+forms:
+  unsupportedRichText: "当前表单不支持富文本控件"
+  nameRequired: 请输入表单名称
+  content: 表单内容
+  settings: 表单设置
+  addFieldHint: 表单中还没有字段。请到“设计表单”中拖入至少一个控件，再检查或保存。
+  newForm: 新建表单
+  newRevision: 创建新版本
+  back: 返回列表
+  name: 表单名称
+  code: 表单编码
+  codeHint: 小写字母开头，可含数字和下划线
+  design: 设计表单
+  fields: 字段清单
+  preview: 填写预览
+  linkages: 条件联动
+  check: 检查表单
+  checked: 表单检查通过，字段清单已更新
+  saveFirst: 保存第一版
+  saveRevision: 保存新版本
+  saved: 表单版本已保存
+  immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
+  versionListHint: 每条记录都是一个保留的表单版本
+  searchHint: 搜索名称或编码
+  empty: 暂无表单，点击“新建表单”开始设计
+  revision: 版本
+  createdAt: 创建时间
+  fieldCount: 字段数
+  view: 查看与试填
+  records: 共 {n} 个版本
+  availableFields: 可用字段
+  fieldKey: 字段标识
+  fieldTitle: 字段名称
+  fieldHint: 填写说明
+  fieldNumber: 第 {n} 个字段
+  required: 必填
+  multilingual: 多语言字段
+  queryable: 可用于查询
+  options: 选项
+  optionLabel: 选项名称
+  optionValue: 保存值
+  addOption: 添加选项
+  optionOne: 选项一
+  optionTwo: 选项二
+  inputType: 输入方式
+  maxLength: 最长字符数
+  min: 最小值
+  max: 最大值
+  precision: 小数位数
+  multiple: 多选
+  placeholder: 输入提示
+  component: 控件
+  constraints: 校验范围
+  yes: 是
+  no: 否
+  checkFirst: 点击“检查表单”生成字段清单
+  fieldListHint: 字段清单由后端解析生成；修改设计后请重新检查。
+  invalidDesign: 无法读取当前设计，请检查字段设置后重试。
+  unavailable: 当前没有查看完整表单设计的权限。
+  unsavedChanges: 当前修改尚未保存，确定返回并丢弃修改吗？
+  reloadLatest: 载入最新版本
+  reloadLatestHint: 将丢弃当前修改，并基于最新版本重新设计，确定继续吗？
+  previewFirst: 点击“填写预览”，检查设计后查看效果
+  unsavedPreview: 这是未保存的设计预览。保存后可运行后端填写校验。
+  testHint: 仅供试填和校验，填写内容不会保存。
+  validateValues: 校验填写内容
+  valid: 填写校验通过，测试内容未保存。
+  linkageHint: 先检查表单更新字段清单，再配置条件。联动只能指向后面的字段。
+  refreshFields: 更新字段清单
+  noLinkages: 暂未配置条件联动
+  condition: 条件 {n}
+  source: 当字段
+  operator: 满足条件
+  compareValue: 比较值
+  target: 目标字段
+  action: 执行动作
+  whenTrue: 条件成立时
+  whenFalse: 条件不成立时
+  addCondition: 添加条件
+  operators:
+    eq: 等于
+    ne: 不等于
+    in: 属于以下任一项
+  actions:
+    visible: 显示字段
+    required: 设为必填
+    options: 限定选项
+  components:
+    input: 文本输入
+    inputNumber: 数值输入
+    switch: 开关
+    select: 下拉选择
+    radio: 单选
+    checkbox: 多选
+    datePicker: 日期
+  inputTypes:
+    text: 单行文本
+    textarea: 多行文本
+    password: 密码
+    email: 邮箱
+    url: 网址
+codeRules:
+  validation:
+    emptySegments: 请至少添加一个编码段，并将流水号放在最后。
+    tooManySegments: 编码段最多只能配置4段。
+    invalidSegment: 存在不支持的编码段，请重新选择。
+    sequenceLast: 必须包含一个流水号，且流水号必须放在最后。
+    duplicateSegment: 日期段和时间戳段各只能添加一个。
+    literal: 第{index}段固定文本须为1–16位字母、数字、下划线或短横线。
+    date: 请选择第{index}段的有效日期格式。
+    timestamp: 请选择第{index}段使用秒级还是毫秒级时间戳。
+    width: 流水位宽必须是1–12之间的整数。
+    length: 编码总长度不能超过64位。
+    start: 起始值必须为大于或等于1的整数，最多12位，不能以0开头。
+    overflow: 起始值不能超过{width}位流水号的最大值{maximum}。
+    period: 请选择有效的重置周期。
+    coverage: 日期段须完整包含重置周期：年用yyyy，月用yyyyMM，日用yyyyMMdd。
+    timezone: 请选择有效的系统时区。
+    code: 规则编码须为2–64位，以小写字母开头，只能包含小写字母、数字和下划线。
+    name: 请填写规则名称，最多100个字符，不能全部为空格。
+    description: 说明不能超过500个字符。
+    status: 请选择启用或停用。
+  businessVersion: 规则版本
+  historicalInactive: 历史版本不参与发号
+  savedStatus: 保存时状态
+  timeZoneNameLoading: 正在加载时区名称…
+  timeZoneNameFailed: 时区名称加载失败
+  historyNotRecorded: 历史未记录
+  currentVersion: 当前版本
+  historicalVersion: 历史版本 · 只读
+  returnCurrent: 返回当前版本
+  historyReadonlyHint: 正在查看历史信息，不会修改或恢复当前规则。
+  savedAt: 版本保存时间
+  previewPeriod: 本次预览周期
+  snapshot:
+    code: 规则编码
+    name: 规则名称
+    description: 说明
+    timezone: 时区
+    resetPeriod: 重置周期
+    start: 起始值
+    status: 状态
+    segments: 编码段
+  period:
+    never: 不重置
+    year: 每年
+    month: 每月
+    day: 每天
+  usageConfig: 用途配置
+  selectRuleLabel: 编码规则
+  selectTarget: 搜索并选择业务及目标字段
+  bindingLocation: 绑定位置
+  noCurrentBinding: 当前未绑定
+  bindingsLoadFailed: 绑定信息加载失败，请刷新
+  ruleAlreadyBound: 已绑定到“{target}”，不能再绑定其他字段。
+  ruleUnavailable: 该规则已停用或曾经绑定过，不能作为新绑定规则。请选择或新建一条启用的全新规则。
+  bindSelectionConfirm: 确认将规则“{rule}”绑定到“{target}”？如该字段已有规则，将进行换绑；已有编码保持不变，新规则必须从未绑定且使用新前缀。
+  bindSaved: 绑定已保存
+  more: 更多
+  copy: 复制规则
+  sequenceRecords: 序号记录
+  snapshotReadonly: 历史快照 · 只读
+  timeZoneSearch: 搜索中文城市、英文名称或IANA标识
+  commonTimeZones: 常用时区
+  allTimeZones: 其他时区
+  savedTimeZone: 当前保存值
+  legacyTimeZone: 当前时区不在目录中，保留原值；如需更改，请选择系统目录中的时区。
+  retryTimeZones: 重新加载时区
+  previewLabel: 格式预览
+  timestamp: 时间戳
+  seconds: 秒级时间戳
+  milliseconds: 毫秒级时间戳
+  enabled: 启用
+  disabled: 禁用
+  dragHint: 拖动左侧手柄调整顺序，也可聚焦手柄后按上下方向键；流水号固定在最后。最多4段，周期重置须包含完整日期。
+  dragSegment: 拖动排序；上下方向键也可移动
+  sequenceFixed: 流水号固定在最后
+  digits: 位
+  codeHint: 2–64位，以小写字母开头，只能包含小写字母、数字和下划线。保存后不可修改。
+  codeExample: 例如 test_code
+  configPreview: 检查格式与示例
+  configPreviewHint: 格式示例从起始值计算，不占用号码；实际后续编码请在详情中预览。
+  rules: 规则管理
+  bindings: 用途绑定
+  sequences: 序号监控
+  segmentHint: 最多4段，流水号必须放在最后；按周期重置时必须包含完整日期。
+  literal: 固定文本
+  date: 日期
+  sequence: 流水号
+  width: 流水位宽
+  up: 上移
+  down: 下移
+  start: 起始值
+  preview: 预计下一批编码
+  history: 版本历史
+  previewHint: 按当前周期的下一序号预估，尚未发号则从起始值计算；不占号、不预留，实际以保存时为准。
+  bind: 保存绑定
+  bindConfirm: 确认保存用途绑定？规则首次绑定后不能被其他用途重新使用；换绑必须采用全新规则和未占用的前缀。
+  bindHint: 业务保存时自动使用所绑定的规则。换绑只允许全新规则与新前缀；已有编码保持不变。
+  selectRule: 搜索并选择启用的规则
+  bound: 当前规则
+  unbound: 尚未绑定
+  maxLength: 最长字符数
 platform:
   adminUsername: 管理员账号
   adminPassword: 管理员密码
@@ -564,3 +768,207 @@ platform:
   menuHint: 勾选这个套餐可用的菜单和按钮；平台专用菜单不会出现在这里
   menuCount: 已选 {count} 项
   loadFailed: 加载失败，可重新打开
+
+autoCodes:
+  correctFields: 请先补全必填项，并修正标红字段。
+  target: 目标字段
+  bindFields: 字段编码规则
+  noFields: 当前没有可绑定的自动编码字段，请先保存表单设计或部署声明了自动编码字段的业务模块。
+  fieldMode: 自动编码
+  manual: 手动填写
+  charset: 编号字符集
+  dynamicField: 自动编号（仅普通文本）
+  designerHint: 保存时生成；最多64位。保存设计后，由管理员在“编码规则→用途配置”选择该表单字段并绑定规则。自动编号不能设默认值或参与联动。
+  codegenHint: 自动设为非空、唯一文本，长度最多64位。“不限制字符集”仍遵循编码规则本身的格式约束。生成模块并注册后，由管理员在“编码规则→用途配置”选择业务字段并绑定规则。
+  submit: 提交并保存
+  submitHint: 正式保存填写内容，自动编号在同一事务中生成；提交后内容与编号保持不变。
+  submissions: 提交记录
+  fill: 填写提交
+  saved: 提交已保存
+  values: 填写内容
+  charsets:
+    unrestricted: 不限制字符集
+    upper_alnum: 大写字母、数字及分隔符
+    lower_slug: 小写字母、数字及下划线
+    digits: 纯数字
+
+workflow:
+  create: "新建流程"
+  viewDefinition: "流程定义详情"
+  viewDesign: "查看设计"
+  revise: "创建新版本"
+  publish: "发布流程"
+  publishConfirm: "发布后可用于发起审批；进行中的申请继续使用原版本。确认发布此版本？"
+  published: "流程已发布"
+  saveDraft: "保存草稿"
+  savedDraft: "草稿已保存，可在详情中发布"
+  name: "流程名称"
+  description: "说明"
+  formVersion: "绑定表单版本"
+  immutableHint: "每次保存创建新版本；已发布版本和进行中的审批保持不变。首次创建前，请在“编码规则”的用途配置中绑定“流程定义编码”。"
+  nodeSettings: "节点配置"
+  selectNode: "点击左侧节点配置审批人、条件和权限"
+  startApplicant: "发起人"
+  end: "流程结束"
+  nodeName: "节点名称"
+  actorSource: "办理人来源"
+  people: "选择成员或角色"
+  level: "第几级"
+  emptyPolicy: "没有可用审批人时"
+  approvalMode: "多人审批方式"
+  skipRepeated: "相邻节点重复审批人自动通过"
+  timeout: "启用超时处理"
+  timeoutMinutes: "超时分钟数"
+  timeoutAction: "超时动作"
+  remind: "提醒当前审批人"
+  transferSupervisor: "自动转交上级；无上级时提醒"
+  fieldPermissions: "节点字段权限"
+  fieldPermissionHint: "仅显式配置的字段获得节点授权；不超过系统委派上限。自动编号、抄送和已办不可编辑。"
+  branch: "分支"
+  branchName: "分支名称"
+  defaultBranch: "默认分支"
+  addBranch: "添加分支"
+  removeBranch: "删除分支"
+  addNode: "添加节点"
+  remove: "删除"
+  moveUp: "上移"
+  moveDown: "下移"
+  addCondition: "添加条件"
+  addGroup: "添加条件组"
+  allConditions: "满足全部条件"
+  anyConditions: "满足任一条件"
+  inspect: "检查流程"
+  inspectionPassed: "流程配置校验通过；尚未保存或发布"
+  needName: "请输入流程名称"
+  needForm: "请选择绑定的表单版本"
+  needApproval: "请至少添加一个审批节点"
+  needNodeName: "请填写每个节点的名称"
+  needPeople: "请选择至少一名成员或一个角色"
+  needBranchName: "请填写每条分支的名称"
+  correctFields: "请补全下列配置"
+  designHidden: "当前账号无权查看该版本的流程设计"
+  unavailableChoice: "选项已失效或无权查看"
+  searchChoice: "输入名称搜索选择"
+  loadMore: "加载更多"
+  retry: "重试"
+  leave: "关闭"
+  discardConfirm: "有尚未保存的内容，确认关闭并放弃？"
+  startApplication: "发起申请"
+  selectWorkflow: "选择已发布流程"
+  fillApplication: "填写申请"
+  fillNew: "新建填写"
+  useSubmission: "使用已有提交"
+  mySubmission: "本人的表单提交"
+  submissionReady: "填写已保存，请点击“发起申请”完成发起"
+  savedSubmissionHint: "填写记录已保存，但申请尚未发起。关闭后可选择“使用已有提交”继续，确认关闭？"
+  startHint: "提交记录与流程绑定的表单版本必须一致；保存填写和发起审批分两步，发起失败时可沿用已保存的提交重试。"
+  started: "申请已发起"
+  handle: "办理"
+  applicationDetail: "审批详情"
+  round: "轮次"
+  progressTitle: "流程进度"
+  chosenBranch: "已选择"
+  records: "审批记录"
+  formValues: "填写内容"
+  noVisibleFields: "当前没有可查看的表单字段"
+  requiredField: "请填写“{field}”"
+  action: "办理动作"
+  comment: "意见"
+  attachments: "附件"
+  attachment: "审批附件"
+  uploadAttachment: "上传附件"
+  attachmentHint: "最多10个，沿用文件模块的类型与大小限制；取消办理不会自动删除已上传文件。"
+  transferTarget: "转交给"
+  needTarget: "请选择转交接收人"
+  actionConfirm: "确认执行“{action}”？"
+  actionDone: "操作已完成"
+  nodes:
+    approve: "审批人"
+    copy: "抄送人"
+    condition: "条件分支"
+    parallel: "并行分支"
+  actors:
+    users: "指定成员"
+    roles: "指定角色"
+    department_leader: "发起人部门负责人"
+    supervisor: "发起人的上级"
+    self_select: "发起人自选"
+    applicant: "发起人本人"
+  modes:
+    sequential: "依次审批"
+    all: "会签（全部同意）"
+    any: "或签（一人同意）"
+  empty:
+    stop: "报错停止，由管理员处理"
+    pass: "自动通过并记录原因"
+    administrator: "转交当前组织适用的管理员"
+  fields:
+    normal: "沿用本人权限（最多只读）"
+    editable: "可编辑"
+    readonly: "只读"
+    masked: "脱敏"
+    hidden: "隐藏"
+  sources:
+    field: "表单字段"
+    applicant_org: "发起人组织"
+    applicant_role: "发起人角色"
+  operators:
+    eq: "等于"
+    ne: "不等于"
+    gt: "大于"
+    gte: "大于等于"
+    lt: "小于"
+    lte: "小于等于"
+    in: "属于任一值"
+    not_in: "不属于任一值"
+  tabs:
+    pending: "我的待办"
+    processed: "我已处理"
+    mine: "我发起的"
+    copy: "抄送我的"
+  actions:
+    approve: "同意"
+    reject: "驳回给申请人"
+    transfer: "转交"
+    withdraw: "撤回申请"
+    resubmit: "重新提交"
+    urge: "催办"
+  instanceStatus:
+    running: "审批中"
+    approved: "已通过"
+    returned: "已退回"
+    withdrawn: "已撤回"
+  progress:
+    waiting: "未进入"
+    pending: "处理中"
+    approved: "已通过"
+    cancelled: "已取消"
+    returned: "已退回"
+    copied: "已抄送"
+    taken: "已选路"
+
+memberPicker:
+  title: "选择成员"
+  choose: "点击选择成员"
+  organizations: "部门组织"
+  members: "人员列表"
+  searchOrg: "搜索部门"
+  searchMember: "搜索成员姓名"
+  search: "搜索"
+  allMembers: "全部成员"
+  includeChildren: "包含子部门"
+  noOrganizations: "暂无可用部门"
+  noMembers: "未找到可选成员"
+  name: "姓名"
+  selectPage: "选择本页成员"
+  selectMember: "选择成员 {name}"
+  selected: "已选成员"
+  selectedCount: "已选 {count} 人，最多 {limit} 人"
+  clear: "清空已选"
+  noneSelected: "尚未选择成员"
+  loadingMember: "正在加载成员姓名"
+  unavailableMember: "已失效成员（编号 {id}）"
+  invalidSelection: "请移除失效成员，并确保未超过选择人数上限。"
+  retry: "重试"
+  cancel: "取消"
+  confirm: "确定"

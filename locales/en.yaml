@@ -119,6 +119,7 @@ admin:
   accountPlaceholder: Enter your account
   passwordPlaceholder: Enter your password
 crud:
+  generatedHint: Generated when saved
   title: Records
   add: Add
   edit: Edit
@@ -546,6 +547,209 @@ pageConfig:
   changedBy: Changed by
   date: Changed at
   confirmChange: Apply this change? The current version will remain in history.
+forms:
+  unsupportedRichText: "Rich text fields are not supported in this form"
+  nameRequired: Please enter a form name
+  content: Form content
+  settings: Form settings
+  addFieldHint: This form has no fields. Drag at least one control into Design before checking or saving.
+  newForm: New form
+  newRevision: New version
+  back: Back to list
+  name: Form name
+  code: Form code
+  codeHint: Lowercase letter first, then letters, numbers or underscores
+  design: Design
+  fields: Fields
+  preview: Fill preview
+  linkages: Conditions
+  check: Check form
+  checked: Form checked and field list updated
+  saveFirst: Save first version
+  saveRevision: Save new version
+  saved: Form version saved
+  immutableHint: Saving a new version preserves historical versions and submitted data.
+  versionListHint: Each record is a preserved form version
+  searchHint: Search name or code
+  empty: No forms yet. Create a form to get started.
+  revision: Version
+  createdAt: Created at
+  fieldCount: Fields
+  view: View and try
+  records: "{n} versions"
+  availableFields: Available fields
+  fieldKey: Field key
+  fieldTitle: Field label
+  fieldHint: Help text
+  fieldNumber: Field {n}
+  required: Required
+  multilingual: Multilingual field
+  queryable: Available for querying
+  options: Options
+  optionLabel: Option label
+  optionValue: Stored value
+  addOption: Add option
+  optionOne: Option one
+  optionTwo: Option two
+  inputType: Input type
+  maxLength: Maximum length
+  min: Minimum
+  max: Maximum
+  precision: Decimal places
+  multiple: Multiple selection
+  placeholder: Placeholder
+  component: Component
+  constraints: Validation limits
+  yes: Yes
+  no: No
+  checkFirst: Check the form to generate its field list
+  fieldListHint: Fields are parsed by the server. Check again after changing the design.
+  invalidDesign: Unable to read this design. Check the field settings and retry.
+  unavailable: You do not have access to the complete form design.
+  unsavedChanges: Discard unsaved changes and return to the list?
+  reloadLatest: Load latest version
+  reloadLatestHint: Discard this draft and start from the latest version?
+  previewFirst: Open Fill preview to check the design and see the result
+  unsavedPreview: This design is not saved. Save it to test server validation.
+  testHint: Test filling and validation only. Values will not be saved.
+  validateValues: Validate values
+  valid: Validation passed. Test values were not saved.
+  linkageHint: Refresh the field list first. Conditions may only target later fields.
+  refreshFields: Refresh fields
+  noLinkages: No conditions configured
+  condition: Condition {n}
+  source: When field
+  operator: Matches
+  compareValue: Compare value
+  target: Target field
+  action: Action
+  whenTrue: When matched
+  whenFalse: When not matched
+  addCondition: Add condition
+  operators:
+    eq: Equals
+    ne: Does not equal
+    in: Is one of
+  actions:
+    visible: Show field
+    required: Require field
+    options: Limit options
+  components:
+    input: Text input
+    inputNumber: Number input
+    switch: Switch
+    select: Select
+    radio: Radio
+    checkbox: Checkboxes
+    datePicker: Date
+  inputTypes:
+    text: Single line
+    textarea: Multiple lines
+    password: Password
+    email: Email
+    url: URL
+codeRules:
+  validation:
+    emptySegments: Add at least one segment and place the sequence last.
+    tooManySegments: Use no more than four segments.
+    invalidSegment: Select a supported segment type.
+    sequenceLast: Include exactly one sequence segment and place it last.
+    duplicateSegment: Use at most one date and one timestamp segment.
+    literal: Literal segment {index} must contain 1–16 letters, digits, underscores or hyphens.
+    date: Select a valid date format for segment {index}.
+    timestamp: Select seconds or milliseconds for timestamp segment {index}.
+    width: Sequence width must be an integer from 1 to 12.
+    length: Total code length must not exceed 64 characters.
+    start: Start must be a positive integer with up to 12 digits and no leading zero.
+    overflow: Start must not exceed {maximum} for a {width}-digit sequence.
+    period: Select a valid reset period.
+    coverage: "Include the complete reset period in the date segment: yyyy for year, yyyyMM for month, yyyyMMdd for day."
+    timezone: Select a valid system time zone.
+    code: Rule code must be 2–64 characters, start with a lowercase letter, and contain only lowercase letters, digits and underscores.
+    name: Enter a non-blank rule name with no more than 100 characters.
+    description: Description must not exceed 500 characters.
+    status: Select enabled or disabled.
+  businessVersion: Rule version
+  historicalInactive: Historical version · not used for allocation
+  savedStatus: Status when saved
+  timeZoneNameLoading: Loading time zone name…
+  timeZoneNameFailed: Failed to load time zone name
+  historyNotRecorded: Not recorded in history
+  currentVersion: Current version
+  historicalVersion: Historical version · read-only
+  returnCurrent: Back to current version
+  historyReadonlyHint: Viewing historical information does not modify or restore the current rule.
+  savedAt: Version saved at
+  previewPeriod: Preview period
+  snapshot:
+    code: Rule code
+    name: Rule name
+    description: Description
+    timezone: Time zone
+    resetPeriod: Reset period
+    start: Start
+    status: Status
+    segments: Segments
+  period:
+    never: Never
+    year: Yearly
+    month: Monthly
+    day: Daily
+  usageConfig: Usage configuration
+  selectRuleLabel: Code rule
+  selectTarget: Search and select a business field
+  bindingLocation: Bound to
+  noCurrentBinding: No current binding
+  bindingsLoadFailed: Could not load bindings. Refresh to retry.
+  ruleAlreadyBound: "Already bound to “{target}”; another field cannot use this rule."
+  ruleUnavailable: This rule is disabled or has been bound before. Choose or create a fresh enabled rule.
+  bindSelectionConfirm: "Bind “{rule}” to “{target}”? This replaces any existing rule for the field. Existing codes stay unchanged; a replacement rule must be fresh and use a new prefix."
+  bindSaved: Binding saved
+  more: More
+  copy: Copy rule
+  sequenceRecords: Sequence records
+  snapshotReadonly: Historical snapshot · read-only
+  timeZoneSearch: Search city names or IANA identifiers
+  commonTimeZones: Common time zones
+  allTimeZones: Other time zones
+  savedTimeZone: Saved value
+  legacyTimeZone: This saved time zone is not in the current catalog. It is preserved until you select a replacement.
+  retryTimeZones: Reload time zones
+  previewLabel: Format preview
+  timestamp: Timestamp
+  seconds: Unix seconds
+  milliseconds: Unix milliseconds
+  enabled: Enabled
+  disabled: Disabled
+  dragHint: Drag the left handle or focus it and use arrow keys. Sequence stays last. Up to four segments; resets require a complete date.
+  dragSegment: Drag to reorder, or use up and down arrow keys
+  sequenceFixed: Sequence stays last
+  digits: digits
+  codeHint: 2–64 characters. Start with a lowercase letter; use lowercase letters, digits and underscores only. Cannot be changed after saving.
+  codeExample: e.g. test_code
+  configPreview: Check format and examples
+  configPreviewHint: Examples start at the configured start value and consume no numbers. Preview actual next codes in details.
+  rules: Rules
+  bindings: Usage bindings
+  sequences: Sequences
+  segmentHint: Up to four segments. Sequence must be last. Periodic resets require a complete date.
+  literal: Fixed text
+  date: Date
+  sequence: Sequence
+  width: Sequence width
+  up: Move up
+  down: Move down
+  start: Start
+  preview: Preview next codes
+  history: Version history
+  previewHint: Preview does not consume numbers. Final codes are generated when saving. Format is frozen after first use.
+  bind: Save binding
+  bindConfirm: Save this binding? Rules cannot be reused for another usage. Switching requires a fresh rule and unused prefix.
+  bindHint: Business records use the bound rule automatically. Switching requires a fresh rule and new prefix. Existing codes remain unchanged.
+  selectRule: Search enabled rules
+  bound: Current rule
+  unbound: Not bound
+  maxLength: Maximum length
 platform:
   adminUsername: Admin account
   adminPassword: Admin password
@@ -564,3 +768,207 @@ platform:
   menuHint: Tick the menus and buttons this package can use; platform-only menus are not listed
   menuCount: "{count} selected"
   loadFailed: Failed to load, reopen to retry
+
+autoCodes:
+  correctFields: Complete the required fields and correct the highlighted values.
+  target: Target field
+  bindFields: Field numbering rules
+  noFields: No automatic code fields. Save the form design or register a business module first.
+  fieldMode: Automatic numbering
+  manual: Enter manually
+  charset: Code character set
+  dynamicField: Automatic code (plain text only)
+  designerHint: Generated when saved; up to 64 characters. After saving the design, an administrator binds the field under Code rules → Usage configuration. Defaults and conditions are unsupported.
+  codegenHint: Makes the field non-null and unique, up to 64 characters. No additional character restrictions still follows the rule format. Register the generated module, then an administrator binds the business field under Code rules → Usage configuration.
+  submit: Submit and save
+  submitHint: Saves the form and generates codes in one transaction. Saved values and codes are immutable.
+  submissions: Submissions
+  fill: Fill and submit
+  saved: Submission saved
+  values: Form values
+  charsets:
+    unrestricted: No additional character restrictions
+    upper_alnum: Uppercase letters, digits and separators
+    lower_slug: Lowercase letters, digits and underscores
+    digits: Digits only
+
+workflow:
+  create: "New workflow"
+  viewDefinition: "Workflow definition"
+  viewDesign: "View design"
+  revise: "New revision"
+  publish: "Publish workflow"
+  publishConfirm: "Publish this revision for new applications? Running instances keep their original revision."
+  published: "Workflow published"
+  saveDraft: "Save draft"
+  savedDraft: "Draft saved. Publish it from the details."
+  name: "Workflow name"
+  description: "Description"
+  formVersion: "Form revision"
+  immutableHint: "Saving creates a revision. Published revisions and running instances are unchanged. Bind a workflow definition code rule before creating the first workflow."
+  nodeSettings: "Node settings"
+  selectNode: "Select a node to configure participants, conditions and permissions"
+  startApplicant: "Applicant"
+  end: "End"
+  nodeName: "Node name"
+  actorSource: "Participant source"
+  people: "Choose members or roles"
+  level: "Level"
+  emptyPolicy: "When no approver is available"
+  approvalMode: "Approval mode"
+  skipRepeated: "Skip consecutive approvals by the same member"
+  timeout: "Enable timeout handling"
+  timeoutMinutes: "Timeout in minutes"
+  timeoutAction: "Timeout action"
+  remind: "Remind the current approver"
+  transferSupervisor: "Transfer to supervisor, or remind if unavailable"
+  fieldPermissions: "Node field permissions"
+  fieldPermissionHint: "Only explicit grants provide node access, capped by system policy. Generated codes, copies and processed tasks are read-only."
+  branch: "Branch"
+  branchName: "Branch name"
+  defaultBranch: "Default branch"
+  addBranch: "Add branch"
+  removeBranch: "Remove branch"
+  addNode: "Add node"
+  remove: "Remove"
+  moveUp: "Move up"
+  moveDown: "Move down"
+  addCondition: "Add condition"
+  addGroup: "Add condition group"
+  allConditions: "Match all conditions"
+  anyConditions: "Match any condition"
+  inspect: "Check workflow"
+  inspectionPassed: "Configuration is valid. Not saved or published."
+  needName: "Enter a workflow name"
+  needForm: "Choose a form revision"
+  needApproval: "Add at least one approval node"
+  needNodeName: "Name each node"
+  needPeople: "Choose at least one member or role"
+  needBranchName: "Name each branch"
+  correctFields: "Complete the configuration below"
+  designHidden: "You cannot view the design of this revision"
+  unavailableChoice: "Unavailable or inaccessible option"
+  searchChoice: "Search by name"
+  loadMore: "Load more"
+  retry: "Retry"
+  leave: "Close"
+  discardConfirm: "Discard unsaved changes and close?"
+  startApplication: "Start application"
+  selectWorkflow: "Choose a published workflow"
+  fillApplication: "Fill application"
+  fillNew: "Fill new form"
+  useSubmission: "Use a saved submission"
+  mySubmission: "My saved form submission"
+  submissionReady: "Form saved. Click Start application to submit for approval."
+  savedSubmissionHint: "The form is saved but approval has not started. Close and continue later using the saved submission?"
+  startHint: "The submission must match the fixed form revision. Save the form before starting approval. Retry a failed start using the same saved submission."
+  started: "Application started"
+  handle: "Handle"
+  applicationDetail: "Application details"
+  round: "Round"
+  progressTitle: "Workflow progress"
+  chosenBranch: "Selected"
+  records: "Approval records"
+  formValues: "Form values"
+  noVisibleFields: "No form fields are visible"
+  requiredField: "Complete {field}"
+  action: "Action"
+  comment: "Comment"
+  attachments: "Attachments"
+  attachment: "Approval attachment"
+  uploadAttachment: "Upload attachment"
+  attachmentHint: "Up to 10 files, subject to file module limits. Canceling does not delete uploaded files."
+  transferTarget: "Transfer to"
+  needTarget: "Choose a transfer recipient"
+  actionConfirm: "Confirm {action}?"
+  actionDone: "Action completed"
+  nodes:
+    approve: "Approval"
+    copy: "Copy"
+    condition: "Condition"
+    parallel: "Parallel"
+  actors:
+    users: "Specified members"
+    roles: "Specified roles"
+    department_leader: "Applicant department leader"
+    supervisor: "Applicant supervisor"
+    self_select: "Selected by applicant"
+    applicant: "Applicant"
+  modes:
+    sequential: "Sequential"
+    all: "All must approve"
+    any: "Any may approve"
+  empty:
+    stop: "Stop with an error"
+    pass: "Pass automatically with a record"
+    administrator: "Assign an applicable administrator"
+  fields:
+    normal: "Own access, read-only at most"
+    editable: "Editable"
+    readonly: "Read-only"
+    masked: "Masked"
+    hidden: "Hidden"
+  sources:
+    field: "Form field"
+    applicant_org: "Applicant organization"
+    applicant_role: "Applicant role"
+  operators:
+    eq: "Equals"
+    ne: "Does not equal"
+    gt: "Greater than"
+    gte: "Greater than or equal"
+    lt: "Less than"
+    lte: "Less than or equal"
+    in: "In"
+    not_in: "Not in"
+  tabs:
+    pending: "My pending tasks"
+    processed: "Processed by me"
+    mine: "My applications"
+    copy: "Copied to me"
+  actions:
+    approve: "Approve"
+    reject: "Return to applicant"
+    transfer: "Transfer"
+    withdraw: "Withdraw"
+    resubmit: "Resubmit"
+    urge: "Remind"
+  instanceStatus:
+    running: "Running"
+    approved: "Approved"
+    returned: "Returned"
+    withdrawn: "Withdrawn"
+  progress:
+    waiting: "Waiting"
+    pending: "Pending"
+    approved: "Approved"
+    cancelled: "Canceled"
+    returned: "Returned"
+    copied: "Copied"
+    taken: "Selected"
+
+memberPicker:
+  title: "Select members"
+  choose: "Choose members"
+  organizations: "Departments"
+  members: "Members"
+  searchOrg: "Search departments"
+  searchMember: "Search member names"
+  search: "Search"
+  allMembers: "All members"
+  includeChildren: "Include subdepartments"
+  noOrganizations: "No available departments"
+  noMembers: "No matching members"
+  name: "Name"
+  selectPage: "Select members on this page"
+  selectMember: "Select {name}"
+  selected: "Selected members"
+  selectedCount: "{count} selected, up to {limit}"
+  clear: "Clear selection"
+  noneSelected: "No members selected"
+  loadingMember: "Loading member name"
+  unavailableMember: "Unavailable member (ID {id})"
+  invalidSelection: "Remove unavailable members and stay within the selection limit."
+  retry: "Retry"
+  cancel: "Cancel"
+  confirm: "Confirm"

@@ -17,7 +17,27 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     base: VITE_PUBLIC_PATH,
     root,
     resolve: {
-      alias
+      alias: [
+        // 上游默认产物内嵌旧编辑器/依赖，改用同版本源码让安全覆盖实际进入构建。
+        {
+          find: /^@form-create\/designer$/,
+          replacement: pathResolve(
+            "./node_modules/@form-create/designer/src/index.js",
+            import.meta.url
+          )
+        },
+        {
+          find: /^@form-create\/component-wangeditor$/,
+          replacement: pathResolve(
+            "./src/components/FormDesigner/UnsupportedRichText.ts",
+            import.meta.url
+          )
+        },
+        ...Object.entries(alias).map(([find, replacement]) => ({
+          find,
+          replacement
+        }))
+      ]
     },
     // 服务端渲染
     server: {

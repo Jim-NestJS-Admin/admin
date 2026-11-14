@@ -2,6 +2,10 @@ import { adaptNavigation } from "./policy.mjs";
 import { useUserStoreHook } from "@/store/modules/user";
 // 只注册实际实现的业务页，T14/T13 添加页面时显式扩展，禁止任意组件路径。
 export const navigationViews = new Map<string, () => Promise<unknown>>([
+  ["workflow/definition", () => import("@/views/workflow/definition.vue")],
+  ["workflow/workbench", () => import("@/views/workflow/workbench.vue")],
+  ["form/submission", () => import("@/views/form/submission.vue")],
+  ["form/definition", () => import("@/views/form/definition.vue")],
   ["dev/codegen", () => import("@/views/dev/codegen.vue")],
 
   ["system/page-config", () => import("@/views/system/page-config.vue")],
@@ -18,6 +22,7 @@ export const navigationViews = new Map<string, () => Promise<unknown>>([
   ["system/dict-type", () => import("@/views/system/dict-type.vue")],
   ["system/dict-item", () => import("@/views/system/dict-item.vue")],
   ["system/parameter", () => import("@/views/system/parameter.vue")],
+  ["system/code-rule", () => import("@/views/system/code-rule.vue")],
   ["system/operation-log", () => import("@/views/system/operation-log.vue")],
   ["system/login-log", () => import("@/views/system/login-log.vue")],
   // 平台管理（阶段 2）：只有平台用户的菜单里会出现

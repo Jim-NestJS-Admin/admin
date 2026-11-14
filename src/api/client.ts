@@ -407,6 +407,158 @@ export function createApiClient(
         config
       );
     },
+    formDefinitionAdd(
+      input: OperationInput<"formDefinitionAdd"> & {
+        body: OperationBody<"formDefinitionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionAdd">>(
+        "post",
+        interpolate("/admin/form/definition/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionInfo(
+      input: OperationInput<"formDefinitionInfo"> & {
+        body: OperationBody<"formDefinitionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionInfo">>(
+        "post",
+        interpolate("/admin/form/definition/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionInspect(
+      input: OperationInput<"formDefinitionInspect"> & {
+        body: OperationBody<"formDefinitionInspect">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionInspect">>(
+        "post",
+        interpolate("/admin/form/definition/inspect", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionPage(
+      input: OperationInput<"formDefinitionPage"> & {
+        body: OperationBody<"formDefinitionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionPage">>(
+        "post",
+        interpolate("/admin/form/definition/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionRevise(
+      input: OperationInput<"formDefinitionRevise"> & {
+        body: OperationBody<"formDefinitionRevise">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionRevise">>(
+        "post",
+        interpolate("/admin/form/definition/revise", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionSchema(
+      input: OperationInput<"formDefinitionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionSchema">>(
+        "get",
+        interpolate("/admin/form/definition/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionValidate(
+      input: OperationInput<"formDefinitionValidate"> & {
+        body: OperationBody<"formDefinitionValidate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionValidate">>(
+        "post",
+        interpolate("/admin/form/definition/validate", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionAdd(
+      input: OperationInput<"formSubmissionAdd"> & {
+        body: OperationBody<"formSubmissionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionAdd">>(
+        "post",
+        interpolate("/admin/form/submission/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionInfo(
+      input: OperationInput<"formSubmissionInfo"> & {
+        body: OperationBody<"formSubmissionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionInfo">>(
+        "post",
+        interpolate("/admin/form/submission/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionMine(
+      input: OperationInput<"formSubmissionMine"> & {
+        body: OperationBody<"formSubmissionMine">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionMine">>(
+        "post",
+        interpolate("/admin/form/submission/mine", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionPage(
+      input: OperationInput<"formSubmissionPage"> & {
+        body: OperationBody<"formSubmissionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionPage">>(
+        "post",
+        interpolate("/admin/form/submission/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formSubmissionSchema(
+      input: OperationInput<"formSubmissionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formSubmissionSchema">>(
+        "get",
+        interpolate("/admin/form/submission/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     platformPackageAdd(
       input: OperationInput<"platformPackageAdd"> & {
         body: OperationBody<"platformPackageAdd">;
@@ -679,6 +831,193 @@ export function createApiClient(
       return transport.request<OperationResponse<"sessionSwitchOrg">>(
         "post",
         interpolate("/admin/session/switch-org", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleAdd(
+      input: OperationInput<"systemCodeRuleAdd"> & {
+        body: OperationBody<"systemCodeRuleAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleAdd">>(
+        "post",
+        interpolate("/admin/system/code-rule/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleBindingSet(
+      input: OperationInput<"codeRuleBindingSet"> & {
+        body: OperationBody<"codeRuleBindingSet">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleBindingSet">>(
+        "post",
+        interpolate("/admin/system/code-rule/binding/set", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleDelete(
+      input: OperationInput<"systemCodeRuleDelete"> & {
+        body: OperationBody<"systemCodeRuleDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleDelete">>(
+        "post",
+        interpolate("/admin/system/code-rule/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleHistory(
+      input: OperationInput<"codeRuleHistory"> & {
+        body: OperationBody<"codeRuleHistory">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleHistory">>(
+        "post",
+        interpolate("/admin/system/code-rule/history", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleInfo(
+      input: OperationInput<"systemCodeRuleInfo"> & {
+        body: OperationBody<"systemCodeRuleInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleInfo">>(
+        "post",
+        interpolate("/admin/system/code-rule/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRulePage(
+      input: OperationInput<"systemCodeRulePage"> & {
+        body: OperationBody<"systemCodeRulePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRulePage">>(
+        "post",
+        interpolate("/admin/system/code-rule/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRulePreview(
+      input: OperationInput<"codeRulePreview"> & {
+        body: OperationBody<"codeRulePreview">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRulePreview">>(
+        "post",
+        interpolate("/admin/system/code-rule/preview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleSchema(
+      input: OperationInput<"systemCodeRuleSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleSchema">>(
+        "get",
+        interpolate("/admin/system/code-rule/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleTimeZones(
+      input: OperationInput<"codeRuleTimeZones"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleTimeZones">>(
+        "post",
+        interpolate("/admin/system/code-rule/timezones", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeRuleUpdate(
+      input: OperationInput<"systemCodeRuleUpdate"> & {
+        body: OperationBody<"systemCodeRuleUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeRuleUpdate">>(
+        "post",
+        interpolate("/admin/system/code-rule/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleUsageList(
+      input: OperationInput<"codeRuleUsageList"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleUsageList">>(
+        "post",
+        interpolate("/admin/system/code-rule/usage/list", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    codeRuleValidate(
+      input: OperationInput<"codeRuleValidate"> & {
+        body: OperationBody<"codeRuleValidate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"codeRuleValidate">>(
+        "post",
+        interpolate("/admin/system/code-rule/validate", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequenceInfo(
+      input: OperationInput<"systemCodeSequenceInfo"> & {
+        body: OperationBody<"systemCodeSequenceInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequenceInfo">>(
+        "post",
+        interpolate("/admin/system/code-sequence/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequencePage(
+      input: OperationInput<"systemCodeSequencePage"> & {
+        body: OperationBody<"systemCodeSequencePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequencePage">>(
+        "post",
+        interpolate("/admin/system/code-sequence/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    systemCodeSequenceSchema(
+      input: OperationInput<"systemCodeSequenceSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemCodeSequenceSchema">>(
+        "get",
+        interpolate("/admin/system/code-sequence/schema", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -1956,6 +2295,377 @@ export function createApiClient(
       return transport.request<OperationResponse<"systemUserUpdate">>(
         "post",
         interpolate("/admin/system/user/update", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionAdd(
+      input: OperationInput<"workflowDefinitionAdd"> & {
+        body: OperationBody<"workflowDefinitionAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionAdd">>(
+        "post",
+        interpolate("/admin/workflow/definition/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionAvailable(
+      input: OperationInput<"workflowDefinitionAvailable"> & {
+        body: OperationBody<"workflowDefinitionAvailable">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowDefinitionAvailable">
+      >(
+        "post",
+        interpolate("/admin/workflow/definition/available", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionInfo(
+      input: OperationInput<"workflowDefinitionInfo"> & {
+        body: OperationBody<"workflowDefinitionInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionInfo">>(
+        "post",
+        interpolate("/admin/workflow/definition/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionInspect(
+      input: OperationInput<"workflowDefinitionInspect"> & {
+        body: OperationBody<"workflowDefinitionInspect">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionInspect">>(
+        "post",
+        interpolate("/admin/workflow/definition/inspect", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionPage(
+      input: OperationInput<"workflowDefinitionPage"> & {
+        body: OperationBody<"workflowDefinitionPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionPage">>(
+        "post",
+        interpolate("/admin/workflow/definition/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionPublish(
+      input: OperationInput<"workflowDefinitionPublish"> & {
+        body: OperationBody<"workflowDefinitionPublish">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionPublish">>(
+        "post",
+        interpolate("/admin/workflow/definition/publish", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionRevise(
+      input: OperationInput<"workflowDefinitionRevise"> & {
+        body: OperationBody<"workflowDefinitionRevise">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionRevise">>(
+        "post",
+        interpolate("/admin/workflow/definition/revise", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDefinitionSchema(
+      input: OperationInput<"workflowDefinitionSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDefinitionSchema">>(
+        "get",
+        interpolate("/admin/workflow/definition/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDirectoryOrganizations(
+      input: OperationInput<"workflowDirectoryOrganizations"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowDirectoryOrganizations">
+      >(
+        "post",
+        interpolate("/admin/workflow/directory/organizations", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowDirectoryPage(
+      input: OperationInput<"workflowDirectoryPage"> & {
+        body: OperationBody<"workflowDirectoryPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowDirectoryPage">>(
+        "post",
+        interpolate("/admin/workflow/directory/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceAttachment(
+      input: OperationInput<"workflowInstanceAttachment"> & {
+        body: OperationBody<"workflowInstanceAttachment">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceAttachment">>(
+        "post",
+        interpolate("/admin/workflow/instance/attachment", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    workflowInstanceDocument(
+      input: OperationInput<"workflowInstanceDocument"> & {
+        body: OperationBody<"workflowInstanceDocument">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDocument">>(
+        "post",
+        interpolate("/admin/workflow/instance/document", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceInfo(
+      input: OperationInput<"workflowInstanceInfo"> & {
+        body: OperationBody<"workflowInstanceInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceInfo">>(
+        "post",
+        interpolate("/admin/workflow/instance/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstancePage(
+      input: OperationInput<"workflowInstancePage"> & {
+        body: OperationBody<"workflowInstancePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstancePage">>(
+        "post",
+        interpolate("/admin/workflow/instance/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstancePreview(
+      input: OperationInput<"workflowInstancePreview"> & {
+        body: OperationBody<"workflowInstancePreview">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstancePreview">>(
+        "post",
+        interpolate("/admin/workflow/instance/preview", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceResubmit(
+      input: OperationInput<"workflowInstanceResubmit"> & {
+        body: OperationBody<"workflowInstanceResubmit">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceResubmit">>(
+        "post",
+        interpolate("/admin/workflow/instance/resubmit", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceSchema(
+      input: OperationInput<"workflowInstanceSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceSchema">>(
+        "get",
+        interpolate("/admin/workflow/instance/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceStart(
+      input: OperationInput<"workflowInstanceStart"> & {
+        body: OperationBody<"workflowInstanceStart">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceStart">>(
+        "post",
+        interpolate("/admin/workflow/instance/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceUrge(
+      input: OperationInput<"workflowInstanceUrge"> & {
+        body: OperationBody<"workflowInstanceUrge">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceUrge">>(
+        "post",
+        interpolate("/admin/workflow/instance/urge", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceWithdraw(
+      input: OperationInput<"workflowInstanceWithdraw"> & {
+        body: OperationBody<"workflowInstanceWithdraw">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceWithdraw">>(
+        "post",
+        interpolate("/admin/workflow/instance/withdraw", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordInfo(
+      input: OperationInput<"workflowRecordInfo"> & {
+        body: OperationBody<"workflowRecordInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordInfo">>(
+        "post",
+        interpolate("/admin/workflow/record/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordPage(
+      input: OperationInput<"workflowRecordPage"> & {
+        body: OperationBody<"workflowRecordPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordPage">>(
+        "post",
+        interpolate("/admin/workflow/record/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowRecordSchema(
+      input: OperationInput<"workflowRecordSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowRecordSchema">>(
+        "get",
+        interpolate("/admin/workflow/record/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskApprove(
+      input: OperationInput<"workflowTaskApprove"> & {
+        body: OperationBody<"workflowTaskApprove">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskApprove">>(
+        "post",
+        interpolate("/admin/workflow/task/approve", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskInfo(
+      input: OperationInput<"workflowTaskInfo"> & {
+        body: OperationBody<"workflowTaskInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskInfo">>(
+        "post",
+        interpolate("/admin/workflow/task/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskPage(
+      input: OperationInput<"workflowTaskPage"> & {
+        body: OperationBody<"workflowTaskPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskPage">>(
+        "post",
+        interpolate("/admin/workflow/task/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskReject(
+      input: OperationInput<"workflowTaskReject"> & {
+        body: OperationBody<"workflowTaskReject">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskReject">>(
+        "post",
+        interpolate("/admin/workflow/task/reject", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskSchema(
+      input: OperationInput<"workflowTaskSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskSchema">>(
+        "get",
+        interpolate("/admin/workflow/task/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowTaskTransfer(
+      input: OperationInput<"workflowTaskTransfer"> & {
+        body: OperationBody<"workflowTaskTransfer">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowTaskTransfer">>(
+        "post",
+        interpolate("/admin/workflow/task/transfer", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

@@ -30,6 +30,7 @@ import FilterIcon from "~icons/ri/filter-3-line";
 import RefreshIcon from "@/assets/table-bar/refresh.svg?component";
 import { useFillHeight } from "./useFillHeight";
 import { useHeadStyle } from "./useHeadStyle";
+import DictionaryValue from "./DictionaryValue.vue";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
@@ -72,6 +73,10 @@ const props = withDefaults(
     addDefaults?: CrudRecord;
     /** 新增接口独立 DTO 上的额外字段，由 form-extra 插槽采集。 */
     addExtraFields?: readonly string[];
+    /** 自定义行操作插槽的列宽；默认操作仍按按钮数量计算。 */
+    rowActionsWidth?: number;
+    /** 只读详情可省略底部关闭，仍保留右上角关闭与Esc。 */
+    hideDetailFooter?: boolean;
   }>(),
   { fill: true }
 );
@@ -115,6 +120,7 @@ const {
   loading,
   saving,
   error,
+  editorError,
   fields,
   rowIssues,
   recycledView,
@@ -193,7 +199,7 @@ const formItems = computed(
   () =>
     schema.value?.form.filter(item =>
       editor.mode === "add"
-        ? item.edit !== "none"
+        ? item.generated || item.edit !== "none"
         : editor.record &&
           readCell(editor.record, item.field).state !== "hidden"
     ) ?? []
@@ -313,6 +319,8 @@ function autoWidth(column) {
 }
 /** 操作列宽度：按实际会出现的按钮数 */
 const actionWidth = computed(() => {
+  if (slots["row-actions"] || slots["row-actions-extra"])
+    return props.rowActionsWidth ?? 300;
   const count =
     (props.permissions?.info && schema.value?.api.includes("info") ? 1 : 0) +
     (props.port.update && schema.value?.api.includes("update") ? 1 : 0) +
@@ -377,7 +385,16 @@ async function confirmRecycle(action: "restore" | "purge") {
     return;
   await view.recycleAction(action, records);
 }
-defineExpose({ reload: view.initialize });
+defineExpose({
+  reload: view.initialize,
+  refresh: view.load,
+  validate: view.validateEditor,
+  async create(values: CrudRecord = {}) {
+    await view.edit();
+    if (editor.mode === "add" && editor.open && !saving.value)
+      Object.assign(editor.values, structuredClone(values));
+  }
+});
 </script>
 
 <template>
@@ -637,12 +654,22 @@ defineExpose({ reload: view.initialize });
               >
                 <template #default="{ row }">
                   <slot
-                    v-if="readCell(row, column.field).state === 'visible'"
+                    v-if="
+                      ['visible', 'readonly'].includes(
+                        readCell(row, column.field).state
+                      )
+                    "
                     :name="`cell-${column.field}`"
+                    :row="row"
                     :value="readCell(row, column.field).display"
                     :text="display(row, column)"
-                    ><el-tag
-                      v-if="
+                    ><DictionaryValue
+                      v-if="column.dict"
+                      :cell="readCell(row, column.field)"
+                      :options="schema.dictionaries[column.dict]"
+                      :text="display(row, column)"
+                    /><el-tag
+                      v-else-if="
                         column.type === 'boolean' &&
                         typeof readCell(row, column.field).display === 'boolean'
                       "
@@ -661,6 +688,7 @@ defineExpose({ reload: view.initialize });
                   }}</span>
                 </template>
               </el-table-column>
+              <slot name="table-columns" />
               <el-table-column
                 v-if="recycledView"
                 prop="deletedAt"
@@ -674,7 +702,10 @@ defineExpose({ reload: view.initialize });
               </el-table-column>
               <el-table-column
                 v-if="
-                  (port.update || port.remove || permissions?.info) &&
+                  (slots['row-actions'] ||
+                    port.update ||
+                    port.remove ||
+                    permissions?.info) &&
                   !recycledView
                 "
                 :label="t('crud.actions')"
@@ -682,36 +713,43 @@ defineExpose({ reload: view.initialize });
                 :width="actionWidth"
                 align="center"
               >
-                <template #default="{ row }"
-                  ><el-button
-                    v-if="permissions?.info && schema.api.includes('info')"
-                    v-perm="permissions.info"
-                    link
-                    type="primary"
-                    :icon="useRenderIcon(ViewIcon)"
+                <template #default="{ row }">
+                  <slot name="row-actions" :row="row" :disabled="saving">
+                    <el-button
+                      v-if="permissions?.info && schema.api.includes('info')"
+                      v-perm="permissions.info"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(ViewIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row, true)"
+                      >{{ t("crud.info") }}</el-button
+                    ><el-button
+                      v-if="port.update && schema.api.includes('update')"
+                      v-perm="permissions?.update ?? []"
+                      link
+                      type="primary"
+                      :icon="useRenderIcon(EditIcon)"
+                      :disabled="saving"
+                      @click="view.edit(row)"
+                      >{{ t("crud.edit") }}</el-button
+                    ><el-button
+                      v-if="port.remove && schema.api.includes('delete')"
+                      v-perm="permissions?.remove ?? []"
+                      link
+                      type="danger"
+                      :icon="useRenderIcon(DeleteIcon)"
+                      :disabled="saving"
+                      @click="confirmRemove([String(row.id)])"
+                      >{{ t("crud.remove") }}</el-button
+                    >
+                  </slot>
+                  <slot
+                    name="row-actions-extra"
+                    :row="row"
                     :disabled="saving"
-                    @click="view.edit(row, true)"
-                    >{{ t("crud.info") }}</el-button
-                  ><el-button
-                    v-if="port.update && schema.api.includes('update')"
-                    v-perm="permissions?.update ?? []"
-                    link
-                    type="primary"
-                    :icon="useRenderIcon(EditIcon)"
-                    :disabled="saving"
-                    @click="view.edit(row)"
-                    >{{ t("crud.edit") }}</el-button
-                  ><el-button
-                    v-if="port.remove && schema.api.includes('delete')"
-                    v-perm="permissions?.remove ?? []"
-                    link
-                    type="danger"
-                    :icon="useRenderIcon(DeleteIcon)"
-                    :disabled="saving"
-                    @click="confirmRemove([String(row.id)])"
-                    >{{ t("crud.remove") }}</el-button
-                  ></template
-                >
+                  />
+                </template>
               </el-table-column>
             </el-table>
           </div>
@@ -769,7 +807,9 @@ defineExpose({ reload: view.initialize });
       :is="formPresentation(schema).mode === 'dialog' ? ElDialog : ElDrawer"
       :model-value="editor.open"
       :width="
-        schema?.children?.length || slots['editor-related']
+        schema?.children?.length ||
+        slots['editor-related'] ||
+        slots['detail-content']
           ? 'min(1080px, 96vw)'
           : 'min(720px, 96vw)'
       "
@@ -787,7 +827,9 @@ defineExpose({ reload: view.initialize });
       :size="
         mobile
           ? '100%'
-          : schema?.children?.length || slots['editor-related']
+          : schema?.children?.length ||
+              slots['editor-related'] ||
+              slots['detail-content']
             ? 'min(1080px, 92vw)'
             : '560px'
       "
@@ -803,214 +845,267 @@ defineExpose({ reload: view.initialize });
         }
       "
     >
-      <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+      <el-alert
+        v-if="editorError"
+        :title="t(editorError)"
+        type="error"
+        :closable="false"
+      />
       <el-alert
         v-if="retrySeconds"
         :title="t('admin.retryAfter', { seconds: retrySeconds })"
         type="warning"
         :closable="false"
       />
-      <!-- 详情：两列描述列表（Pure / Element 的 Descriptions），值和列表显示一致 -->
-      <el-descriptions
-        v-if="editor.readOnly && editor.record"
-        class="crud-info"
-        :column="mobile ? 1 : 2"
-        border
+      <div
+        :class="{
+          'crud-editor-layout': editor.readOnly && slots['detail-aside']
+        }"
       >
-        <el-descriptions-item
-          v-for="item in infoItems"
-          :key="item.field"
-          :label="item.label"
-          :span="item.wide && !mobile ? 2 : 1"
-          label-class-name="crud-info-label"
-        >
-          <slot
-            v-if="slots[`detail-${item.field}`]"
-            :name="`detail-${item.field}`"
-            :record="editor.record"
-            :field="item.field"
-          />
-          <el-tag
-            v-else-if="
-              item.type === 'boolean' &&
-              readCell(editor.record, item.field).state === 'visible' &&
-              typeof readCell(editor.record, item.field).display === 'boolean'
-            "
-            size="small"
-            effect="light"
-            :type="
-              readCell(editor.record, item.field).display ? 'success' : 'info'
-            "
-            >{{ display(editor.record, item) }}</el-tag
-          >
-          <el-avatar
-            v-else-if="imageUrl(readCell(editor.record, item.field).display)"
-            :size="40"
-            :src="imageUrl(readCell(editor.record, item.field).display)"
-          />
-          <span
+        <div class="crud-editor-main">
+          <!-- 详情：两列描述列表（Pure / Element 的 Descriptions），值和列表显示一致 -->
+          <template v-if="editor.readOnly && editor.record">
+            <slot
+              name="detail-content"
+              :dictionaries="schema.dictionaries"
+              :record="editor.record"
+              :items="infoItems"
+              :display="display"
+            >
+              <el-descriptions
+                class="crud-info"
+                :column="mobile ? 1 : 2"
+                border
+              >
+                <el-descriptions-item
+                  v-for="item in infoItems"
+                  :key="item.field"
+                  :label="item.label"
+                  :span="item.wide && !mobile ? 2 : 1"
+                  label-class-name="crud-info-label"
+                >
+                  <slot
+                    v-if="slots[`detail-${item.field}`]"
+                    :name="`detail-${item.field}`"
+                    :record="editor.record"
+                    :field="item.field"
+                  />
+                  <DictionaryValue
+                    v-else-if="item.dict"
+                    :cell="readCell(editor.record, item.field)"
+                    :options="schema.dictionaries[item.dict]"
+                    :text="display(editor.record, item)"
+                  />
+                  <el-tag
+                    v-else-if="
+                      item.type === 'boolean' &&
+                      readCell(editor.record, item.field).state === 'visible' &&
+                      typeof readCell(editor.record, item.field).display ===
+                        'boolean'
+                    "
+                    size="small"
+                    effect="light"
+                    :type="
+                      readCell(editor.record, item.field).display
+                        ? 'success'
+                        : 'info'
+                    "
+                    >{{ display(editor.record, item) }}</el-tag
+                  >
+                  <el-avatar
+                    v-else-if="
+                      imageUrl(readCell(editor.record, item.field).display)
+                    "
+                    :size="40"
+                    :src="imageUrl(readCell(editor.record, item.field).display)"
+                  />
+                  <span
+                    v-else
+                    :class="{
+                      'crud-muted':
+                        readCell(editor.record, item.field).state !== 'visible'
+                    }"
+                    >{{ display(editor.record, item) }}</span
+                  >
+                </el-descriptions-item>
+              </el-descriptions>
+            </slot>
+          </template>
+          <el-form
             v-else
-            :class="{
-              'crud-muted':
-                readCell(editor.record, item.field).state !== 'visible'
-            }"
-            >{{ display(editor.record, item) }}</span
+            class="crud-editor-form"
+            :label-position="mobile ? 'top' : 'right'"
+            label-width="110px"
+            @submit.prevent="view.save"
           >
-        </el-descriptions-item>
-      </el-descriptions>
-      <el-form
-        v-else
-        class="crud-editor-form"
-        :label-position="mobile ? 'top' : 'right'"
-        label-width="110px"
-        @submit.prevent="view.save"
-      >
-        <el-form-item
-          v-for="item in formItems"
-          :key="item.field"
-          :label="
-            formPresentation(schema, item.field).group
-              ? `${formPresentation(schema, item.field).group} / ${item.label}`
-              : item.label
-          "
-          :class="{
-            'half-field': formPresentation(schema, item.field).span === 12
-          }"
-          :required="item.required && writable(item)"
-          :error="fields[item.field]?.map(message => t(message)).join('；')"
-        >
-          <template v-if="!writable(item)"
-            ><span>{{
-              editor.record
-                ? cellText(
-                    readCell(editor.record, item.field),
-                    schema.dictionaries[item.dict]
+            <el-form-item
+              v-for="item in formItems"
+              :key="item.field"
+              :label="
+                formPresentation(schema, item.field).group
+                  ? `${formPresentation(schema, item.field).group} / ${item.label}`
+                  : item.label
+              "
+              :class="{
+                'half-field': formPresentation(schema, item.field).span === 12
+              }"
+              :required="item.required && writable(item)"
+              :error="fields[item.field]?.map(message => t(message)).join('；')"
+            >
+              <template v-if="!writable(item)"
+                ><span>{{
+                  editor.record
+                    ? cellText(
+                        readCell(editor.record, item.field),
+                        schema.dictionaries[item.dict]
+                      )
+                    : item.generated
+                      ? item.generatedHint || t("crud.generatedHint")
+                      : "—"
+                }}</span></template
+              >
+              <slot
+                v-else
+                :name="`form-${item.field}`"
+                :options="schema.dictionaries[item.dict] ?? []"
+                :values="editor.values"
+                :field="item.field"
+                :disabled="saving"
+              >
+                <el-tree-select
+                  v-if="item.component === 'tree-select' && schema.tree"
+                  v-model="editor.values[item.field]"
+                  :data="
+                    view.treeOptions.value.map(row => ({
+                      value: row.id,
+                      label: String(row[schema.tree.nameField] ?? row.id),
+                      disabled: row.id === editor.record?.id
+                    }))
+                  "
+                  :aria-label="item.label"
+                  :disabled="saving"
+                  clearable
+                  filterable
+                  check-strictly
+                />
+                <el-input-number
+                  v-else-if="item.component === 'number'"
+                  v-model="editor.values[item.field] as number"
+                  :aria-label="item.label"
+                  :disabled="saving"
+                />
+                <el-switch
+                  v-else-if="item.component === 'switch'"
+                  v-model="editor.values[item.field] as boolean"
+                  :aria-label="item.label"
+                  :disabled="saving"
+                />
+                <el-select
+                  v-else-if="item.component === 'select'"
+                  v-model="editor.values[item.field]"
+                  :aria-label="item.label"
+                  :disabled="saving"
+                  clearable
+                  ><el-option
+                    v-for="option in schema.dictionaries[item.dict] ?? []"
+                    :key="String(option.value)"
+                    :label="option.label"
+                    :value="option.value"
+                /></el-select>
+                <el-date-picker
+                  v-else-if="
+                    item.component === 'date' || item.component === 'datetime'
+                  "
+                  v-model="editor.values[item.field] as string"
+                  :type="item.component"
+                  :value-format="
+                    item.component === 'date'
+                      ? 'YYYY-MM-DD'
+                      : 'YYYY-MM-DDTHH:mm:ssZ'
+                  "
+                  :aria-label="item.label"
+                  :disabled="saving"
+                />
+                <el-input
+                  v-else
+                  v-model="editor.values[item.field] as string"
+                  :type="item.component === 'textarea' ? 'textarea' : 'text'"
+                  :aria-label="item.label"
+                  :placeholder="item.placeholder"
+                  :disabled="saving"
+                />
+              </slot>
+            </el-form-item>
+            <!-- 不在实体上的额外输入（例如新建租户时的管理员账号），由页面自己提交 -->
+            <slot
+              name="form-extra"
+              :mode="editor.mode"
+              :values="editor.values"
+              :errors="fields"
+              :disabled="saving"
+            />
+          </el-form>
+          <el-tabs
+            v-if="schema?.children?.length"
+            v-model="activeChild"
+            class="crud-children-tabs"
+          >
+            <el-tab-pane
+              v-for="child in schema.children"
+              :key="child.resource"
+              :label="child.label"
+              :name="child.resource"
+            >
+              <ChildEditor
+                v-if="
+                  editor.related.find(
+                    group => group.resource === child.resource
                   )
-                : "—"
-            }}</span></template
-          >
+                "
+                :child="child"
+                :draft="
+                  editor.related.find(
+                    group => group.resource === child.resource
+                  )
+                "
+                :dictionaries="schema.dictionaries"
+                :disabled="saving || editor.readOnly"
+                :readonly="editor.readOnly"
+                :issues="rowIssues"
+                :cell="
+                  (row, field) =>
+                    childCell
+                      ? childCell(child.resource, row, field)
+                      : defaultCell(row, field)
+                "
+              />
+            </el-tab-pane>
+          </el-tabs>
           <slot
-            v-else
-            :name="`form-${item.field}`"
-            :values="editor.values"
-            :field="item.field"
-            :disabled="saving"
-          >
-            <el-tree-select
-              v-if="item.component === 'tree-select' && schema.tree"
-              v-model="editor.values[item.field]"
-              :data="
-                view.treeOptions.value.map(row => ({
-                  value: row.id,
-                  label: String(row[schema.tree.nameField] ?? row.id),
-                  disabled: row.id === editor.record?.id
-                }))
-              "
-              :aria-label="item.label"
-              :disabled="saving"
-              clearable
-              filterable
-              check-strictly
-            />
-            <el-input-number
-              v-else-if="item.component === 'number'"
-              v-model="editor.values[item.field] as number"
-              :aria-label="item.label"
-              :disabled="saving"
-            />
-            <el-switch
-              v-else-if="item.component === 'switch'"
-              v-model="editor.values[item.field] as boolean"
-              :aria-label="item.label"
-              :disabled="saving"
-            />
-            <el-select
-              v-else-if="item.component === 'select'"
-              v-model="editor.values[item.field]"
-              :aria-label="item.label"
-              :disabled="saving"
-              clearable
-              ><el-option
-                v-for="option in schema.dictionaries[item.dict] ?? []"
-                :key="String(option.value)"
-                :label="option.label"
-                :value="option.value"
-            /></el-select>
-            <el-date-picker
-              v-else-if="
-                item.component === 'date' || item.component === 'datetime'
-              "
-              v-model="editor.values[item.field] as string"
-              :type="item.component"
-              :value-format="
-                item.component === 'date'
-                  ? 'YYYY-MM-DD'
-                  : 'YYYY-MM-DDTHH:mm:ssZ'
-              "
-              :aria-label="item.label"
-              :disabled="saving"
-            />
-            <el-input
-              v-else
-              v-model="editor.values[item.field] as string"
-              :type="item.component === 'textarea' ? 'textarea' : 'text'"
-              :aria-label="item.label"
-              :placeholder="item.placeholder"
-              :disabled="saving"
-            />
-          </slot>
-        </el-form-item>
-        <!-- 不在实体上的额外输入（例如新建租户时的管理员账号），由页面自己提交 -->
-        <slot
-          name="form-extra"
-          :mode="editor.mode"
-          :values="editor.values"
-          :errors="fields"
-          :disabled="saving"
-        />
-      </el-form>
-      <el-tabs
-        v-if="schema?.children?.length"
-        v-model="activeChild"
-        class="crud-children-tabs"
-      >
-        <el-tab-pane
-          v-for="child in schema.children"
-          :key="child.resource"
-          :label="child.label"
-          :name="child.resource"
-        >
-          <ChildEditor
-            v-if="
-              editor.related.find(group => group.resource === child.resource)
-            "
-            :child="child"
-            :draft="
-              editor.related.find(group => group.resource === child.resource)
-            "
-            :dictionaries="schema.dictionaries"
-            :disabled="saving || editor.readOnly"
-            :readonly="editor.readOnly"
-            :issues="rowIssues"
-            :cell="
-              (row, field) =>
-                childCell
-                  ? childCell(child.resource, row, field)
-                  : defaultCell(row, field)
-            "
+            v-if="editor.open && editor.record"
+            name="editor-related"
+            :record="editor.record"
           />
-        </el-tab-pane>
-      </el-tabs>
-      <slot
-        v-if="editor.open && editor.record"
-        name="editor-related"
-        :record="editor.record"
-      />
-      <template #footer
+        </div>
+        <aside
+          v-if="editor.readOnly && editor.record && slots['detail-aside']"
+          class="crud-editor-aside"
+        >
+          <slot name="detail-aside" :record="editor.record" />
+        </aside>
+      </div>
+      <template v-if="!editor.readOnly || !hideDetailFooter" #footer
         ><el-button :disabled="saving" @click="view.closeEditor">{{
           t(editor.readOnly ? "crud.close" : "crud.cancel")
         }}</el-button
-        ><el-button
+        ><slot
+          name="editor-footer"
+          :values="editor.values"
+          :record="editor.record"
+          :readonly="editor.readOnly"
+          :disabled="saving"
+        />
+        <el-button
           v-if="!editor.readOnly"
           type="primary"
           :loading="saving"
@@ -1331,5 +1426,35 @@ defineExpose({ reload: view.initialize });
   align-items: flex-start;
   padding: 16px;
   background: var(--el-bg-color);
+}
+</style>
+
+<style scoped>
+.crud-editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+}
+
+.crud-editor-main {
+  min-width: 0;
+}
+
+.crud-editor-aside {
+  min-width: 0;
+  padding-left: 20px;
+  border-left: 1px solid var(--el-border-color-lighter);
+}
+
+@media (width <= 760px) {
+  .crud-editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .crud-editor-aside {
+    padding: 20px 0 0;
+    border-top: 1px solid var(--el-border-color-lighter);
+    border-left: 0;
+  }
 }
 </style>

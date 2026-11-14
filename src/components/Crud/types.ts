@@ -59,6 +59,11 @@ export interface CrudExportOptions {
   columns?: string[];
 }
 export interface CrudPort {
+  /** 保存前的业务校验，仅改善交互；服务端仍独立校验。 */
+  validate?(
+    values: CrudRecord,
+    context: { mode: "add" | "update"; record?: CrudRecord }
+  ): Record<string, string[]>;
   tree?(signal: AbortSignal): Promise<CrudRecord[]>;
   /** format 默认 csv；columns 为当前可见列（按显示顺序），服务端仍按字段权限裁剪 */
   export?(

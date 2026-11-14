@@ -178,7 +178,7 @@ async function loadOptions() {
   const tasks: Promise<void>[] = [];
   if (
     can(permission("systemUserPage")) &&
-    ["user", "user-role", "user-supervisor"].includes(props.resource)
+    ["user", "org", "user-role", "user-supervisor"].includes(props.resource)
   )
     tasks.push(
       lookup(signal => allRecords("user", signal), users, [
@@ -300,7 +300,8 @@ async function submit() {
   }
 }
 function selection(field: string): Option[] {
-  if (field === "userId" || field === "supervisorId") return users.value;
+  if (field === "userId" || field === "supervisorId" || field === "leaderId")
+    return users.value;
   if (field === "roleId") return roles.value;
   if (field === "typeId") return dictionaries.value;
   if (field === "parentId" && props.resource === "menu") return menus.value;
@@ -313,6 +314,7 @@ const referenceFields = [
   "userId",
   "roleId",
   "supervisorId",
+  "leaderId",
   "typeId"
 ];
 function fieldValue(values: CrudRecord, field: string): string | undefined {

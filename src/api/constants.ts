@@ -8,6 +8,14 @@ export const PERMISSIONS = [
   "file:asset:page",
   "file:asset:read",
   "file:asset:upload",
+  "form:definition:add",
+  "form:definition:info",
+  "form:definition:page",
+  "form:definition:update",
+  "form:definition:validate",
+  "form:submission:add",
+  "form:submission:info",
+  "form:submission:page",
   "platform:package:add",
   "platform:package:delete",
   "platform:package:export",
@@ -20,6 +28,15 @@ export const PERMISSIONS = [
   "platform:tenant:info",
   "platform:tenant:page",
   "platform:tenant:update",
+  "system:code-rule:add",
+  "system:code-rule:bind",
+  "system:code-rule:delete",
+  "system:code-rule:info",
+  "system:code-rule:page",
+  "system:code-rule:preview",
+  "system:code-rule:update",
+  "system:code-sequence:info",
+  "system:code-sequence:page",
   "system:dict-item:add",
   "system:dict-item:delete",
   "system:dict-item:export",
@@ -93,7 +110,26 @@ export const PERMISSIONS = [
   "system:user:info",
   "system:user:page",
   "system:user:reset-password",
-  "system:user:update"
+  "system:user:update",
+  "workflow:definition:add",
+  "workflow:definition:info",
+  "workflow:definition:page",
+  "workflow:definition:publish",
+  "workflow:definition:update",
+  "workflow:directory:page",
+  "workflow:instance:add",
+  "workflow:instance:info",
+  "workflow:instance:page",
+  "workflow:instance:resubmit",
+  "workflow:instance:urge",
+  "workflow:instance:withdraw",
+  "workflow:record:info",
+  "workflow:record:page",
+  "workflow:task:approve",
+  "workflow:task:info",
+  "workflow:task:page",
+  "workflow:task:reject",
+  "workflow:task:transfer"
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const OPERATION_PERMISSIONS = {
@@ -102,6 +138,12 @@ export const OPERATION_PERMISSIONS = {
   authLogout: [],
   authRefresh: [],
   authTenantHint: [],
+  codeRuleBindingSet: ["system:code-rule:bind"],
+  codeRuleHistory: ["system:code-rule:info"],
+  codeRulePreview: ["system:code-rule:preview"],
+  codeRuleTimeZones: ["system:code-rule:page"],
+  codeRuleUsageList: ["system:code-rule:page"],
+  codeRuleValidate: ["system:code-rule:preview"],
   devCodegenDelete: ["dev:codegen:delete"],
   devCodegenDownload: ["dev:codegen:save"],
   devCodegenFieldTypes: ["dev:codegen:save"],
@@ -124,6 +166,18 @@ export const OPERATION_PERMISSIONS = {
   fileAssetPage: ["file:asset:page"],
   fileAssetSchema: ["file:asset:page"],
   fileAssetUpload: ["file:asset:upload"],
+  formDefinitionAdd: ["form:definition:add"],
+  formDefinitionInfo: ["form:definition:info"],
+  formDefinitionInspect: ["form:definition:info"],
+  formDefinitionPage: ["form:definition:page"],
+  formDefinitionRevise: ["form:definition:update"],
+  formDefinitionSchema: ["form:definition:page"],
+  formDefinitionValidate: ["form:definition:validate"],
+  formSubmissionAdd: ["form:submission:add"],
+  formSubmissionInfo: ["form:submission:info"],
+  formSubmissionMine: ["form:submission:page"],
+  formSubmissionPage: ["form:submission:page"],
+  formSubmissionSchema: ["form:submission:page"],
   platformPackageAdd: ["platform:package:add"],
   platformPackageDelete: ["platform:package:delete"],
   platformPackageExport: ["platform:package:export"],
@@ -146,6 +200,15 @@ export const OPERATION_PERMISSIONS = {
   sessionPreferenceSave: [],
   sessionProfile: [],
   sessionSwitchOrg: [],
+  systemCodeRuleAdd: ["system:code-rule:add"],
+  systemCodeRuleDelete: ["system:code-rule:delete"],
+  systemCodeRuleInfo: ["system:code-rule:info"],
+  systemCodeRulePage: ["system:code-rule:page"],
+  systemCodeRuleSchema: ["system:code-rule:page"],
+  systemCodeRuleUpdate: ["system:code-rule:update"],
+  systemCodeSequenceInfo: ["system:code-sequence:info"],
+  systemCodeSequencePage: ["system:code-sequence:page"],
+  systemCodeSequenceSchema: ["system:code-sequence:page"],
   systemDictItemAdd: ["system:dict-item:add"],
   systemDictItemDelete: ["system:dict-item:delete"],
   systemDictItemExport: ["system:dict-item:export"],
@@ -246,10 +309,45 @@ export const OPERATION_PERMISSIONS = {
   systemUserSupervisorPage: ["system:user-supervisor:page"],
   systemUserSupervisorSchema: ["system:user-supervisor:page"],
   systemUserSupervisorUpdate: ["system:user-supervisor:update"],
-  systemUserUpdate: ["system:user:update"]
+  systemUserUpdate: ["system:user:update"],
+  workflowDefinitionAdd: ["workflow:definition:add"],
+  workflowDefinitionAvailable: ["workflow:instance:add"],
+  workflowDefinitionInfo: ["workflow:definition:info"],
+  workflowDefinitionInspect: ["workflow:definition:info"],
+  workflowDefinitionPage: ["workflow:definition:page"],
+  workflowDefinitionPublish: ["workflow:definition:publish"],
+  workflowDefinitionRevise: ["workflow:definition:update"],
+  workflowDefinitionSchema: ["workflow:definition:page"],
+  workflowDirectoryOrganizations: ["workflow:directory:page"],
+  workflowDirectoryPage: ["workflow:directory:page"],
+  workflowInstanceAttachment: ["workflow:instance:info"],
+  workflowInstanceDocument: ["workflow:instance:info"],
+  workflowInstanceInfo: ["workflow:instance:info"],
+  workflowInstancePage: ["workflow:instance:page"],
+  workflowInstancePreview: ["workflow:instance:info"],
+  workflowInstanceResubmit: ["workflow:instance:resubmit"],
+  workflowInstanceSchema: ["workflow:instance:page"],
+  workflowInstanceStart: ["workflow:instance:add"],
+  workflowInstanceUrge: ["workflow:instance:urge"],
+  workflowInstanceWithdraw: ["workflow:instance:withdraw"],
+  workflowRecordInfo: ["workflow:record:info"],
+  workflowRecordPage: ["workflow:record:page"],
+  workflowRecordSchema: ["workflow:record:page"],
+  workflowTaskApprove: ["workflow:task:approve"],
+  workflowTaskInfo: ["workflow:task:info"],
+  workflowTaskPage: ["workflow:task:page"],
+  workflowTaskReject: ["workflow:task:reject"],
+  workflowTaskSchema: ["workflow:task:page"],
+  workflowTaskTransfer: ["workflow:task:transfer"]
 } as const;
 export const SCOPES = [] as const;
 export const ENUMS = {
+  "components.schemas.CodeUsageItem.properties.charset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits",
+    "unrestricted"
+  ],
   "components.schemas.CrudSchema.properties.api.items": [
     "page",
     "info",
@@ -271,6 +369,13 @@ export const ENUMS = {
     "datetime",
     "json",
     "reference"
+  ],
+  "components.schemas.CrudSchemaDictItem.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
   ],
   "components.schemas.CrudSchemaFormItem.properties.component": [
     "input",
@@ -309,6 +414,13 @@ export const ENUMS = {
     "date"
   ],
   "components.schemas.CrudSchemaSort.properties.order": ["asc", "desc"],
+  "components.schemas.DictionaryOption.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.FieldConfigurationChange.properties.delegable": [
     "editable",
     "readonly",
@@ -426,6 +538,55 @@ export const ENUMS = {
   "components.schemas.FileAssetPageSort.properties.order": ["asc", "desc"],
   "components.schemas.FileAssetRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.FormDefinitionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "code",
+    "revision"
+  ],
+  "components.schemas.FormDefinitionPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.FormDefinitionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.FormDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.FormFieldDto.properties.codeCharset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits",
+    "unrestricted"
+  ],
+  "components.schemas.FormFieldDto.properties.component": [
+    "input",
+    "inputNumber",
+    "switch",
+    "select",
+    "radio",
+    "checkbox",
+    "datePicker"
+  ],
+  "components.schemas.FormFieldDto.properties.type": [
+    "string",
+    "number",
+    "boolean",
+    "array",
+    "date"
+  ],
+  "components.schemas.FormLinkageDto.properties.action": [
+    "visible",
+    "required",
+    "options"
+  ],
+  "components.schemas.FormLinkageDto.properties.operator": ["eq", "ne", "in"],
+  "components.schemas.FormSubmissionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.FormSubmissionPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.FormSubmissionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.FormValidationDto.properties.format": ["email", "url"],
+  "components.schemas.FormValidationResult.properties.valid": [true],
   "components.schemas.MaskRuleDto.properties.code": [
     "phone",
     "email",
@@ -489,6 +650,12 @@ export const ENUMS = {
     "notNull"
   ],
   "components.schemas.QueryGroupDto.properties.op": ["and", "or"],
+  "components.schemas.SpecField.properties.codeCharset": [
+    "upper_alnum",
+    "lower_slug",
+    "digits",
+    "unrestricted"
+  ],
   "components.schemas.SpecField.properties.type": [
     "string",
     "text",
@@ -531,6 +698,56 @@ export const ENUMS = {
     "modified",
     "invalid"
   ],
+  "components.schemas.SystemCodeRuleAddData.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRulePageEq.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRulePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemCodeRulePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.SystemCodeRuleRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemCodeRuleRow.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeRuleUpdateData.properties.resetPeriod": [
+    "never",
+    "year",
+    "month",
+    "day"
+  ],
+  "components.schemas.SystemCodeSequencePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.SystemCodeSequencePageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.SystemCodeSequenceRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.SystemDictItemAddData.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.SystemDictItemExportBody.properties.format": [
     "csv",
     "xlsx"
@@ -544,6 +761,20 @@ export const ENUMS = {
   "components.schemas.SystemDictItemPageSort.properties.order": ["asc", "desc"],
   "components.schemas.SystemDictItemRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
+  "components.schemas.SystemDictItemRow.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
+  "components.schemas.SystemDictItemUpdateData.properties.tagType": [
+    "primary",
+    "success",
+    "info",
+    "warning",
+    "danger"
+  ],
   "components.schemas.SystemDictTypeExportBody.properties.format": [
     "csv",
     "xlsx"
@@ -831,5 +1062,186 @@ export const ENUMS = {
   "components.schemas.SystemUserSupervisorRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
   "components.schemas.TenantHintResult.properties.mode": ["domain", "code"],
-  "components.schemas.TokenResult.properties.tokenType": ["Bearer"]
+  "components.schemas.TokenResult.properties.tokenType": ["Bearer"],
+  "components.schemas.WorkflowActor.properties.type": [
+    "users",
+    "roles",
+    "department_leader",
+    "supervisor",
+    "self_select",
+    "applicant"
+  ],
+  "components.schemas.WorkflowConditionGroup.properties.logic": ["all", "any"],
+  "components.schemas.WorkflowConditionValue.properties.operator": [
+    "eq",
+    "ne",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "in",
+    "not_in"
+  ],
+  "components.schemas.WorkflowConditionValue.properties.source": [
+    "field",
+    "applicant_org",
+    "applicant_role"
+  ],
+  "components.schemas.WorkflowDefinition.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDefinitionPageEq.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDefinitionPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "revision"
+  ],
+  "components.schemas.WorkflowDefinitionPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.WorkflowDefinitionRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowDefinitionRow.properties.status": [
+    "draft",
+    "published"
+  ],
+  "components.schemas.WorkflowDesignerDto.properties.schemaVersion": [1],
+  "components.schemas.WorkflowDirectoryBody.properties.kind": [
+    "users",
+    "roles",
+    "orgs"
+  ],
+  "components.schemas.WorkflowFormView.properties.fieldStates.additionalProperties":
+    ["editable", "readonly", "masked", "hidden"],
+  "components.schemas.WorkflowInstance.properties.status": [
+    "running",
+    "approved",
+    "returned",
+    "withdrawn"
+  ],
+  "components.schemas.WorkflowInstancePageEq.properties.status": [
+    "running",
+    "approved",
+    "returned",
+    "withdrawn"
+  ],
+  "components.schemas.WorkflowInstancePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowInstancePageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.WorkflowInstanceRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowInstanceRow.properties.status": [
+    "running",
+    "approved",
+    "returned",
+    "withdrawn"
+  ],
+  "components.schemas.WorkflowNode.properties.empty": [
+    "pass",
+    "administrator",
+    "stop"
+  ],
+  "components.schemas.WorkflowNode.properties.fieldPermissions.additionalProperties":
+    ["editable", "readonly", "masked", "hidden"],
+  "components.schemas.WorkflowNode.properties.mode": [
+    "sequential",
+    "all",
+    "any"
+  ],
+  "components.schemas.WorkflowNode.properties.rejectTo": ["applicant"],
+  "components.schemas.WorkflowNode.properties.type": [
+    "approve",
+    "copy",
+    "condition",
+    "parallel"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.status": [
+    "waiting",
+    "pending",
+    "approved",
+    "cancelled",
+    "returned",
+    "copied",
+    "taken"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.type": [
+    "approve",
+    "copy",
+    "condition",
+    "parallel"
+  ],
+  "components.schemas.WorkflowRecordPageEq.properties.action": [
+    "start",
+    "approve",
+    "empty_pass",
+    "repeat_pass",
+    "reject",
+    "transfer",
+    "withdraw",
+    "resubmit",
+    "urge",
+    "timeout"
+  ],
+  "components.schemas.WorkflowRecordPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowRecordPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.WorkflowRecordRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowRecordRow.properties.action": [
+    "start",
+    "approve",
+    "empty_pass",
+    "repeat_pass",
+    "reject",
+    "transfer",
+    "withdraw",
+    "resubmit",
+    "urge",
+    "timeout"
+  ],
+  "components.schemas.WorkflowTaskPageEq.properties.kind": ["approve", "copy"],
+  "components.schemas.WorkflowTaskPageEq.properties.status": [
+    "pending",
+    "approved",
+    "cancelled",
+    "rejected",
+    "transferred",
+    "copied"
+  ],
+  "components.schemas.WorkflowTaskPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.WorkflowTaskPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.WorkflowTaskRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.WorkflowTaskRow.properties.kind": ["approve", "copy"],
+  "components.schemas.WorkflowTaskRow.properties.status": [
+    "pending",
+    "approved",
+    "cancelled",
+    "rejected",
+    "transferred",
+    "copied"
+  ],
+  "components.schemas.WorkflowTimeout.properties.action": [
+    "remind",
+    "supervisor"
+  ]
 } as const;
