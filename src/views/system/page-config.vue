@@ -96,6 +96,11 @@ const dirty = computed(
 const previewColumns = computed(() =>
   columns.value.filter(column => !column.hidden)
 );
+function crudOperationPrefix(resource: string) {
+  return resource.replace(/[:-]([a-z0-9])/g, (_, char: string) =>
+    char.toUpperCase()
+  );
+}
 function fail(reason: unknown) {
   error.value =
     reason instanceof RequestFailure
@@ -220,7 +225,11 @@ onMounted(async () => {
       {},
       { signal: request.signal }
     );
-    if (!request.signal.aborted) modules.value = result.data.resources;
+    if (request.signal.aborted) return;
+    // 字段权限清单也包含动态表单，只有提供 CRUD 页面描述的资源可以配置页面。
+    modules.value = result.data.resources.filter(({ resource }) =>
+      Object.hasOwn(api, `${crudOperationPrefix(resource)}Schema`)
+    );
   } catch (reason) {
     if (!request.signal.aborted) fail(reason);
   } finally {
@@ -235,14 +244,9 @@ async function load() {
   loading.value = true;
   error.value = "";
   try {
-    const prefix = selected.value
-      .split(/[:-]/)
-      .map(part => part[0].toUpperCase() + part.slice(1))
-      .join("");
+    const prefix = crudOperationPrefix(selected.value);
     const [description, response] = await Promise.all([
-      generatedCrud(prefix[0].toLowerCase() + prefix.slice(1)).port.describe(
-        request.signal
-      ),
+      generatedCrud(prefix).port.describe(request.signal),
       api.systemPageConfigInfo(
         { query: { resource: selected.value } },
         { signal: request.signal }
