@@ -378,6 +378,7 @@ export const OPERATION_PERMISSIONS = {
   systemOrgSchema: ["system:org:page"],
   systemOrgTree: ["system:org:page"],
   systemOrgUpdate: ["system:org:update"],
+  systemPageConfigCatalog: ["system:page-config:info"],
   systemPageConfigHistory: ["system:page-config:info"],
   systemPageConfigHistoryInfo: ["system:page-config:info"],
   systemPageConfigInfo: ["system:page-config:info"],

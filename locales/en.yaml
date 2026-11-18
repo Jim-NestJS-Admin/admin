@@ -566,6 +566,9 @@ codegen:
 
 pageConfig:
   title: Module settings
+  topLevel: Top-level menus
+  noModules: No configurable modules
+  noReadPermission: Your current role cannot read this page
   version: "Current version {version}"
   versionLabel: Version
   history: History

@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { api, type OperationBody, type OperationResponse } from "@/api/client";
 import { ENUMS } from "@/api/constants";
 import { generatedCrud } from "@/platform/generated-crud";
+import { navigationViews } from "@/platform/navigation";
 import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
 import { notifyPageConfigChanged } from "@/platform/page-config-events";
+import { useUserStoreHook } from "@/store/modules/user";
 import { RequestFailure } from "@/utils/http";
 import type { CrudSchema, CrudTableMode } from "@/components/Crud/types";
 import FieldPermissions from "./FieldPermissions.vue";
@@ -18,10 +20,11 @@ import {
 } from "./page-config-diff.mjs";
 
 const { t } = useI18n();
+const user = useUserStoreHook();
 const tableModes =
   ENUMS["components.schemas.CrudSchema.properties.defaultTableMode"];
-const modules = ref<
-  OperationResponse<"systemFieldPermRegistry">["data"]["resources"]
+const moduleGroups = ref<
+  OperationResponse<"systemPageConfigCatalog">["data"]["groups"]
 >([]);
 const selected = ref(""),
   tab = ref("list"),
@@ -29,7 +32,8 @@ const selected = ref(""),
   version = ref(0),
   error = ref(""),
   busy = ref(false),
-  loading = ref(false);
+  loading = ref(false),
+  catalogLoading = ref(false);
 // 这些是编辑器视图状态；提交仍经正式生成客户端，由后端检查显示白名单。
 const columns = ref<
   {
@@ -202,7 +206,9 @@ function resetSession() {
   serial++;
   requests.forEach(request => request.abort());
   requests.clear();
-  modules.value = [];
+  moduleGroups.value = [];
+  catalogLoading.value = false;
+  loading.value = false;
   schema.value = undefined;
   selected.value = "";
   columns.value = [];
@@ -217,25 +223,45 @@ onBeforeUnmount(() => {
   stop();
   resetSession();
 });
-onMounted(async () => {
+async function loadCatalog() {
+  if (catalogLoading.value) return;
   const request = new AbortController();
   requests.add(request);
+  catalogLoading.value = true;
+  error.value = "";
   try {
-    const result = await api.systemFieldPermRegistry(
+    const { data } = await api.systemPageConfigCatalog(
       {},
       { signal: request.signal }
     );
     if (request.signal.aborted) return;
-    // 字段权限清单也包含动态表单，只有提供 CRUD 页面描述的资源可以配置页面。
-    modules.value = result.data.resources.filter(({ resource }) =>
-      Object.hasOwn(api, `${crudOperationPrefix(resource)}Schema`)
-    );
+    moduleGroups.value = data.groups.flatMap(group => {
+      const pages = group.pages.filter(
+        ({ resource }) =>
+          navigationViews.has(resource.replaceAll(":", "/")) &&
+          Object.hasOwn(api, `${crudOperationPrefix(resource)}Schema`)
+      );
+      return pages.length ? [{ ...group, pages }] : [];
+    });
   } catch (reason) {
     if (!request.signal.aborted) fail(reason);
   } finally {
     requests.delete(request);
+    if (!request.signal.aborted) catalogLoading.value = false;
   }
-});
+}
+watch(
+  [() => user.epoch, () => user.transitioning],
+  () => {
+    if (
+      !user.transitioning &&
+      user.isAuthenticated &&
+      user.permissions.includes(permission("systemPageConfigCatalog"))
+    )
+      void loadCatalog();
+  },
+  { immediate: true }
+);
 async function load() {
   if (!selected.value || busy.value) return;
   const turn = ++serial,
@@ -414,18 +440,34 @@ async function previewHistory(id: string) {
         filterable
         :aria-label="t('fieldPerm.module')"
         :placeholder="t('fieldPerm.module')"
+        :loading="catalogLoading"
+        :no-data-text="t('pageConfig.noModules')"
         :disabled="busy || dirty"
         @change="load"
-        ><el-option
-          v-for="module in modules"
-          :key="module.resource"
-          :value="module.resource"
-          :label="module.label"
-      /></el-select>
+      >
+        <el-option-group
+          v-for="group in moduleGroups"
+          :key="group.pages[0].resource"
+          :label="group.title || t('pageConfig.topLevel')"
+        >
+          <el-option
+            v-for="page in group.pages"
+            :key="page.resource"
+            :value="page.resource"
+            :label="page.title"
+            :disabled="!page.selectable"
+            :title="
+              page.selectable ? undefined : t('pageConfig.noReadPermission')
+            "
+          />
+        </el-option-group>
+      </el-select>
       <el-tag v-if="schema">{{ t("pageConfig.version", { version }) }}</el-tag>
-      <el-button :disabled="!selected || busy" @click="load">{{
-        t("crud.reload")
-      }}</el-button>
+      <el-button
+        :disabled="busy || loading || catalogLoading"
+        @click="selected ? load() : loadCatalog()"
+        >{{ t("crud.reload") }}</el-button
+      >
       <el-button
         v-perm="permission('systemPageConfigHistory')"
         :disabled="!schema || busy"
