@@ -11,7 +11,9 @@ import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
 import type { TreeInstance } from "element-plus";
 import CrudPage from "@/components/Crud/CrudPage.vue";
+import MenuIcon from "@/components/ReIcon/src/MenuIcon.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import MenuIconPicker from "./MenuIconPicker.vue";
 import SearchIcon from "~icons/ri/search-line";
 import AddIcon from "~icons/ri/add-circle-line";
 import KeyIcon from "~icons/ri/key-2-line";
@@ -45,9 +47,17 @@ const props = withDefaults(
 const { t } = useI18n();
 const user = useUserStoreHook();
 const definition = computed(() => resources[props.resource]);
-const port = computed<CrudPort>(() =>
-  scopePort(definition.value.port, props.fixed)
-);
+const menuPage = computed(() => props.resource === "menu" && !props.fixed);
+/** SystemMenuDeleteBody 的 ids 上限。 */
+const menuBatchRemoveLimit = 500;
+const port = computed<CrudPort>(() => {
+  const scoped = scopePort(definition.value.port, props.fixed);
+  if (!menuPage.value) return scoped;
+  return {
+    ...scoped,
+    tree: async signal => (await api.systemMenuTree({}, { signal })).data.list
+  };
+});
 type Option = {
   id: string;
   label: string;
@@ -115,6 +125,11 @@ const permissionOptions = computed(() =>
 const scopeOptions =
   ENUMS["components.schemas.SystemRoleAddData.properties.dataScope"];
 const menuTypes = ENUMS["components.schemas.SystemMenuAddData.properties.type"];
+const menuTypeTags = {
+  directory: "info",
+  page: "primary",
+  button: "warning"
+} as const satisfies Record<(typeof menuTypes)[number], string>;
 const options = (rows: CrudRecord[], fields: string[]): Option[] =>
   rows.flatMap(row =>
     typeof row.id !== "string"
@@ -354,6 +369,8 @@ function cell(row: CrudRecord, field: string): CrudCell {
       :key="`${resource}:${JSON.stringify(fixed)}`"
       :port="port"
       :fill="fill"
+      :collapse-tree="menuPage"
+      :batch-remove-limit="menuPage ? menuBatchRemoveLimit : undefined"
       :page-key="`system/${resource}`"
       :permissions="
         noRemove
@@ -362,6 +379,41 @@ function cell(row: CrudRecord, field: string): CrudCell {
       "
       :cell="cell"
     >
+      <template v-if="resource === 'menu'" #cell-scope="{ value, text }">
+        <el-tag
+          v-if="value === 'platform' || value === 'tenant'"
+          :type="value === 'platform' ? 'primary' : 'success'"
+          size="small"
+          effect="light"
+        >
+          {{ text }}
+        </el-tag>
+        <template v-else>{{ text }}</template>
+      </template>
+      <template v-if="resource === 'menu'" #cell-type="{ value, text }">
+        <el-tag
+          v-if="typeof value === 'string' && Object.hasOwn(menuTypeTags, value)"
+          :type="menuTypeTags[value]"
+          size="small"
+          effect="light"
+        >
+          {{ text }}
+        </el-tag>
+        <template v-else>{{ text }}</template>
+      </template>
+      <template v-if="resource === 'menu'" #cell-icon="{ value }">
+        <span
+          title=""
+          :aria-label="
+            t('system.menuIconPicker.fieldLabel', {
+              value: value || t('system.menuIconPicker.none')
+            })
+          "
+          role="img"
+        >
+          <MenuIcon :value="typeof value === 'string' ? value : null" />
+        </span>
+      </template>
       <template v-if="treeField && !fixed" #tree="{ filter }">
         <!-- 左侧树（参考 xinliwei）：标题 + 全部 / 刷新，搜索框，树 -->
         <aside class="side">
@@ -545,6 +597,16 @@ function cell(row: CrudRecord, field: string): CrudCell {
             :label="t(`system.menuTypes.${type}`)"
           />
         </el-select>
+      </template>
+      <template v-if="resource === 'menu'" #form-icon="{ values, disabled }">
+        <MenuIconPicker
+          :model-value="typeof values.icon === 'string' ? values.icon : null"
+          :menu-title="
+            typeof values.title === 'string' ? values.title : undefined
+          "
+          :disabled="disabled"
+          @update:model-value="values.icon = $event"
+        />
       </template>
       <template #form-enabled="{ values, disabled }"
         ><el-switch

@@ -261,6 +261,11 @@ export const pageSize = schema =>
         : 20
     )
   );
+export function tableModeOf(schema) {
+  const mode = schema?.view?.list?.tableMode;
+  if (mode === "normal" || mode === "virtual") return mode;
+  return schema?.defaultTableMode === "virtual" ? "virtual" : "normal";
+}
 export function formPresentation(schema, field) {
   const form = schema?.view?.form;
   const item = Array.isArray(form?.items)

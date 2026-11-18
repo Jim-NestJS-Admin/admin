@@ -45,6 +45,20 @@ test("什么都没改时保存空配置", () => {
   assert.deepEqual(minimalPageConfig(untouched(), defaults), {});
 });
 
+test("只保存不同于资源默认的表格模式，也能把菜单切回普通模式", () => {
+  const state = untouched();
+  state.options.tableMode = "virtual";
+  assert.deepEqual(minimalPageConfig(state, defaults), {
+    list: { tableMode: "virtual" }
+  });
+  const menu = { ...defaults, defaultTableMode: "virtual" };
+  assert.deepEqual(minimalPageConfig(state, menu), {});
+  state.options.tableMode = "normal";
+  assert.deepEqual(minimalPageConfig(state, menu), {
+    list: { tableMode: "normal" }
+  });
+});
+
 test("只改一列的属性时，只写到这一列为止的最短前缀，且只带改过的属性", () => {
   const state = untouched();
   state.columns[1].hidden = true;

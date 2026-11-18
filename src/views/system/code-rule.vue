@@ -162,6 +162,17 @@ const defaults = {
       page-key="system:code-rule"
       :permissions="rules.permissions"
       :add-defaults="defaults"
+      :extra-columns="
+        canReadBindings
+          ? [
+              {
+                field: 'binding-location',
+                label: t('codeRules.bindingLocation'),
+                width: 240
+              }
+            ]
+          : []
+      "
     >
       <template #cell-revision="{ value }"
         ><el-tag effect="plain">v{{ value }}</el-tag></template
@@ -169,25 +180,17 @@ const defaults = {
       <template #cell-timezone="{ value }"
         ><TimeZoneText :value="value"
       /></template>
-      <template #table-columns>
-        <el-table-column
-          v-if="canReadBindings"
-          :label="t('codeRules.bindingLocation')"
-          min-width="240"
-          show-overflow-tooltip
+      <template #extra-cell-binding-location="{ row }">
+        <span v-if="bindingsFailed">{{
+          t("codeRules.bindingsLoadFailed")
+        }}</span>
+        <el-tag
+          v-else-if="bindings.some(item => item.ruleId === row.id)"
+          effect="plain"
         >
-          <template #default="{ row }">
-            <span v-if="bindingsFailed">{{
-              t("codeRules.bindingsLoadFailed")
-            }}</span>
-            <el-tag
-              v-else-if="bindings.some(item => item.ruleId === row.id)"
-              effect="plain"
-              >{{ bindings.find(item => item.ruleId === row.id)?.name }}</el-tag
-            >
-            <span v-else>{{ t("codeRules.noCurrentBinding") }}</span>
-          </template>
-        </el-table-column>
+          {{ bindings.find(item => item.ruleId === row.id)?.name }}
+        </el-tag>
+        <span v-else>{{ t("codeRules.noCurrentBinding") }}</span>
       </template>
       <template #toolbar>
         <el-button

@@ -108,6 +108,7 @@ declare global {
     TooltipEffect?: Effect;
     ResponsiveStorageNameSpace?: string;
     MenuSearchHistory?: number;
+    EnableOnlineMenuIcons?: boolean;
   }
 
   /**

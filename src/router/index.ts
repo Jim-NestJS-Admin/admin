@@ -41,6 +41,10 @@ export const router = createRouter({
 });
 let loaded = false,
   restored = false;
+let oauthUid = new URL(window.location.href).searchParams.get("oauth_uid");
+let mcpOperation = new URL(window.location.href).searchParams.get(
+  "mcp_operation"
+);
 export function resetLoadedPaths() {
   loaded = false;
 }
@@ -62,13 +66,32 @@ onSessionReset(() => {
 });
 router.beforeEach(async to => {
   NProgress.start();
+  if (mcpOperation) {
+    const id = mcpOperation;
+    mcpOperation = null;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("mcp_operation");
+    window.history.replaceState(window.history.state, "", url.href);
+    if (/^[1-9]\d{0,19}$/.test(id))
+      return { path: "/automation/confirm", query: { operation: id } };
+  }
+  if (oauthUid) {
+    const uid = oauthUid;
+    oauthUid = null;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("oauth_uid");
+    window.history.replaceState(window.history.state, "", url.href);
+    if (/^[a-zA-Z0-9_-]{10,150}$/.test(uid))
+      return { path: "/authorization/consent", query: { uid } };
+  }
   const user = useUserStoreHook();
   if (!restored) {
     restored = true;
     await user.restoreSession();
   }
   if (to.path === "/login") return user.isAuthenticated ? "/welcome" : true;
-  if (!user.accessToken) return "/login";
+  if (!user.accessToken)
+    return { path: "/login", query: { next: to.fullPath } };
   if (user.transitioning) return false;
   try {
     await user.ensureFreshSession();

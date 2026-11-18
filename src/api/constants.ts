@@ -1,5 +1,16 @@
 // 此文件由 pnpm gen:api 生成，禁止手改。
 export const PERMISSIONS = [
+  "ai:config:info",
+  "ai:config:update",
+  "ai:reconciliation:info",
+  "ai:reconciliation:page",
+  "ai:reconciliation:update",
+  "ai:task:add",
+  "ai:task:info",
+  "ai:task:page",
+  "ai:template:add",
+  "ai:template:info",
+  "ai:template:page",
   "dev:codegen:delete",
   "dev:codegen:list",
   "dev:codegen:save",
@@ -16,6 +27,39 @@ export const PERMISSIONS = [
   "form:submission:add",
   "form:submission:info",
   "form:submission:page",
+  "integration:app:info",
+  "integration:app:page",
+  "integration:app:sync",
+  "integration:app:update",
+  "integration:sync-log:info",
+  "integration:sync-log:page",
+  "mcp:config:info",
+  "mcp:config:update",
+  "mcp:delegation:info",
+  "mcp:delegation:update",
+  "mcp:event:info",
+  "mcp:event:page",
+  "mcp:operation-list:info",
+  "mcp:operation-list:page",
+  "mcp:use",
+  "notify:message:info",
+  "notify:message:page",
+  "oauth:client:delete",
+  "oauth:client:info",
+  "oauth:client:page",
+  "oauth:client:update",
+  "oauth:event:info",
+  "oauth:event:page",
+  "oauth:grant:info",
+  "oauth:grant:page",
+  "oauth:grant:revoke",
+  "oauth:service-account:add",
+  "order:test:add",
+  "order:test:delete",
+  "order:test:export",
+  "order:test:info",
+  "order:test:page",
+  "order:test:update",
   "platform:package:add",
   "platform:package:delete",
   "platform:package:export",
@@ -133,6 +177,26 @@ export const PERMISSIONS = [
 ] as const;
 export type PermissionCode = (typeof PERMISSIONS)[number];
 export const OPERATION_PERMISSIONS = {
+  aiConfigRead: ["ai:config:info"],
+  aiConfigSave: ["ai:config:update"],
+  aiReconcile: ["ai:reconciliation:update"],
+  aiReconciliationInfo: ["ai:reconciliation:info"],
+  aiReconciliationPage: ["ai:reconciliation:page"],
+  aiReconciliationSchema: ["ai:reconciliation:page"],
+  aiTaskBatch: ["ai:task:add"],
+  aiTaskEvents: ["ai:task:info"],
+  aiTaskInfo: ["ai:task:info"],
+  aiTaskPage: ["ai:task:page"],
+  aiTaskResult: ["ai:task:info"],
+  aiTaskSchema: ["ai:task:page"],
+  aiTaskSubmit: ["ai:task:add"],
+  aiTemplateInfo: ["ai:template:info"],
+  aiTemplatePage: ["ai:template:page"],
+  aiTemplateSave: ["ai:template:add"],
+  aiTemplateSchema: ["ai:template:page"],
+  aiTemplatesAvailable: ["ai:template:page"],
+  aiUncertainTasks: ["ai:reconciliation:page"],
+  aiUsage: ["ai:task:page"],
   authCaptcha: [],
   authLogin: [],
   authLogout: [],
@@ -178,6 +242,63 @@ export const OPERATION_PERMISSIONS = {
   formSubmissionMine: ["form:submission:page"],
   formSubmissionPage: ["form:submission:page"],
   formSubmissionSchema: ["form:submission:page"],
+  integrationAppInfo: ["integration:app:info"],
+  integrationAppPage: ["integration:app:page"],
+  integrationAppSave: ["integration:app:update"],
+  integrationAppSchema: ["integration:app:page"],
+  integrationAppSync: ["integration:app:sync"],
+  integrationLoginExchange: [],
+  integrationLoginStart: [],
+  integrationSyncLogInfo: ["integration:sync-log:info"],
+  integrationSyncLogPage: ["integration:sync-log:page"],
+  integrationSyncLogSchema: ["integration:sync-log:page"],
+  mcpAccess: ["mcp:use"],
+  mcpConfiguration: ["mcp:config:info"],
+  mcpConfigurationSave: ["mcp:config:update"],
+  mcpDelegationSave: ["mcp:delegation:update"],
+  mcpDelegations: ["mcp:delegation:info"],
+  mcpEventInfo: ["mcp:event:info"],
+  mcpEventPage: ["mcp:event:page"],
+  mcpEventSchema: ["mcp:event:page"],
+  mcpOperationDecide: [],
+  mcpOperationDetails: [],
+  mcpOperationListInfo: ["mcp:operation-list:info"],
+  mcpOperationListPage: ["mcp:operation-list:page"],
+  mcpOperationListSchema: ["mcp:operation-list:page"],
+  mcpOperations: [],
+  notifyMessageInfo: ["notify:message:info"],
+  notifyMessagePage: ["notify:message:page"],
+  notifyMessageRead: ["notify:message:info"],
+  notifyMessageSchema: ["notify:message:page"],
+  notifyMessageUnread: ["notify:message:page"],
+  oauthClientDelete: ["oauth:client:delete"],
+  oauthClientInfo: ["oauth:client:info"],
+  oauthClientPage: ["oauth:client:page"],
+  oauthClientSave: ["oauth:client:update"],
+  oauthClientSchema: ["oauth:client:page"],
+  oauthEventInfo: ["oauth:event:info"],
+  oauthEventPage: ["oauth:event:page"],
+  oauthEventSchema: ["oauth:event:page"],
+  oauthGrantInfo: ["oauth:grant:info"],
+  oauthGrantPage: ["oauth:grant:page"],
+  oauthGrantRevoke: ["oauth:grant:revoke"],
+  oauthGrantSchema: ["oauth:grant:page"],
+  oauthIntegrationInfo: ["oauth:client:info"],
+  oauthIntegrationSave: ["oauth:client:update"],
+  oauthInteractionComplete: [],
+  oauthInteractionDetails: [],
+  oauthMyGrantRevoke: [],
+  oauthMyGrants: [],
+  oauthScopes: ["oauth:client:page"],
+  oauthServiceAccountCreate: ["oauth:service-account:add"],
+  oauthStatus: ["oauth:client:page"],
+  orderTestAdd: ["order:test:add"],
+  orderTestDelete: ["order:test:delete"],
+  orderTestExport: ["order:test:export"],
+  orderTestInfo: ["order:test:info"],
+  orderTestPage: ["order:test:page"],
+  orderTestSchema: ["order:test:page"],
+  orderTestUpdate: ["order:test:update"],
   platformPackageAdd: ["platform:package:add"],
   platformPackageDelete: ["platform:package:delete"],
   platformPackageExport: ["platform:package:export"],
@@ -340,8 +461,80 @@ export const OPERATION_PERMISSIONS = {
   workflowTaskSchema: ["workflow:task:page"],
   workflowTaskTransfer: ["workflow:task:transfer"]
 } as const;
-export const SCOPES = [] as const;
+export const SCOPES = [
+  "ai:read",
+  "ai:risk",
+  "ai:write",
+  "file:read",
+  "file:write",
+  "form:read",
+  "form:write",
+  "integration:read",
+  "integration:risk",
+  "mcp:read",
+  "mcp:risk",
+  "mcp:write",
+  "notify:read",
+  "oauth:read",
+  "oauth:risk",
+  "order:read",
+  "order:risk",
+  "order:write",
+  "system:read",
+  "system:risk",
+  "system:write",
+  "workflow:read",
+  "workflow:risk",
+  "workflow:write"
+] as const;
 export const ENUMS = {
+  "components.schemas.AiReconciliationPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.AiReconciliationPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.AiReconciliationRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.AiSubmitBody.properties.feature": [
+    "generate",
+    "rewrite",
+    "translate"
+  ],
+  "components.schemas.AiTaskPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.AiTaskPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.AiTaskResult.properties.status": [
+    "queued",
+    "running",
+    "succeeded",
+    "failed",
+    "uncertain"
+  ],
+  "components.schemas.AiTaskRow.properties._fieldState.additionalProperties": [
+    "readonly",
+    "masked",
+    "hidden"
+  ],
+  "components.schemas.AiTemplatePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.AiTemplatePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.AiTemplateRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.AiTemplateSaveBody.properties.code": [
+    "generate",
+    "rewrite",
+    "translate"
+  ],
   "components.schemas.CodeUsageItem.properties.charset": [
     "upper_alnum",
     "lower_slug",
@@ -359,6 +552,10 @@ export const ENUMS = {
     "purge",
     "export",
     "tree"
+  ],
+  "components.schemas.CrudSchema.properties.defaultTableMode": [
+    "normal",
+    "virtual"
   ],
   "components.schemas.CrudSchema.properties.deleteMode": ["soft", "hard"],
   "components.schemas.CrudSchemaColumn.properties.type": [
@@ -587,12 +784,58 @@ export const ENUMS = {
     ["readonly", "masked", "hidden"],
   "components.schemas.FormValidationDto.properties.format": ["email", "url"],
   "components.schemas.FormValidationResult.properties.valid": [true],
+  "components.schemas.IntegrationAppPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.IntegrationAppPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.IntegrationAppRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.IntegrationSyncLogPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.IntegrationSyncLogPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.IntegrationSyncLogRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.MaskRuleDto.properties.code": [
     "phone",
     "email",
     "idcard",
     "last4",
     "all"
+  ],
+  "components.schemas.McpEventPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.McpEventPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.McpEventRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.McpOperationListPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "expiresAt"
+  ],
+  "components.schemas.McpOperationListPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.McpOperationListRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.McpOperationListRow.properties.status": [
+    "pending",
+    "succeeded",
+    "rejected",
+    "expired",
+    "invalid"
   ],
   "components.schemas.MenuItemDto.properties.type": ["directory", "page"],
   "components.schemas.ModuleSpec.properties.template": [
@@ -601,6 +844,56 @@ export const ENUMS = {
     "masterDetail"
   ],
   "components.schemas.ModuleSpec.properties.version": [1],
+  "components.schemas.NotifyMessagePageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.NotifyMessagePageSort.properties.order": ["asc", "desc"],
+  "components.schemas.NotifyMessageRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.OAuthClientSaveBody.properties.authMethod": [
+    "none",
+    "client_secret_basic",
+    "private_key_jwt"
+  ],
+  "components.schemas.OauthClientPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.OauthClientPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.OauthClientRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.OauthEventPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.OauthEventPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.OauthEventRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.OauthGrantPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt"
+  ],
+  "components.schemas.OauthGrantPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.OauthGrantRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.OrderTestExportBody.properties.format": ["csv", "xlsx"],
+  "components.schemas.OrderTestPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "orderNo",
+    "unitPrice",
+    "qty",
+    "state"
+  ],
+  "components.schemas.OrderTestPageSort.properties.order": ["asc", "desc"],
+  "components.schemas.OrderTestRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
   "components.schemas.PackageMenuItem.properties.type": [
     "directory",
     "page",

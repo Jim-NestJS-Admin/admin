@@ -116,6 +116,14 @@ export function createBackendGateway(
   };
   const refresh = async () => hydrate((await client().authRefresh()).data);
   return {
+    async wecomStart(desktop, returnPath) {
+      return (
+        await client().integrationLoginStart({ body: { desktop, returnPath } })
+      ).data;
+    },
+    async signInWecom(body) {
+      return hydrate((await client().integrationLoginExchange({ body })).data);
+    },
     async signIn(input) {
       const result = await client().authLogin({
         body: {

@@ -8,9 +8,15 @@ import {
   watch
 } from "vue";
 import { useI18n } from "vue-i18n";
-import { useElementSize, useMediaQuery, useNow } from "@vueuse/core";
+import {
+  createReusableTemplate,
+  useElementSize,
+  useMediaQuery,
+  useNow
+} from "@vueuse/core";
 import { onSessionReset } from "@/platform/lifecycle";
 import {
+  ElMessage,
   ElMessageBox,
   ElDrawer,
   ElDialog,
@@ -34,6 +40,7 @@ import DictionaryValue from "./DictionaryValue.vue";
 import ChildEditor from "./ChildEditor.vue";
 import AdvancedQuery from "./AdvancedQuery.vue";
 import ColumnSettings from "./ColumnSettings.vue";
+import CrudVirtualTable from "./CrudVirtualTable.vue";
 import ClearIcon from "~icons/ri/close-circle-line";
 import ArrowDownIcon from "~icons/ri/arrow-down-s-line";
 import {
@@ -41,12 +48,16 @@ import {
   columnChoices,
   defaultCell,
   formatValue,
-  formPresentation
+  formPresentation,
+  tableModeOf
 } from "./model.mjs";
 import { useCrud } from "./useCrud";
+import { walkTreeRows } from "./tree.mjs";
 import type {
   CrudPort,
   CrudCell,
+  CrudColumn,
+  CrudExtraColumn,
   CrudRecord,
   CrudChoices,
   CrudExportFormat
@@ -77,11 +88,22 @@ const props = withDefaults(
     rowActionsWidth?: number;
     /** 只读详情可省略底部关闭，仍保留右上角关闭与Esc。 */
     hideDetailFooter?: boolean;
+    /** 树形列表默认折叠，筛选命中的分支仍自动展开。 */
+    collapseTree?: boolean;
+    extraColumns?: readonly CrudExtraColumn[];
+    batchRemoveLimit?: number;
   }>(),
   { fill: true }
 );
 const { t } = useI18n();
 const slots = useSlots();
+const [DefineListCell, RenderListCell] = createReusableTemplate<{
+  row: CrudRecord;
+  column: CrudColumn;
+}>({ inheritAttrs: false });
+const [DefineRowActions, RenderRowActions] = createReusableTemplate<{
+  row: CrudRecord;
+}>({ inheritAttrs: false });
 const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
@@ -114,6 +136,8 @@ const view = useCrud(
 );
 const {
   schema,
+  fullTree,
+  sortRequested,
   rows,
   selected,
   total,
@@ -131,6 +155,19 @@ const {
   visibleColumns,
   retryUntil
 } = view;
+const rowTree = computed(() =>
+  recycledView.value ? undefined : schema.value?.tree
+);
+const expandTree = computed(
+  () =>
+    !!rowTree.value &&
+    (!props.collapseTree ||
+      !!(query.search || query.advanced || Object.keys(query.equality).length))
+);
+// 旧版插槽直接传入 el-table-column，只能由普通表格渲染。
+const virtualTable = computed(
+  () => tableModeOf(schema.value) === "virtual" && !slots["table-columns"]
+);
 const exporting = ref(false);
 let exportRequest: AbortController | undefined;
 const stopExport = onSessionReset(() => exportRequest?.abort());
@@ -317,6 +354,58 @@ function autoWidth(column) {
     [...String(column.label ?? "")].length * 14 + (column.sortable ? 52 : 32);
   return Math.max(base, title);
 }
+const showSelection = computed(() =>
+  recycledView.value
+    ? !!(
+        (props.port.restore && props.permissions?.restore) ||
+        (props.port.purge && props.permissions?.purge)
+      )
+    : !!(props.port.remove && props.permissions?.remove)
+);
+const showActions = computed(
+  () =>
+    !recycledView.value &&
+    !!(
+      slots["row-actions"] ||
+      props.port.update ||
+      props.port.remove ||
+      props.permissions?.info
+    )
+);
+function sortable(column: CrudColumn) {
+  return (
+    !recycledView.value &&
+    column.sortable &&
+    schema.value?.actions.page?.sortable.includes(column.field)
+  );
+}
+const virtualColumns = computed(() => [
+  ...visibleColumns.value.map(column => ({
+    ...column,
+    width: column.width ?? autoWidth(column),
+    sortable: !!sortable(column)
+  })),
+  ...(props.extraColumns ?? []).map(column => ({
+    ...column,
+    type: "text" as const,
+    width: column.width ?? 160,
+    fixed: false as const,
+    sortable: false,
+    extra: true
+  })),
+  ...(recycledView.value
+    ? [
+        {
+          field: "deletedAt",
+          label: t("crud.deletedAt"),
+          type: "datetime" as const,
+          width: 170,
+          fixed: false as const,
+          sortable: false
+        }
+      ]
+    : [])
+]);
 /** 操作列宽度：按实际会出现的按钮数 */
 const actionWidth = computed(() => {
   if (slots["row-actions"] || slots["row-actions-extra"])
@@ -328,7 +417,14 @@ const actionWidth = computed(() => {
   return Math.max(90, count * 66 + 14);
 });
 async function confirmRemove(ids: string[]) {
+  if (props.batchRemoveLimit && ids.length > props.batchRemoveLimit) {
+    ElMessage.warning(
+      t("crud.batchRemoveLimit", { limit: props.batchRemoveLimit })
+    );
+    return;
+  }
   const description = schema.value;
+  const confirmedRows = rows.value;
   try {
     await ElMessageBox.confirm(
       t("crud.confirmRemove", { count: ids.length }),
@@ -343,10 +439,13 @@ async function confirmRemove(ids: string[]) {
     return;
   }
   // 确认框打开期间发生组织切换时，旧选择已清除，不能提交旧上下文的删除。
+  const currentRows = rowTree.value ? walkTreeRows(rows.value) : rows.value;
+  const currentIds = new Set(Array.from(currentRows, row => row.id));
   if (
     !schema.value ||
     schema.value !== description ||
-    !ids.every(id => rows.value.some(row => row.id === id))
+    (virtualTable.value && confirmedRows !== rows.value) ||
+    !ids.every(id => currentIds.has(id))
   )
     return;
   await view.remove(ids);
@@ -404,6 +503,71 @@ defineExpose({
     :style="[headStyle, fill ? { height: `${fillHeight}px` } : {}]"
     :aria-label="schema?.label ?? t('crud.title')"
   >
+    <DefineListCell v-slot="{ row, column }">
+      <slot
+        v-if="
+          ['visible', 'readonly'].includes(readCell(row, column.field).state)
+        "
+        :name="`cell-${column.field}`"
+        :row="row"
+        :value="readCell(row, column.field).display"
+        :text="display(row, column)"
+      >
+        <DictionaryValue
+          v-if="column.dict"
+          :cell="readCell(row, column.field)"
+          :options="schema.dictionaries[column.dict]"
+          :text="display(row, column)"
+        />
+        <el-tag
+          v-else-if="
+            column.type === 'boolean' &&
+            typeof readCell(row, column.field).display === 'boolean'
+          "
+          size="small"
+          :type="readCell(row, column.field).display ? 'success' : 'info'"
+          effect="light"
+          >{{ display(row, column) }}</el-tag
+        >
+        <template v-else>{{ display(row, column) }}</template>
+      </slot>
+      <span v-else class="crud-muted">{{ display(row, column) }}</span>
+    </DefineListCell>
+    <DefineRowActions v-slot="{ row }">
+      <slot name="row-actions" :row="row" :disabled="saving">
+        <el-button
+          v-if="permissions?.info && schema.api.includes('info')"
+          v-perm="permissions.info"
+          link
+          type="primary"
+          :icon="useRenderIcon(ViewIcon)"
+          :disabled="saving"
+          @click="view.edit(row, true)"
+          >{{ t("crud.info") }}</el-button
+        >
+        <el-button
+          v-if="port.update && schema.api.includes('update')"
+          v-perm="permissions?.update ?? []"
+          link
+          type="primary"
+          :icon="useRenderIcon(EditIcon)"
+          :disabled="saving"
+          @click="view.edit(row)"
+          >{{ t("crud.edit") }}</el-button
+        >
+        <el-button
+          v-if="port.remove && schema.api.includes('delete')"
+          v-perm="permissions?.remove ?? []"
+          link
+          type="danger"
+          :icon="useRenderIcon(DeleteIcon)"
+          :disabled="saving"
+          @click="confirmRemove([String(row.id)])"
+          >{{ t("crud.remove") }}</el-button
+        >
+      </slot>
+      <slot name="row-actions-extra" :row="row" :disabled="saving" />
+    </DefineRowActions>
     <el-splitter v-if="schema" class="crud-splitter" lazy>
       <el-splitter-panel
         v-if="slots.tree && !treeInDrawer && !recycledView"
@@ -602,12 +766,46 @@ defineExpose({
             :closable="false"
             class="crud-error"
           />
-          <div class="crud-table">
+          <div
+            class="crud-table"
+            :class="{ 'crud-table-bounded': virtualTable && !fill }"
+          >
+            <CrudVirtualTable
+              v-if="virtualTable"
+              v-model:selected="selected"
+              :rows="rows"
+              :columns="virtualColumns"
+              :name-field="rowTree?.nameField"
+              :selectable="showSelection"
+              :action-width="showActions ? actionWidth : 0"
+              :density="choices.density"
+              :loading="loading"
+              :expand-all="expandTree"
+              :sort="sortRequested ? query.sorting[0] : undefined"
+              @sort="view.sort"
+            >
+              <template #cell="{ row, column }">
+                <span v-if="column.extra" class="crud-virtual-cell">
+                  <slot :name="`extra-cell-${column.field}`" :row="row" />
+                </span>
+                <span
+                  v-else
+                  class="crud-virtual-cell"
+                  :title="String(display(row, column))"
+                >
+                  <RenderListCell :row="row" :column="column" />
+                </span>
+              </template>
+              <template #actions="{ row }">
+                <RenderRowActions :row="row" />
+              </template>
+            </CrudVirtualTable>
             <el-table
+              v-else
               v-loading="loading"
               :data="rows"
               row-key="id"
-              :default-expand-all="!!schema.tree"
+              :default-expand-all="expandTree"
               :tree-props="{
                 children: '__crudTreeChildren',
                 hasChildren: '__crudTreeHasChildren'
@@ -624,12 +822,7 @@ defineExpose({
               @sort-change="view.sort($event.prop, $event.order)"
             >
               <el-table-column
-                v-if="
-                  recycledView
-                    ? (port.restore && permissions?.restore) ||
-                      (port.purge && permissions?.purge)
-                    : port.remove && permissions?.remove
-                "
+                v-if="showSelection"
                 type="selection"
                 width="48"
                 align="center"
@@ -644,48 +837,21 @@ defineExpose({
                 :fixed="column.fixed"
                 :align="columnAlign(column)"
                 show-overflow-tooltip
-                :sortable="
-                  !recycledView &&
-                  column.sortable &&
-                  schema.actions.page?.sortable.includes(column.field)
-                    ? 'custom'
-                    : false
-                "
+                :sortable="sortable(column) ? 'custom' : false"
               >
                 <template #default="{ row }">
-                  <slot
-                    v-if="
-                      ['visible', 'readonly'].includes(
-                        readCell(row, column.field).state
-                      )
-                    "
-                    :name="`cell-${column.field}`"
-                    :row="row"
-                    :value="readCell(row, column.field).display"
-                    :text="display(row, column)"
-                    ><DictionaryValue
-                      v-if="column.dict"
-                      :cell="readCell(row, column.field)"
-                      :options="schema.dictionaries[column.dict]"
-                      :text="display(row, column)"
-                    /><el-tag
-                      v-else-if="
-                        column.type === 'boolean' &&
-                        typeof readCell(row, column.field).display === 'boolean'
-                      "
-                      size="small"
-                      :type="
-                        readCell(row, column.field).display ? 'success' : 'info'
-                      "
-                      effect="light"
-                      >{{ display(row, column) }}</el-tag
-                    ><template v-else>{{
-                      display(row, column)
-                    }}</template></slot
-                  >
-                  <span v-else class="crud-muted">{{
-                    display(row, column)
-                  }}</span>
+                  <RenderListCell :row="row" :column="column" />
+                </template>
+              </el-table-column>
+              <el-table-column
+                v-for="column in extraColumns"
+                :key="column.field"
+                :label="column.label"
+                :min-width="column.width ?? 160"
+                show-overflow-tooltip
+              >
+                <template #default="{ row }">
+                  <slot :name="`extra-cell-${column.field}`" :row="row" />
                 </template>
               </el-table-column>
               <slot name="table-columns" />
@@ -701,67 +867,21 @@ defineExpose({
                 }}</template>
               </el-table-column>
               <el-table-column
-                v-if="
-                  (slots['row-actions'] ||
-                    port.update ||
-                    port.remove ||
-                    permissions?.info) &&
-                  !recycledView
-                "
+                v-if="showActions"
                 :label="t('crud.actions')"
                 fixed="right"
                 :width="actionWidth"
                 align="center"
               >
                 <template #default="{ row }">
-                  <slot name="row-actions" :row="row" :disabled="saving">
-                    <el-button
-                      v-if="permissions?.info && schema.api.includes('info')"
-                      v-perm="permissions.info"
-                      link
-                      type="primary"
-                      :icon="useRenderIcon(ViewIcon)"
-                      :disabled="saving"
-                      @click="view.edit(row, true)"
-                      >{{ t("crud.info") }}</el-button
-                    ><el-button
-                      v-if="port.update && schema.api.includes('update')"
-                      v-perm="permissions?.update ?? []"
-                      link
-                      type="primary"
-                      :icon="useRenderIcon(EditIcon)"
-                      :disabled="saving"
-                      @click="view.edit(row)"
-                      >{{ t("crud.edit") }}</el-button
-                    ><el-button
-                      v-if="port.remove && schema.api.includes('delete')"
-                      v-perm="permissions?.remove ?? []"
-                      link
-                      type="danger"
-                      :icon="useRenderIcon(DeleteIcon)"
-                      :disabled="saving"
-                      @click="confirmRemove([String(row.id)])"
-                      >{{ t("crud.remove") }}</el-button
-                    >
-                  </slot>
-                  <slot
-                    name="row-actions-extra"
-                    :row="row"
-                    :disabled="saving"
-                  />
+                  <RenderRowActions :row="row" />
                 </template>
               </el-table-column>
             </el-table>
           </div>
           <footer class="crud-pagination">
             <el-pagination
-              v-if="
-                !schema.tree ||
-                recycledView ||
-                query.search ||
-                query.advanced ||
-                Object.keys(query.equality).length
-              "
+              v-if="!fullTree"
               v-model:current-page="query.pageNumber"
               v-model:page-size="query.pageSize"
               background
@@ -1407,8 +1527,20 @@ defineExpose({
   overflow: hidden;
 }
 
+.crud-table-bounded {
+  flex: none;
+  height: min(360px, 50dvh);
+}
+
 .crud-muted {
   color: var(--el-text-color-placeholder);
+}
+
+.crud-virtual-cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .crud-pagination {

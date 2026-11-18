@@ -35,11 +35,11 @@ function trimRows(rows, base, attributes) {
  * @param {object} state 编辑器当前状态
  *   columns: [{ field, width?, hidden, fixed }]
  *   items: [{ field, group, span, placeholder }]
- *   options: { pageSize, tree, mode, keyWords, filterable, sorting }
+ *   options: { pageSize, tableMode, tree, mode, keyWords, filterable, sorting }
  * @param {object} defaults 代码默认（来自原始页面描述，不含任何配置）
  *   columns: [{ field, width?, hidden? }]，按默认顺序
  *   items: [{ field, placeholder? }]，按默认顺序
- *   keyWords, filterable: string[]；sorting: [{ field, order }]
+ *   defaultTableMode, keyWords, filterable: string[]；sorting: [{ field, order }]
  */
 export function minimalPageConfig(state, defaults) {
   const columnDefault = new Map(
@@ -85,6 +85,11 @@ export function minimalPageConfig(state, defaults) {
   if (!sameList(sortKey(options.sorting), sortKey(defaults.sorting)))
     list.defaultSort = options.sorting.map(item => ({ ...item }));
   if (options.pageSize !== DEFAULT_PAGE_SIZE) list.pageSize = options.pageSize;
+  if (
+    options.tableMode &&
+    options.tableMode !== (defaults.defaultTableMode ?? "normal")
+  )
+    list.tableMode = options.tableMode;
   if (options.tree === false) list.tree = false;
   const form = {};
   if (options.mode !== DEFAULT_FORM_MODE) form.mode = options.mode;

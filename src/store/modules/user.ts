@@ -115,6 +115,17 @@ export const useUserStore = defineStore("admin-user", {
       if (epoch !== this.epoch) throw new Error("admin.requestCanceled");
       this.applySession(session);
     },
+    async loginByWecom(
+      input: import("@/api/schema").components["schemas"]["IntegrationLoginBody"]
+    ) {
+      this.clearSession();
+      const epoch = this.epoch;
+      const login = getAdminGateway().signInWecom;
+      if (!login) throw new Error("admin.serviceUnavailable");
+      const session = await coordinatedMutation(() => login(input));
+      if (epoch !== this.epoch) throw new Error("admin.requestCanceled");
+      this.applySession(session);
+    },
     async restoreSession() {
       if (!gatewayReady()) return;
       const epoch = this.epoch;

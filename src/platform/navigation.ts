@@ -2,6 +2,19 @@ import { adaptNavigation } from "./policy.mjs";
 import { useUserStoreHook } from "@/store/modules/user";
 // 只注册实际实现的业务页，T14/T13 添加页面时显式扩展，禁止任意组件路径。
 export const navigationViews = new Map<string, () => Promise<unknown>>([
+  ["mcp/config", () => import("@/views/mcp/config.vue")],
+  ["mcp/operation", () => import("@/views/mcp/operation.vue")],
+  ["mcp/event", () => import("@/views/mcp/event.vue")],
+  ["oauth/client", () => import("@/views/oauth/client.vue")],
+  ["oauth/grant", () => import("@/views/oauth/grant.vue")],
+  ["oauth/event", () => import("@/views/oauth/event.vue")],
+  ["ai/task", () => import("@/views/ai/task.vue")],
+  ["ai/reconciliation", () => import("@/views/ai/reconciliation.vue")],
+  ["ai/template", () => import("@/views/ai/template.vue")],
+  ["ai/config", () => import("@/views/ai/config.vue")],
+  ["notify/message", () => import("@/views/notify/message.vue")],
+  ["integration/app", () => import("@/views/integration/app.vue")],
+  ["order/test", () => import("@/views/order/test/index.vue")],
   ["workflow/definition", () => import("@/views/workflow/definition.vue")],
   ["workflow/workbench", () => import("@/views/workflow/workbench.vue")],
   ["form/submission", () => import("@/views/form/submission.vue")],

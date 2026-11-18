@@ -3,8 +3,29 @@ import assert from "node:assert/strict";
 import {
   applyPageView,
   constrainFieldSchema,
-  formPresentation
+  formPresentation,
+  tableModeOf
 } from "../src/components/Crud/model.mjs";
+
+test("表格模式优先生效配置，旧描述和无效值回到代码默认", () => {
+  assert.equal(tableModeOf({}), "normal");
+  assert.equal(tableModeOf({ defaultTableMode: "virtual" }), "virtual");
+  assert.equal(
+    tableModeOf({
+      defaultTableMode: "virtual",
+      view: { list: { tableMode: "normal" } }
+    }),
+    "normal"
+  );
+  assert.equal(
+    tableModeOf({ view: { list: { tableMode: "virtual" } } }),
+    "virtual"
+  );
+  assert.equal(
+    tableModeOf({ view: { list: { tableMode: "unknown" } } }),
+    "normal"
+  );
+});
 test("显示配置不能增加字段或恢复隐藏字段，表单跨度分组只影响显示", () => {
   const source = {
     columns: [{ field: "name" }, { field: "cost" }],
