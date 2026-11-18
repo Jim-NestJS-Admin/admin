@@ -7187,17 +7187,15 @@ export type components = {
       type: "directory" | "page" | "button";
     };
     PageConfigCatalogDto: {
-      groups: components["schemas"]["PageConfigMenuGroupDto"][];
+      menus: components["schemas"]["PageConfigMenuNodeDto"][];
     };
-    PageConfigMenuGroupDto: {
-      pages: components["schemas"]["PageConfigMenuItemDto"][];
-      /** @description 菜单目录路径，顶层页面为空 */
-      title: string;
-    };
-    PageConfigMenuItemDto: {
-      resource: string;
+    PageConfigMenuNodeDto: {
+      children?: components["schemas"]["PageConfigMenuNodeDto"][];
+      id: string;
+      /** @description 页面对应的 CRUD 资源 */
+      resource?: string;
       /** @description 当前角色能否读取该资源的页面描述 */
-      selectable: boolean;
+      selectable?: boolean;
       title: string;
     };
     PermissionItem: {

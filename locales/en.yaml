@@ -566,9 +566,12 @@ codegen:
 
 pageConfig:
   title: Module settings
-  topLevel: Top-level menus
+  searchModules: Search modules
+  selectModule: Select a module from the menu tree to configure it
   noModules: No configurable modules
   noReadPermission: Your current role cannot read this page
+  unsavedSwitch: Switching modules will discard your unsaved changes.
+  discardAndSwitch: Discard and switch
   version: "Current version {version}"
   versionLabel: Version
   history: History

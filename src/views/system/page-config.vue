@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
+import { useMediaQuery } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox } from "element-plus";
+import {
+  ElMessage,
+  ElMessageBox,
+  ElSplitter,
+  ElSplitterPanel,
+  type TreeInstance
+} from "element-plus";
 import { api, type OperationBody, type OperationResponse } from "@/api/client";
 import { ENUMS } from "@/api/constants";
 import { generatedCrud } from "@/platform/generated-crud";
@@ -11,7 +18,12 @@ import { onSessionReset } from "@/platform/lifecycle";
 import { notifyPageConfigChanged } from "@/platform/page-config-events";
 import { useUserStoreHook } from "@/store/modules/user";
 import { RequestFailure } from "@/utils/http";
+import { useFillHeight } from "@/components/Crud/useFillHeight";
+import { useHeadStyle } from "@/components/Crud/useHeadStyle";
 import type { CrudSchema, CrudTableMode } from "@/components/Crud/types";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import RefreshIcon from "~icons/ri/refresh-line";
+import SearchIcon from "~icons/ri/search-line";
 import FieldPermissions from "./FieldPermissions.vue";
 import {
   DEFAULT_FORM_MODE,
@@ -21,19 +33,32 @@ import {
 
 const { t } = useI18n();
 const user = useUserStoreHook();
+const pageEl = ref<HTMLElement>();
+const fillHeight = useFillHeight(pageEl);
+const headStyle = useHeadStyle();
+const mobile = useMediaQuery("(max-width: 760px)");
 const tableModes =
   ENUMS["components.schemas.CrudSchema.properties.defaultTableMode"];
-const moduleGroups = ref<
-  OperationResponse<"systemPageConfigCatalog">["data"]["groups"]
->([]);
-const selected = ref(""),
-  tab = ref("list"),
+type ModuleNode =
+  OperationResponse<"systemPageConfigCatalog">["data"]["menus"][number];
+const moduleTree = ref<TreeInstance>();
+const moduleNodes = ref<ModuleNode[]>([]);
+const moduleSearch = ref("");
+const moduleTreeProps = {
+  label: "title",
+  disabled: (node: ModuleNode) => Boolean(node.resource && !node.selectable)
+};
+const fieldEditor = ref<InstanceType<typeof FieldPermissions>>();
+const selectedModule = ref<{ id: string; title: string; resource: string }>();
+const selected = computed(() => selectedModule.value?.resource ?? "");
+const tab = ref("list"),
   schema = ref<CrudSchema>(),
   version = ref(0),
   error = ref(""),
   busy = ref(false),
   loading = ref(false),
-  catalogLoading = ref(false);
+  catalogLoading = ref(false),
+  catalogError = ref("");
 // 这些是编辑器视图状态；提交仍经正式生成客户端，由后端检查显示白名单。
 const columns = ref<
   {
@@ -70,7 +95,8 @@ const histories = ref<
   historyPage = ref(1),
   historyTotal = ref(0),
   historyPreview = ref("");
-let baseline = "",
+const baseline = ref("");
+let confirmingSwitch = false,
   serial = 0,
   dragIndex = -1;
 const requests = new Set<AbortController>();
@@ -95,7 +121,10 @@ const config = () =>
       )
     : {};
 const dirty = computed(
-  () => !!schema.value && JSON.stringify(config()) !== baseline
+  () => !!schema.value && JSON.stringify(config()) !== baseline.value
+);
+const hasUnsavedChanges = computed(
+  () => dirty.value || fieldEditor.value?.hasUnsavedChanges
 );
 const previewColumns = computed(() =>
   columns.value.filter(column => !column.hidden)
@@ -105,8 +134,8 @@ function crudOperationPrefix(resource: string) {
     char.toUpperCase()
   );
 }
-function fail(reason: unknown) {
-  error.value =
+function fail(reason: unknown, target = error) {
+  target.value =
     reason instanceof RequestFailure
       ? reason.failure.message
       : t("crud.requestFailed");
@@ -206,45 +235,55 @@ function resetSession() {
   serial++;
   requests.forEach(request => request.abort());
   requests.clear();
-  moduleGroups.value = [];
+  moduleNodes.value = [];
+  moduleSearch.value = "";
   catalogLoading.value = false;
+  catalogError.value = "";
   loading.value = false;
+  busy.value = false;
+  error.value = "";
   schema.value = undefined;
-  selected.value = "";
+  selectedModule.value = undefined;
+  tab.value = "list";
   columns.value = [];
   items.value = [];
   histories.value = [];
   historyOpen.value = false;
   historyPreview.value = "";
-  baseline = "";
+  baseline.value = "";
 }
 const stop = onSessionReset(resetSession);
 onBeforeUnmount(() => {
   stop();
   resetSession();
 });
+function supportedNodes(nodes: ModuleNode[]): ModuleNode[] {
+  return nodes.flatMap(node => {
+    if (node.resource) {
+      return navigationViews.has(node.resource.replaceAll(":", "/")) &&
+        Object.hasOwn(api, `${crudOperationPrefix(node.resource)}Schema`)
+        ? [node]
+        : [];
+    }
+    const children = supportedNodes(node.children ?? []);
+    return children.length ? [{ ...node, children }] : [];
+  });
+}
 async function loadCatalog() {
   if (catalogLoading.value) return;
   const request = new AbortController();
   requests.add(request);
   catalogLoading.value = true;
-  error.value = "";
+  catalogError.value = "";
   try {
     const { data } = await api.systemPageConfigCatalog(
       {},
       { signal: request.signal }
     );
     if (request.signal.aborted) return;
-    moduleGroups.value = data.groups.flatMap(group => {
-      const pages = group.pages.filter(
-        ({ resource }) =>
-          navigationViews.has(resource.replaceAll(":", "/")) &&
-          Object.hasOwn(api, `${crudOperationPrefix(resource)}Schema`)
-      );
-      return pages.length ? [{ ...group, pages }] : [];
-    });
+    moduleNodes.value = supportedNodes(data.menus);
   } catch (reason) {
-    if (!request.signal.aborted) fail(reason);
+    if (!request.signal.aborted) fail(reason, catalogError);
   } finally {
     requests.delete(request);
     if (!request.signal.aborted) catalogLoading.value = false;
@@ -262,6 +301,58 @@ watch(
   },
   { immediate: true }
 );
+watch(
+  [moduleSearch, moduleNodes],
+  ([search]) => moduleTree.value?.filter(search.trim().toLocaleLowerCase()),
+  { flush: "post" }
+);
+async function switchModule(node: ModuleNode) {
+  // 树组件在事件前更新高亮，先还原，等确认后才切换当前项。
+  moduleTree.value?.setCurrentKey(selectedModule.value?.id ?? null, false);
+  const { id, title, resource, selectable } = node;
+  if (
+    !resource ||
+    !selectable ||
+    resource === selected.value ||
+    busy.value ||
+    loading.value ||
+    fieldEditor.value?.busy ||
+    confirmingSwitch
+  )
+    return;
+  const epoch = user.epoch;
+  if (hasUnsavedChanges.value) {
+    confirmingSwitch = true;
+    try {
+      await ElMessageBox.confirm(
+        t("pageConfig.unsavedSwitch"),
+        t("pageConfig.title"),
+        {
+          type: "warning",
+          confirmButtonText: t("pageConfig.discardAndSwitch"),
+          cancelButtonText: t("crud.cancel")
+        }
+      );
+    } catch {
+      return;
+    } finally {
+      confirmingSwitch = false;
+    }
+  }
+  if (epoch !== user.epoch) return;
+  selectedModule.value = { id, title, resource };
+  schema.value = undefined;
+  baseline.value = "";
+  intent = undefined;
+  dragIndex = -1;
+  tab.value = "list";
+  historyOpen.value = false;
+  historyPage.value = 1;
+  histories.value = [];
+  historyTotal.value = 0;
+  historyPreview.value = "";
+  await load();
+}
 async function load() {
   if (!selected.value || busy.value) return;
   const turn = ++serial,
@@ -284,7 +375,7 @@ async function load() {
     schema.value = description;
     version.value = data.version as number;
     fill(data.config);
-    baseline = JSON.stringify(config());
+    baseline.value = JSON.stringify(config());
   } catch (reason) {
     if (!request.signal.aborted && turn === serial) {
       schema.value = undefined;
@@ -312,6 +403,8 @@ async function mutation(
   historyId?: string
 ) {
   if (busy.value || !schema.value) return;
+  const resource = selected.value;
+  const epoch = user.epoch;
   if (action !== "save") {
     try {
       await ElMessageBox.confirm(
@@ -322,6 +415,7 @@ async function mutation(
       return;
     }
   }
+  if (resource !== selected.value || epoch !== user.epoch) return;
   const request = new AbortController();
   requests.add(request);
   busy.value = true;
@@ -375,7 +469,7 @@ async function mutation(
     if (!request.signal.aborted) fail(reason);
   } finally {
     requests.delete(request);
-    busy.value = false;
+    if (!request.signal.aborted) busy.value = false;
   }
 }
 async function loadHistory() {
@@ -432,298 +526,380 @@ async function previewHistory(id: string) {
 }
 </script>
 <template>
-  <section class="page-config">
-    <header class="config-toolbar">
-      <h2>{{ t("pageConfig.title") }}</h2>
-      <el-select
-        v-model="selected"
-        filterable
-        :aria-label="t('fieldPerm.module')"
-        :placeholder="t('fieldPerm.module')"
-        :loading="catalogLoading"
-        :no-data-text="t('pageConfig.noModules')"
-        :disabled="busy || dirty"
-        @change="load"
+  <section
+    ref="pageEl"
+    class="page-config"
+    :style="[headStyle, { height: `${fillHeight}px` }]"
+  >
+    <el-splitter :layout="mobile ? 'vertical' : 'horizontal'" lazy>
+      <el-splitter-panel
+        :size="mobile ? '32%' : '260px'"
+        :min="mobile ? '106px' : '200px'"
+        :max="mobile ? '250px' : '420px'"
+        collapsible
       >
-        <el-option-group
-          v-for="group in moduleGroups"
-          :key="group.pages[0].resource"
-          :label="group.title || t('pageConfig.topLevel')"
-        >
-          <el-option
-            v-for="page in group.pages"
-            :key="page.resource"
-            :value="page.resource"
-            :label="page.title"
-            :disabled="!page.selectable"
-            :title="
-              page.selectable ? undefined : t('pageConfig.noReadPermission')
-            "
+        <aside class="module-nav" :aria-label="t('fieldPerm.module')">
+          <header class="module-nav-header">
+            <h2>{{ t("fieldPerm.module") }}</h2>
+            <el-tooltip :content="t('system.refreshTree')" placement="top">
+              <el-button
+                link
+                type="primary"
+                :icon="useRenderIcon(RefreshIcon)"
+                :loading="catalogLoading"
+                :aria-label="t('system.refreshTree')"
+                @click="loadCatalog"
+              />
+            </el-tooltip>
+          </header>
+          <div class="module-search">
+            <el-input
+              v-model="moduleSearch"
+              clearable
+              :prefix-icon="useRenderIcon(SearchIcon)"
+              :aria-label="t('pageConfig.searchModules')"
+              :placeholder="t('pageConfig.searchModules')"
+            />
+          </div>
+          <el-alert
+            v-if="catalogError"
+            class="module-error"
+            :title="catalogError"
+            type="error"
+            :closable="false"
           />
-        </el-option-group>
-      </el-select>
-      <el-tag v-if="schema">{{ t("pageConfig.version", { version }) }}</el-tag>
-      <el-button
-        :disabled="busy || loading || catalogLoading"
-        @click="selected ? load() : loadCatalog()"
-        >{{ t("crud.reload") }}</el-button
-      >
-      <el-button
-        v-perm="permission('systemPageConfigHistory')"
-        :disabled="!schema || busy"
-        @click="
-          historyOpen = true;
-          loadHistory();
-        "
-        >{{ t("pageConfig.history") }}</el-button
-      >
-      <el-button
-        v-perm="permission('systemPageConfigReset')"
-        :disabled="!schema || busy"
-        @click="mutation('reset')"
-        >{{ t("crud.reset") }}</el-button
-      >
-      <el-button
-        v-perm="permission('systemPageConfigSave')"
-        type="primary"
-        :disabled="!dirty"
-        :loading="busy"
-        @click="mutation('save')"
-        >{{ t("crud.save") }}</el-button
-      >
-    </header>
-    <el-alert v-if="error" :title="error" type="error" :closable="false" />
-    <el-tabs v-if="schema" v-model="tab" v-loading="loading">
-      <el-tab-pane name="fields" :label="t('fieldPerm.title')" lazy
-        ><FieldPermissions
-          v-if="tab === 'fields'"
-          :key="selected"
-          mode="default"
-          :resource-filter="selected"
-      /></el-tab-pane>
-      <el-tab-pane name="list" :label="t('pageConfig.list')">
-        <el-form inline label-position="top">
-          <el-form-item :label="t('pageConfig.tableMode')">
-            <el-radio-group
-              v-model="options.tableMode"
-              :disabled="busy"
-              :aria-label="t('pageConfig.tableMode')"
+          <el-scrollbar v-loading="catalogLoading" class="module-scroll">
+            <el-tree
+              ref="moduleTree"
+              :data="moduleNodes"
+              :props="moduleTreeProps"
+              :current-node-key="selectedModule?.id"
+              :aria-label="t('fieldPerm.module')"
+              :empty-text="t('pageConfig.noModules')"
+              :filter-node-method="
+                (search, node) =>
+                  node.title.toLocaleLowerCase().includes(search)
+              "
+              node-key="id"
+              default-expand-all
+              highlight-current
+              @node-click="switchModule"
             >
-              <el-radio-button
-                v-for="mode in tableModes"
-                :key="mode"
-                :value="mode"
+              <template #default="{ data }">
+                <span
+                  class="module-node-label"
+                  :title="
+                    data.resource && !data.selectable
+                      ? t('pageConfig.noReadPermission')
+                      : data.title
+                  "
+                  >{{ data.title }}</span
+                >
+              </template>
+            </el-tree>
+          </el-scrollbar>
+        </aside>
+      </el-splitter-panel>
+      <el-splitter-panel>
+        <section v-loading="loading" class="config-content">
+          <header class="config-header">
+            <div class="config-title">
+              <h2>{{ selectedModule?.title ?? t("pageConfig.title") }}</h2>
+              <el-tag v-if="schema" type="info" effect="plain">{{
+                t("pageConfig.version", { version })
+              }}</el-tag>
+            </div>
+            <div class="config-actions">
+              <el-button
+                :disabled="!selected || busy || loading"
+                @click="load"
+                >{{ t("crud.reload") }}</el-button
               >
-                {{
-                  t(
-                    mode === "normal"
-                      ? "pageConfig.tableNormal"
-                      : "pageConfig.tableVirtual"
-                  )
-                }}
-              </el-radio-button>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item :label="t('pageConfig.pageSize')"
-            ><el-input-number
-              v-model="options.pageSize"
-              :min="1"
-              :max="schema.maxSize"
-              :disabled="busy"
-          /></el-form-item>
-          <el-form-item :label="t('pageConfig.keyWords')"
-            ><el-select v-model="options.keyWords" multiple :disabled="busy"
-              ><el-option
-                v-for="field in schema.actions.page?.keyWords ?? []"
-                :key="field"
-                :value="field"
-                :label="
-                  schema.columns.find(item => item.field === field)?.label ??
-                  field
-                " /></el-select
-          ></el-form-item>
-          <el-form-item :label="t('pageConfig.filterable')"
-            ><el-select v-model="options.filterable" multiple :disabled="busy"
-              ><el-option
-                v-for="field in schema.query"
-                :key="field.field"
-                :value="field.field"
-                :label="field.label" /></el-select
-          ></el-form-item>
-          <el-form-item v-if="schema.tree" :label="t('pageConfig.tree')"
-            ><el-switch v-model="options.tree" :disabled="busy"
-          /></el-form-item>
-        </el-form>
-        <div
-          v-for="(sort, index) in options.sorting"
-          :key="index"
-          class="config-toolbar"
-        >
-          <el-select
-            v-model="sort.field"
-            :aria-label="t('pageConfig.sort')"
-            :disabled="busy"
-            ><el-option
-              v-for="field in schema.actions.page?.sortable ?? []"
-              :key="field"
-              :value="field"
-              :label="field" /></el-select
-          ><el-select
-            v-model="sort.order"
-            :aria-label="t('pageConfig.order')"
-            :disabled="busy"
-            ><el-option value="asc" :label="t('pageConfig.asc')" /><el-option
-              value="desc"
-              :label="t('pageConfig.desc')" /></el-select
-          ><el-button
-            :disabled="busy"
-            @click="options.sorting.splice(index, 1)"
-            >{{ t("crud.remove") }}</el-button
-          >
-        </div>
-        <el-button
-          :disabled="busy || options.sorting.length >= 5"
-          @click="
-            options.sorting.push({
-              field: schema.actions.page?.sortable[0] ?? 'id',
-              order: 'asc'
-            })
-          "
-          >{{ t("pageConfig.addSort") }}</el-button
-        >
-        <el-table :data="columns" row-key="field" border>
-          <el-table-column :label="t('pageConfig.reorder')" width="150"
-            ><template #default="{ $index }"
-              ><el-button
-                :disabled="busy || !$index"
-                @click="move(columns, $index, $index - 1)"
-                >↑</el-button
-              ><el-button
-                :disabled="busy || $index === columns.length - 1"
-                @click="move(columns, $index, $index + 1)"
-                >↓</el-button
-              ></template
-            ></el-table-column
-          >
-          <el-table-column :label="t('fieldPerm.field')" min-width="140"
-            ><template #default="{ row, $index }"
-              ><span
-                :draggable="!busy"
-                @dragstart="dragIndex = $index"
-                @dragover.prevent
-                @drop.prevent="move(columns, dragIndex, $index)"
-                >{{ row.label }}</span
-              ></template
-            ></el-table-column
-          >
-          <el-table-column :label="t('crud.width')" min-width="180"
-            ><template #default="{ row }"
-              ><el-input-number
-                v-model="row.width"
-                :min="40"
-                :max="800"
-                :value-on-clear="null"
-                :placeholder="t('crud.widthAuto')"
-                controls-position="right"
-                :disabled="busy" /></template
-          ></el-table-column>
-          <el-table-column :label="t('pageConfig.hidden')" width="95"
-            ><template #default="{ row }"
-              ><el-switch v-model="row.hidden" :disabled="busy" /></template
-          ></el-table-column>
-          <el-table-column :label="t('crud.fixed')" min-width="160"
-            ><template #default="{ row }"
-              ><el-select v-model="row.fixed" :disabled="busy"
-                ><el-option value="" :label="t('crud.unfixed')" /><el-option
-                  value="left"
-                  :label="t('crud.left')" /><el-option
-                  value="right"
-                  :label="t('crud.right')" /></el-select></template
-          ></el-table-column>
-        </el-table>
-        <h3>{{ t("pageConfig.preview") }}</h3>
-        <el-table :data="[]" border
-          ><el-table-column
-            v-for="column in previewColumns"
-            :key="column.field"
-            :label="column.label"
-            :width="column.width"
-        /></el-table>
-      </el-tab-pane>
-      <el-tab-pane name="form" :label="t('pageConfig.form')">
-        <el-radio-group v-model="options.mode" :disabled="busy"
-          ><el-radio value="dialog">{{ t("pageConfig.dialog") }}</el-radio
-          ><el-radio value="drawer">{{
-            t("pageConfig.drawer")
-          }}</el-radio></el-radio-group
-        >
-        <el-table :data="items" row-key="field" border>
-          <el-table-column :label="t('pageConfig.reorder')" width="150"
-            ><template #default="{ $index }"
-              ><el-button
-                :disabled="busy || !$index"
-                @click="move(items, $index, $index - 1)"
-                >↑</el-button
-              ><el-button
-                :disabled="busy || $index === items.length - 1"
-                @click="move(items, $index, $index + 1)"
-                >↓</el-button
-              ></template
-            ></el-table-column
-          >
-          <el-table-column :label="t('fieldPerm.field')" min-width="130"
-            ><template #default="{ row, $index }"
-              ><span
-                :draggable="!busy"
-                @dragstart="dragIndex = $index"
-                @dragover.prevent
-                @drop.prevent="move(items, dragIndex, $index)"
-                >{{ row.label }}</span
-              ></template
-            ></el-table-column
-          >
-          <el-table-column :label="t('pageConfig.group')"
-            ><template #default="{ row }"
-              ><el-input
-                v-model="row.group"
-                :disabled="busy"
-                maxlength="100" /></template
-          ></el-table-column>
-          <el-table-column :label="t('pageConfig.span')"
-            ><template #default="{ row }"
-              ><el-select v-model="row.span" :disabled="busy"
-                ><el-option
-                  :value="12"
-                  :label="t('pageConfig.half')" /><el-option
-                  :value="24"
-                  :label="t('pageConfig.full')" /></el-select></template
-          ></el-table-column>
-          <el-table-column :label="t('pageConfig.placeholder')"
-            ><template #default="{ row }"
-              ><el-input
-                v-model="row.placeholder"
-                :disabled="busy"
-                maxlength="200" /></template
-          ></el-table-column>
-        </el-table>
-        <h3>{{ t("pageConfig.preview") }}</h3>
-        <el-row :gutter="16"
-          ><el-col
-            v-for="item in items"
-            :key="item.field"
-            :span="item.span"
-            :xs="24"
-            ><el-form label-position="top"
-              ><el-form-item
-                :label="
-                  item.group ? `${item.group} / ${item.label}` : item.label
+              <el-button
+                v-perm="permission('systemPageConfigHistory')"
+                :disabled="!schema || busy || loading"
+                @click="
+                  historyOpen = true;
+                  loadHistory();
                 "
-                ><el-input
-                  :placeholder="item.placeholder"
-                  disabled /></el-form-item></el-form></el-col
-        ></el-row>
-      </el-tab-pane>
-    </el-tabs>
+                >{{ t("pageConfig.history") }}</el-button
+              >
+              <el-button
+                v-perm="permission('systemPageConfigReset')"
+                :disabled="!schema || busy || loading"
+                @click="mutation('reset')"
+                >{{ t("crud.reset") }}</el-button
+              >
+              <el-button
+                v-perm="permission('systemPageConfigSave')"
+                type="primary"
+                :disabled="!dirty || loading"
+                :loading="busy"
+                @click="mutation('save')"
+                >{{ t("crud.save") }}</el-button
+              >
+            </div>
+          </header>
+          <el-alert
+            v-if="error"
+            class="config-error"
+            :title="error"
+            type="error"
+            :closable="false"
+          />
+          <el-empty
+            v-if="!selected && !error"
+            class="config-empty"
+            :description="t('pageConfig.selectModule')"
+          />
+          <el-tabs v-if="schema" v-model="tab" class="config-tabs">
+            <el-tab-pane name="fields" :label="t('fieldPerm.title')" lazy
+              ><FieldPermissions
+                ref="fieldEditor"
+                :key="selected"
+                mode="default"
+                :resource-filter="selected"
+            /></el-tab-pane>
+            <el-tab-pane name="list" :label="t('pageConfig.list')">
+              <el-form inline label-position="top">
+                <el-form-item :label="t('pageConfig.tableMode')">
+                  <el-radio-group
+                    v-model="options.tableMode"
+                    :disabled="busy"
+                    :aria-label="t('pageConfig.tableMode')"
+                  >
+                    <el-radio-button
+                      v-for="mode in tableModes"
+                      :key="mode"
+                      :value="mode"
+                    >
+                      {{
+                        t(
+                          mode === "normal"
+                            ? "pageConfig.tableNormal"
+                            : "pageConfig.tableVirtual"
+                        )
+                      }}
+                    </el-radio-button>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item :label="t('pageConfig.pageSize')"
+                  ><el-input-number
+                    v-model="options.pageSize"
+                    :min="1"
+                    :max="schema.maxSize"
+                    :disabled="busy"
+                /></el-form-item>
+                <el-form-item :label="t('pageConfig.keyWords')"
+                  ><el-select
+                    v-model="options.keyWords"
+                    multiple
+                    :disabled="busy"
+                    ><el-option
+                      v-for="field in schema.actions.page?.keyWords ?? []"
+                      :key="field"
+                      :value="field"
+                      :label="
+                        schema.columns.find(item => item.field === field)
+                          ?.label ?? field
+                      " /></el-select
+                ></el-form-item>
+                <el-form-item :label="t('pageConfig.filterable')"
+                  ><el-select
+                    v-model="options.filterable"
+                    multiple
+                    :disabled="busy"
+                    ><el-option
+                      v-for="field in schema.query"
+                      :key="field.field"
+                      :value="field.field"
+                      :label="field.label" /></el-select
+                ></el-form-item>
+                <el-form-item v-if="schema.tree" :label="t('pageConfig.tree')"
+                  ><el-switch v-model="options.tree" :disabled="busy"
+                /></el-form-item>
+              </el-form>
+              <div
+                v-for="(sort, index) in options.sorting"
+                :key="index"
+                class="config-toolbar"
+              >
+                <el-select
+                  v-model="sort.field"
+                  :aria-label="t('pageConfig.sort')"
+                  :disabled="busy"
+                  ><el-option
+                    v-for="field in schema.actions.page?.sortable ?? []"
+                    :key="field"
+                    :value="field"
+                    :label="field" /></el-select
+                ><el-select
+                  v-model="sort.order"
+                  :aria-label="t('pageConfig.order')"
+                  :disabled="busy"
+                  ><el-option
+                    value="asc"
+                    :label="t('pageConfig.asc')" /><el-option
+                    value="desc"
+                    :label="t('pageConfig.desc')" /></el-select
+                ><el-button
+                  :disabled="busy"
+                  @click="options.sorting.splice(index, 1)"
+                  >{{ t("crud.remove") }}</el-button
+                >
+              </div>
+              <el-button
+                :disabled="busy || options.sorting.length >= 5"
+                @click="
+                  options.sorting.push({
+                    field: schema.actions.page?.sortable[0] ?? 'id',
+                    order: 'asc'
+                  })
+                "
+                >{{ t("pageConfig.addSort") }}</el-button
+              >
+              <el-table :data="columns" row-key="field" border>
+                <el-table-column :label="t('pageConfig.reorder')" width="150"
+                  ><template #default="{ $index }"
+                    ><el-button
+                      :disabled="busy || !$index"
+                      @click="move(columns, $index, $index - 1)"
+                      >↑</el-button
+                    ><el-button
+                      :disabled="busy || $index === columns.length - 1"
+                      @click="move(columns, $index, $index + 1)"
+                      >↓</el-button
+                    ></template
+                  ></el-table-column
+                >
+                <el-table-column :label="t('fieldPerm.field')" min-width="140"
+                  ><template #default="{ row, $index }"
+                    ><span
+                      :draggable="!busy"
+                      @dragstart="dragIndex = $index"
+                      @dragover.prevent
+                      @drop.prevent="move(columns, dragIndex, $index)"
+                      >{{ row.label }}</span
+                    ></template
+                  ></el-table-column
+                >
+                <el-table-column :label="t('crud.width')" min-width="180"
+                  ><template #default="{ row }"
+                    ><el-input-number
+                      v-model="row.width"
+                      :min="40"
+                      :max="800"
+                      :value-on-clear="null"
+                      :placeholder="t('crud.widthAuto')"
+                      controls-position="right"
+                      :disabled="busy" /></template
+                ></el-table-column>
+                <el-table-column :label="t('pageConfig.hidden')" width="95"
+                  ><template #default="{ row }"
+                    ><el-switch
+                      v-model="row.hidden"
+                      :disabled="busy" /></template
+                ></el-table-column>
+                <el-table-column :label="t('crud.fixed')" min-width="160"
+                  ><template #default="{ row }"
+                    ><el-select v-model="row.fixed" :disabled="busy"
+                      ><el-option
+                        value=""
+                        :label="t('crud.unfixed')" /><el-option
+                        value="left"
+                        :label="t('crud.left')" /><el-option
+                        value="right"
+                        :label="t('crud.right')" /></el-select></template
+                ></el-table-column>
+              </el-table>
+              <h3>{{ t("pageConfig.preview") }}</h3>
+              <el-table :data="[]" border
+                ><el-table-column
+                  v-for="column in previewColumns"
+                  :key="column.field"
+                  :label="column.label"
+                  :width="column.width"
+              /></el-table>
+            </el-tab-pane>
+            <el-tab-pane name="form" :label="t('pageConfig.form')">
+              <el-radio-group v-model="options.mode" :disabled="busy"
+                ><el-radio value="dialog">{{ t("pageConfig.dialog") }}</el-radio
+                ><el-radio value="drawer">{{
+                  t("pageConfig.drawer")
+                }}</el-radio></el-radio-group
+              >
+              <el-table :data="items" row-key="field" border>
+                <el-table-column :label="t('pageConfig.reorder')" width="150"
+                  ><template #default="{ $index }"
+                    ><el-button
+                      :disabled="busy || !$index"
+                      @click="move(items, $index, $index - 1)"
+                      >↑</el-button
+                    ><el-button
+                      :disabled="busy || $index === items.length - 1"
+                      @click="move(items, $index, $index + 1)"
+                      >↓</el-button
+                    ></template
+                  ></el-table-column
+                >
+                <el-table-column :label="t('fieldPerm.field')" min-width="130"
+                  ><template #default="{ row, $index }"
+                    ><span
+                      :draggable="!busy"
+                      @dragstart="dragIndex = $index"
+                      @dragover.prevent
+                      @drop.prevent="move(items, dragIndex, $index)"
+                      >{{ row.label }}</span
+                    ></template
+                  ></el-table-column
+                >
+                <el-table-column :label="t('pageConfig.group')"
+                  ><template #default="{ row }"
+                    ><el-input
+                      v-model="row.group"
+                      :disabled="busy"
+                      maxlength="100" /></template
+                ></el-table-column>
+                <el-table-column :label="t('pageConfig.span')"
+                  ><template #default="{ row }"
+                    ><el-select v-model="row.span" :disabled="busy"
+                      ><el-option
+                        :value="12"
+                        :label="t('pageConfig.half')" /><el-option
+                        :value="24"
+                        :label="t('pageConfig.full')" /></el-select></template
+                ></el-table-column>
+                <el-table-column :label="t('pageConfig.placeholder')"
+                  ><template #default="{ row }"
+                    ><el-input
+                      v-model="row.placeholder"
+                      :disabled="busy"
+                      maxlength="200" /></template
+                ></el-table-column>
+              </el-table>
+              <h3>{{ t("pageConfig.preview") }}</h3>
+              <el-row :gutter="16"
+                ><el-col
+                  v-for="item in items"
+                  :key="item.field"
+                  :span="item.span"
+                  :xs="24"
+                  ><el-form label-position="top"
+                    ><el-form-item
+                      :label="
+                        item.group
+                          ? `${item.group} / ${item.label}`
+                          : item.label
+                      "
+                      ><el-input
+                        :placeholder="item.placeholder"
+                        disabled /></el-form-item></el-form></el-col
+              ></el-row>
+            </el-tab-pane>
+          </el-tabs>
+        </section>
+      </el-splitter-panel>
+    </el-splitter>
     <el-drawer
       v-model="historyOpen"
       :title="t('pageConfig.history')"
@@ -764,27 +940,135 @@ async function previewHistory(id: string) {
 </template>
 <style scoped>
 .page-config {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.page-config :deep(.el-splitter-panel) {
+  overflow: hidden;
+}
+
+.page-config :deep(.el-splitter__horizontal > .el-splitter-bar) {
+  width: 8px !important;
+}
+
+.page-config :deep(.el-splitter__vertical > .el-splitter-bar) {
+  height: 8px !important;
+}
+
+.module-nav,
+.config-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   min-width: 0;
-  padding: 16px 20px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   background: var(--el-bg-color);
   border-radius: 4px;
 }
 
-.config-toolbar h2 {
-  margin: 0 8px 0 0;
-  font-size: 16px;
-  font-weight: 700;
+.module-nav-header {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--crud-head-height, 49px);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.module-nav-header h2,
+.config-title h2 {
+  margin: 0;
+  font-size: var(--el-font-size-base);
+  font-weight: 500;
   color: var(--el-text-color-primary);
 }
 
+.module-search {
+  flex-shrink: 0;
+  padding: 10px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.module-error {
+  flex-shrink: 0;
+  width: auto;
+  margin: 10px 10px 0;
+}
+
+.module-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 5px 10px;
+}
+
+.module-scroll :deep(.el-tree-node__content) {
+  height: 36px;
+  border-radius: 6px;
+}
+
+.module-scroll :deep([aria-disabled="true"] > .el-tree-node__content) {
+  color: var(--el-text-color-disabled);
+  cursor: not-allowed;
+}
+
+.module-node-label {
+  padding-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.config-content {
+  padding: 0 16px 12px;
+}
+
+.config-header,
+.config-title,
+.config-actions,
 .config-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
+}
+
+.config-header {
+  flex-shrink: 0;
+  justify-content: space-between;
+  min-height: var(--crud-head-height, 49px);
+  padding: 8px 16px;
+  margin: 0 -16px 8px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+}
+
+.config-actions :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.config-error {
+  flex-shrink: 0;
+}
+
+.config-empty,
+.config-tabs {
+  flex: 1;
+  min-height: 0;
+}
+
+.config-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-tabs :deep(.el-tabs__content) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .config-toolbar :deep(.el-select),

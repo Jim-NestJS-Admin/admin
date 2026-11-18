@@ -566,9 +566,12 @@ codegen:
 
 pageConfig:
   title: 模块配置
-  topLevel: 顶层菜单
+  searchModules: 搜索模块
+  selectModule: 请从菜单树选择要配置的模块
   noModules: 暂无可配置的模块
   noReadPermission: 当前角色没有此页面的读取权限
+  unsavedSwitch: 当前模块有未保存的改动，切换后会丢弃这些改动。
+  discardAndSwitch: 丢弃并切换
   version: "当前版本 {version}"
   versionLabel: 版本
   history: 修改历史

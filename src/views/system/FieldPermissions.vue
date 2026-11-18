@@ -48,6 +48,10 @@ const stateValue = (row: Entry) =>
 const dirty = computed(() =>
   rows.value.filter(row => stateValue(row) !== baseline.get(key(row)))
 );
+defineExpose({
+  hasUnsavedChanges: computed(() => dirty.value.length > 0),
+  busy
+});
 const resources = computed(() => [
   ...new Map(rows.value.map(row => [row.resource, row.resourceLabel])).entries()
 ]);
