@@ -125,6 +125,7 @@ crud:
   edit: Edit
   remove: Delete
   batchRemove: Delete selected
+  batchRemoveLimit: You can delete up to {limit} records at a time. Select fewer records.
   confirmRemove: Delete the {count} selected records?
   confirm: Confirm
   cancel: Cancel
@@ -144,6 +145,8 @@ crud:
   columnsTip: Drag to reorder; saved to your account
   columns: Columns
   actions: Actions
+  selectAllRows: Select all rows
+  selectRow: Select record {id}
   density: Table density
   small: Compact
   default: Standard
@@ -212,6 +215,49 @@ system:
   globalScope: Global scope
   dataScope: Data scope
   menuType: Menu type
+  menuIconPicker:
+    fieldLabel: "Menu icon: {value}"
+    choose: Choose an icon
+    none: No icon
+    source: Icon source
+    library: Icon set
+    search: Search by name, purpose, or ID
+    onlineNote: Online previews and sidebar icons require an icon service connection
+    empty: No matching icons
+    preview: Sidebar preview
+    menuTitle: Menu name
+    sources:
+      local: Local icons
+      project: Project icons
+      online: Online icons
+    names:
+      home: Home
+      folder: Folder
+      workflow: Workflow
+      form: Form
+      approval: Approval
+      permissions: Permissions
+      user: User
+      organization: Organization
+      audit: Audit log
+      report: Report
+      settings: Settings
+      notification: Notification
+      assistant: Assistant
+      sparkling: Smart features
+      team: Team
+      database: Database
+      modules: Modules
+      development: Developer tools
+      schedule: Schedule
+      search: Search
+      information: Information
+      language: Language
+      brand: Brand
+      tabs: Tabs
+      newItem: New feature
+      business: Business
+      site: Site
   enabled: Enabled
   currentOrganization: Current organization
   noOrganization: No organization
@@ -526,6 +572,9 @@ pageConfig:
   list: List view
   form: Form
   pageSize: Rows per page
+  tableMode: Table mode
+  tableNormal: Standard table
+  tableVirtual: Virtual table
   keyWords: Search fields
   filterable: Filter fields
   tree: Show tree table
@@ -751,11 +800,16 @@ codeRules:
   unbound: Not bound
   maxLength: Maximum length
 platform:
+  packageBasicInfo: Basic information
+  availableMenus: Available menus
   adminUsername: Admin account
   adminPassword: Admin password
   adminHint: Super admin of the new tenant; at least 8 characters with letters and digits
   domainsHint: Press Enter after each domain; leave empty to sign in with the tenant code
   usage: Usage
+  usageItem: Item
+  usageUsed: Used
+  usageLimit: Limit
   users: Users
   storage: Storage
   unlimited: Unlimited
@@ -764,7 +818,7 @@ platform:
   maxSites: Max sites
   aiTokensMonthly: AI tokens per month
   mcpCallsMonthly: MCP calls per month
-  quotaHint: Leave empty for unlimited; stage 2 enforces users and storage only
+  quotaHint: Leave empty for unlimited. Users, storage, monthly AI tokens, and monthly MCP calls are enforced; the site limit is not yet enforced.
   menuHint: Tick the menus and buttons this package can use; platform-only menus are not listed
   menuCount: "{count} selected"
   loadFailed: Failed to load, reopen to retry
@@ -972,3 +1026,154 @@ memberPicker:
   retry: "Retry"
   cancel: "Cancel"
   confirm: "Confirm"
+notifications:
+  queued: Sync queued. Check sync history for the result.
+  logs: Sync history
+  open: Open message
+  configure: WeCom settings
+  sync: Sync directory
+  syncConfirm: Sync updates managed departments and members. Disabled members lose sessions and pending tasks are reassigned. Continue?
+  corpId: Corporation ID
+  agentId: Application ID
+  mount: Parent organization
+  defaultRole: Default role for new members
+  adminUrl: Admin HTTPS URL
+  secret: Application secret (leave empty to keep)
+  enabled: Enabled
+  cancel: Cancel
+  save: Save
+  login: Sign in with WeCom
+aiCapability:
+  batch: Batch generation (separate items with blank lines)
+  batchLimit: Maximum 20 items per batch
+  reconciliation: Reconcile billing
+  reconcileConfirm: Confirm that provider billing has been verified. This settles usage or releases the reservation and cannot be repeated.
+  uncertainTasks: Uncertain tasks
+  taskId: Task ID
+  reserved: Reserved tokens
+  charged: Provider confirmed a charge
+  inputTokens: Actual input tokens
+  outputTokens: Actual output tokens
+  evidence: Billing or request reference (no keys or content)
+  config: AI configuration
+  enabled: Enable AI
+  model: Model name
+  outputLimit: Maximum output tokens
+  apiKey: Tenant API key
+  keyPlaceholder: Leave blank to retain the saved key
+  keyState: "Tenant key: {tenant}; platform key: {platform}"
+  configured: Configured
+  unconfigured: Not configured
+  platformKey: Remove tenant key and use platform key
+  encryptionMissing: AI encryption is not configured. Contact the deployment administrator.
+  save: Save
+  refresh: Refresh
+  templates: Prompt templates
+  newRevision: Save new revision
+  variables: "Variables use double braces: text (required), instruction, language. Saving creates an immutable revision."
+  currentRevision: "Tenant revision: {revision} (0 uses the platform default)"
+  feature: Feature
+  generate: Generate content
+  rewrite: Rewrite content
+  translate: Translate
+  prompt: Template content
+  newTask: New AI draft
+  refreshUsage: Refresh usage
+  viewResult: View draft
+  draft: AI draft
+  draftNotice: Results require human review. Generating a draft never publishes content.
+  source: Source or outline
+  instruction: Tone, terminology and instructions
+  language: Target language
+  submit: Generate draft
+  taskState: "Task {id} · {status}"
+  usage: "{month} (UTC): {used} tokens used, {reserved} reserved, monthly limit {limit}"
+  unlimited: Unlimited
+  queued: Queued
+  running: Generating
+  succeeded: Completed, awaiting review
+  failed: Failed
+  uncertain: Uncertain result, reservation retained
+  loading: Loading
+oauth:
+  businessTenantRequired: You are managing the platform. Sign in to a business tenant to create applications. Use ordinary business roles; built-in super administrator roles cannot be assigned to applications.
+  disabled: OAuth is disabled. Register applications first, then configure deployment keys to enable authorization.
+  newClient: Register application
+  client: OAuth application
+  clientId: Client ID
+  newService: Create service account
+  edit: Configure
+  name: Name
+  enabled: Enabled
+  authMethod: Client authentication
+  public: Public client (PKCE)
+  privateKey: Private key JWT
+  secretBasic: Client secret (Basic)
+  redirects: Redirect URIs (one per line, exact match)
+  secret: Client secret
+  secretHint: Leave blank to retain; rotation invalidates old grants
+  generateSecret: Generate random secret
+  copySecret: Copy and securely store the secret before saving. Only its hash is stored; it is not shown again.
+  jwks: Client public JWKS (no private keys)
+  scopes: Scopes
+  serviceUser: Bound service account (optional)
+  serviceOrg: Fixed service organization
+  save: Save
+  org: Organization
+  serviceHint: Service accounts have no login password. Assign minimal roles before binding an application.
+  createdService: "Service account {id} created. Assign its roles next."
+  myGrants: My authorizations
+  revokeConfirm: Revoke this authorization? Its access and refresh tokens will stop working.
+  refresh: Refresh
+  audience: Audience
+  state: Status
+  active: Not revoked
+  revoked: Revoked
+  revoke: Revoke
+  consent: Application authorization
+  request: 'Application "{name}" requests access to tenant "{tenant}", organization {org}.'
+  consentHint: Only read scopes are selected by default. Access also depends on your current role, data and field permissions. The organization is fixed.
+  approve: Approve selected scopes
+  deny: Deny
+  invalidResume: Invalid authorization resume URL
+  integration: System integration
+  newIntegration: Create system integration
+  newUserApp: Create user authorization app
+  integrationHint: Enter a name, choose an organization and permission roles, then receive an independent client ID and secret. No redirect URL is needed.
+  permissionRoles: Allowed business roles
+  roleHint: Selected roles retain their data and field permissions. Built-in super administrator roles cannot be assigned to an application.
+  createCredentials: Create and receive credentials
+  credentialsHint: Copy and securely retain the secret. It cannot be viewed again after this window is closed; replace it if lost.
+  allowedScopes: Available scopes (calculated from roles)
+  secretUnchanged: The secret has not changed. Continue using the existing secret.
+  rotateSecret: Replace secret
+  rotateSelected: Saving invalidates the old secret and grants. Update the connecting application.
+  updateIntegrationHint: Configuration changes invalidate existing access tokens. The application must obtain a new token.
+  copy: Copy
+  copied: Copied
+  copyManually: Automatic copying failed. Select and copy the value manually.
+mcp:
+  pending: MCP pending operations
+  operationId: Operation ID
+  review: Review operation
+  fixedContext: The originating organization, parameters and target versions are fixed. The server executes after confirmation, independently of your current organization.
+  owner: Originating account
+  approver: Designated approver
+  resource: Resource and action
+  expires: Expires at
+  parameters: Proposed parameters (sensitive values hidden)
+  targets: Target IDs and fixed versions
+  confirm: Confirm and execute
+  reject: Reject
+  confirmWarning: Check the application, organization, targets and parameters. Confirmation executes immediately and must be performed by you.
+  rejectWarning: Rejection permanently invalidates this operation.
+  settings: MCP settings
+  disabled: MCP is not enabled for this deployment. Tenant settings are not yet effective.
+  enabled: Enable MCP for this tenant (roles also require MCP access permission)
+  blocked: Disabled modules or resources
+  extraConfirm: Additional permissions requiring confirmation (built-in high risk remains protected)
+  configWarning: Changes affect subsequent calls and pending operations. Save?
+  delegations: Service account approval and exemptions
+  delegationWarning: Tenant administrators only. Exemptions bind an application, service account, organization and exact permission, without adding business access. Every execution creates an audit and notification. Leave permission empty to update only the approver.
+  exemptPermission: Exact permission exempt from confirmation
+  exemptEnabled: Enable exemption (turn off to revoke)

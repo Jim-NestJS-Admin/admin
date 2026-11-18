@@ -125,6 +125,7 @@ crud:
   edit: 编辑
   remove: 删除
   batchRemove: 批量删除
+  batchRemoveLimit: 每次最多删除 {limit} 条记录，请减少选中的记录数。
   confirmRemove: 确定删除选中的 {count} 条记录吗？
   confirm: 确定
   cancel: 取消
@@ -144,6 +145,8 @@ crud:
   columnsTip: 拖动调整顺序，按账号保存，换电脑也保留
   columns: 列设置
   actions: 操作
+  selectAllRows: 选择全部行
+  selectRow: 选择记录 {id}
   density: 表格密度
   small: 紧凑
   default: 标准
@@ -212,6 +215,49 @@ system:
   globalScope: 全局作用范围
   dataScope: 数据范围
   menuType: 菜单类型
+  menuIconPicker:
+    fieldLabel: "菜单图标：{value}"
+    choose: 选择图标
+    none: 无图标
+    source: 图标来源
+    library: 图标集
+    search: 搜索名称、用途或标识
+    onlineNote: 预览和侧栏显示需要连接在线图标服务
+    empty: 没有匹配的图标
+    preview: 侧栏预览
+    menuTitle: 菜单名称
+    sources:
+      local: 本地图标
+      project: 项目图标
+      online: 在线图标
+    names:
+      home: 首页
+      folder: 目录
+      workflow: 流程
+      form: 表单
+      approval: 审批
+      permissions: 权限
+      user: 用户
+      organization: 组织
+      audit: 审计日志
+      report: 报表
+      settings: 设置
+      notification: 通知
+      assistant: 智能助手
+      sparkling: 智能功能
+      team: 团队
+      database: 数据库
+      modules: 模块
+      development: 开发工具
+      schedule: 排程
+      search: 搜索
+      information: 信息
+      language: 多语言
+      brand: 品牌标识
+      tabs: 标签页
+      newItem: 新功能
+      business: 业务
+      site: 站点
   enabled: 启用
   currentOrganization: 当前组织
   noOrganization: 暂无组织
@@ -526,6 +572,9 @@ pageConfig:
   list: 列表页
   form: 表单
   pageSize: 每页条数
+  tableMode: 表格模式
+  tableNormal: 普通表格
+  tableVirtual: 虚拟表格
   keyWords: 搜索框字段
   filterable: 筛选字段
   tree: 显示树表
@@ -751,11 +800,16 @@ codeRules:
   unbound: 尚未绑定
   maxLength: 最长字符数
 platform:
+  packageBasicInfo: 基本信息
+  availableMenus: 可用菜单
   adminUsername: 管理员账号
   adminPassword: 管理员密码
   adminHint: 新租户的超级管理员，至少 8 位且同时包含字母和数字
   domainsHint: 输入域名后回车，可填多个；不填则登录时用租户编码
   usage: 使用情况
+  usageItem: 项目
+  usageUsed: 已用
+  usageLimit: 上限
   users: 用户数
   storage: 存储用量
   unlimited: 不限
@@ -764,7 +818,7 @@ platform:
   maxSites: 站点数上限
   aiTokensMonthly: AI 用量（每月 token）
   mcpCallsMonthly: MCP 调用（每月次数）
-  quotaHint: 留空表示不限；阶段 2 只执行用户数和存储空间两项
+  quotaHint: 留空表示不限。用户数、存储空间、AI月用量和MCP月调用次数已执行限制；站点数暂未接入。
   menuHint: 勾选这个套餐可用的菜单和按钮；平台专用菜单不会出现在这里
   menuCount: 已选 {count} 项
   loadFailed: 加载失败，可重新打开
@@ -972,3 +1026,154 @@ memberPicker:
   retry: "重试"
   cancel: "取消"
   confirm: "确定"
+notifications:
+  queued: 已加入同步队列，请在同步记录查看结果
+  logs: 同步记录
+  open: 查看消息
+  configure: 企业微信配置
+  sync: 同步通讯录
+  syncConfirm: 同步将更新企业微信管理的部门和员工，停用员工会失去会话并转交待办。是否继续？
+  corpId: 企业ID
+  agentId: 应用ID
+  mount: 挂载组织
+  defaultRole: 新员工默认角色
+  adminUrl: 后台HTTPS地址
+  secret: 应用密钥（留空保持原值）
+  enabled: 启用
+  cancel: 取消
+  save: 保存
+  login: 企业微信登录
+aiCapability:
+  batch: 批量生成（空行分隔独立内容）
+  batchLimit: 每批最多20项
+  reconciliation: 核对账单
+  reconcileConfirm: 请确认已核对提供方账单。此操作会结算实际用量或释放预占，不能重复执行。
+  uncertainTasks: 待核对任务
+  taskId: 任务编号
+  reserved: 预占Token
+  charged: 提供方已计费
+  inputTokens: 实际输入Token
+  outputTokens: 实际输出Token
+  evidence: 账单或请求核对依据（勿填密钥或正文）
+  config: AI配置
+  enabled: 启用AI
+  model: 模型名称
+  outputLimit: 最大输出Token
+  apiKey: 租户API密钥
+  keyPlaceholder: 留空保留已有密钥
+  keyState: "租户密钥：{tenant}；平台密钥：{platform}"
+  configured: 已配置
+  unconfigured: 未配置
+  platformKey: 清除租户密钥，改用平台密钥
+  encryptionMissing: AI尚未配置加密主密钥，请联系部署管理员
+  save: 保存
+  refresh: 刷新
+  templates: 提示词模板
+  newRevision: 保存新修订
+  variables: "支持变量：双花括号包围的text（必需）、instruction、language。保存会新增修订，不修改历史。"
+  currentRevision: "当前租户修订：{revision}（0表示沿用平台模板）"
+  feature: 功能
+  generate: 内容生成
+  rewrite: 内容改写
+  translate: 翻译
+  prompt: 模板正文
+  newTask: 新建AI草稿
+  refreshUsage: 刷新用量
+  viewResult: 查看草稿
+  draft: AI草稿
+  draftNotice: 结果仅供人工审核和校对，生成后不会自动发布。
+  source: 原文或大纲
+  instruction: 语气、术语及其他要求
+  language: 目标语言
+  submit: 生成草稿
+  taskState: "任务 {id} · {status}"
+  usage: "{month}（UTC）：已用 {used} Token，预占 {reserved} Token，月度上限 {limit}"
+  unlimited: 不限
+  queued: 排队中
+  running: 正在生成
+  succeeded: 已完成，待人工审核
+  failed: 未完成
+  uncertain: 结果不确定，预占待核对
+  loading: 加载中
+oauth:
+  businessTenantRequired: 当前是平台管理。请切换到业务租户后创建应用；应用只能使用普通业务角色，不能使用内置超级管理员角色。
+  disabled: OAuth授权服务尚未启用；应用可先登记，部署密钥配置后再开放授权。
+  newClient: 登记应用
+  client: OAuth应用
+  clientId: 应用ID
+  newService: 创建服务账号
+  edit: 配置
+  name: 名称
+  enabled: 启用
+  authMethod: 客户端认证方式
+  public: 公共客户端（PKCE）
+  privateKey: 私钥签名（private_key_jwt）
+  secretBasic: 客户端密钥（Basic）
+  redirects: 回调地址（每行一项，精确匹配）
+  secret: 客户端密钥
+  secretHint: 留空保留；更换后旧授权失效
+  generateSecret: 生成随机密钥
+  copySecret: 请在保存前复制并保管密钥；服务器只存哈希，保存后不再显示。
+  jwks: 客户端公钥集（JWKS，不包含私钥）
+  scopes: 授权范围
+  serviceUser: 绑定服务账号（可选）
+  serviceOrg: 服务账号固定组织
+  save: 保存
+  org: 组织
+  serviceHint: 服务账号没有登录密码。创建后请在用户角色分配中配置最小权限，再绑定应用。
+  createdService: "服务账号已创建，编号：{id}。请分配角色。"
+  myGrants: 我的授权
+  revokeConfirm: 撤销后，此授权的访问和刷新令牌将失效。确定撤销？
+  refresh: 刷新
+  audience: 使用对象
+  state: 状态
+  active: 未撤销
+  revoked: 已撤销
+  revoke: 撤销
+  consent: 应用请求授权
+  request: "应用「{name}」申请访问租户「{tenant}」的组织 {org}。"
+  consentHint: 默认只勾选只读范围。应用实际权限还受你的当前角色、数据和字段权限限制；授权固定组织。
+  approve: 同意所选范围
+  deny: 拒绝
+  invalidResume: 授权返回地址无效
+  integration: 系统对接应用
+  newIntegration: 创建系统对接
+  newUserApp: 创建用户授权应用
+  integrationHint: 填写名称，选择执行组织和权限角色，即可领取此应用独立的ID与密钥；无需回调地址。
+  permissionRoles: 允许使用的业务角色
+  roleHint: 沿用所选角色的数据范围和字段权限。请选择普通业务角色，内置超级管理员角色不可授予应用。
+  createCredentials: 创建并领取凭据
+  credentialsHint: 请复制并妥善保存密钥。关闭窗口后无法再次查看原密钥；丢失时可更换。
+  allowedScopes: 可申请的授权范围（由角色自动计算）
+  secretUnchanged: 密钥未更换，请继续使用原有密钥。
+  rotateSecret: 更换密钥
+  rotateSelected: 保存后旧密钥与旧授权失效，请同步更新接入程序。
+  updateIntegrationHint: 修改应用配置会使旧访问令牌失效，接入程序需要重新获取令牌。
+  copy: 复制
+  copied: 已复制
+  copyManually: 自动复制失败，请手动选择并复制。
+mcp:
+  pending: MCP待确认操作
+  operationId: 操作编号
+  review: 核对操作
+  fixedContext: 此操作绑定发起时的组织、参数和目标版本。确认后由服务端直接执行；切换后台组织不会改变它。
+  owner: 发起账号
+  approver: 指定确认人
+  resource: 资源与动作
+  expires: 有效期至
+  parameters: 拟提交的参数（敏感值已隐藏）
+  targets: 目标编号与冻结版本
+  confirm: 确认并执行
+  reject: 拒绝
+  confirmWarning: 请核对应用、组织、目标和参数。确认后将立即执行，不能由客户端替你确认。
+  rejectWarning: 拒绝后本次操作永久失效。
+  settings: MCP设置
+  disabled: 部署尚未启用MCP，租户开关暂不生效。
+  enabled: 允许本租户使用MCP（角色还需MCP准入权限）
+  blocked: 关闭的模块或资源
+  extraConfirm: 追加需要确认的权限（内置高风险始终需要确认）
+  configWarning: 设置会影响之后的调用和待确认操作，确定保存？
+  delegations: 服务账号审批与免确认
+  delegationWarning: 仅租户管理员可配置。免确认精确绑定应用、服务账号、组织和权限码；不增加业务权限，执行后留审计和站内提醒。留空权限只修改审批人。
+  exemptPermission: 免确认的具体权限码
+  exemptEnabled: 启用免确认（关闭即撤销该权限）

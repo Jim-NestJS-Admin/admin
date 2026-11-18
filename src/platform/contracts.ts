@@ -49,6 +49,15 @@ export interface SignInInput {
 }
 
 export interface AdminGateway {
+  wecomStart?(
+    desktop: boolean,
+    returnPath?: string
+  ): Promise<
+    import("@/api/schema").components["schemas"]["IntegrationLoginStartResult"]
+  >;
+  signInWecom?(
+    input: import("@/api/schema").components["schemas"]["IntegrationLoginBody"]
+  ): Promise<SessionSnapshot>;
   signIn(input: SignInInput): Promise<SessionSnapshot>;
   resume(): Promise<SessionSnapshot | null>;
   refresh(): Promise<SessionSnapshot>;

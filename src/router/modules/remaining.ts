@@ -3,6 +3,24 @@ const Layout = () => import("@/layout/index.vue");
 
 export default [
   {
+    path: "/automation/confirm",
+    name: "McpConfirm",
+    component: () => import("@/views/mcp/operation.vue"),
+    meta: { title: "MCP操作确认", showLink: false }
+  },
+  {
+    path: "/authorization/consent",
+    name: "OAuthConsent",
+    component: () => import("@/views/oauth/consent.vue"),
+    meta: { title: "OAuth授权", showLink: false }
+  },
+  {
+    path: "/authorizations",
+    name: "MyAuthorizations",
+    component: () => import("@/views/oauth/grant.vue"),
+    meta: { title: "我的授权", showLink: false }
+  },
+  {
     path: "/login",
     name: "Login",
     component: () => import("@/views/login/index.vue"),

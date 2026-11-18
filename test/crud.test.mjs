@@ -279,6 +279,53 @@ test("控制器拒绝旧上下文/乱序回填，保留失败表单和重试幂�
         { field: "nickname", direction: "desc" }
       ]);
     });
+    await t.test(
+      "树默认加载完整层级，显式排序走服务端分页，清除排序恢复完整树",
+      async () => {
+        const calls = [];
+        let treeView;
+        await renderToString(
+          createSSRApp(
+            defineComponent({
+              setup() {
+                treeView = useCrud(
+                  {
+                    ...port,
+                    describe: async () => ({
+                      ...structuredClone(original),
+                      tree: { parentField: "parentId", nameField: "username" }
+                    }),
+                    tree: async () => {
+                      calls.push("tree");
+                      return [row, { id: "13", parentId: row.id }];
+                    },
+                    list: async query => {
+                      calls.push(query);
+                      return { rows: [row], totalRows: 1 };
+                    }
+                  },
+                  "tree-sort"
+                );
+                return () => h("div");
+              }
+            })
+          )
+        );
+        await treeView.initialize();
+        assert.equal(treeView.fullTree.value, true);
+        assert.equal(treeView.rows.value[0].__crudTreeChildren[0].id, "13");
+        await treeView.sort("unknown", "ascending");
+        assert.deepEqual(calls, ["tree"]);
+        await treeView.sort("nickname", "descending");
+        assert.equal(treeView.fullTree.value, false);
+        assert.deepEqual(calls[1].sorting, [
+          { field: "nickname", direction: "desc" }
+        ]);
+        await treeView.sort("nickname", null);
+        assert.equal(calls[2], "tree");
+        assert.equal(treeView.fullTree.value, true);
+      }
+    );
     await t.test("409 不关闭表单，旧版本号和同一意图的键保留", async () => {
       await view.edit(row);
       view.editor.values.nickname = "新姓名";

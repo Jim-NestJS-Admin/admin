@@ -3,12 +3,13 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { api, type OperationBody, type OperationResponse } from "@/api/client";
+import { ENUMS } from "@/api/constants";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
 import { notifyPageConfigChanged } from "@/platform/page-config-events";
 import { RequestFailure } from "@/utils/http";
-import type { CrudSchema } from "@/components/Crud/types";
+import type { CrudSchema, CrudTableMode } from "@/components/Crud/types";
 import FieldPermissions from "./FieldPermissions.vue";
 import {
   DEFAULT_FORM_MODE,
@@ -17,6 +18,8 @@ import {
 } from "./page-config-diff.mjs";
 
 const { t } = useI18n();
+const tableModes =
+  ENUMS["components.schemas.CrudSchema.properties.defaultTableMode"];
 const modules = ref<
   OperationResponse<"systemFieldPermRegistry">["data"]["resources"]
 >([]);
@@ -49,6 +52,7 @@ const items = ref<
 >([]);
 const options = reactive({
   pageSize: 20,
+  tableMode: "normal" as CrudTableMode,
   tree: true,
   mode: DEFAULT_FORM_MODE as string,
   keyWords: [] as string[],
@@ -81,7 +85,8 @@ const config = () =>
           items: schema.value.form,
           keyWords: schema.value.actions.page?.keyWords ?? [],
           filterable: schema.value.actions.page?.filterable ?? [],
-          sorting: schema.value.defaultSort
+          sorting: schema.value.defaultSort,
+          defaultTableMode: schema.value.defaultTableMode
         }
       )
     : {};
@@ -162,6 +167,10 @@ function fill(value: unknown) {
   });
   options.pageSize =
     typeof list.pageSize === "number" ? list.pageSize : DEFAULT_PAGE_SIZE;
+  options.tableMode =
+    tableModes.find(mode => mode === list.tableMode) ??
+    schema.value.defaultTableMode ??
+    "normal";
   options.tree = list.tree !== false;
   options.mode =
     form.mode === "dialog" || form.mode === "drawer"
@@ -448,6 +457,27 @@ async function previewHistory(id: string) {
       /></el-tab-pane>
       <el-tab-pane name="list" :label="t('pageConfig.list')">
         <el-form inline label-position="top">
+          <el-form-item :label="t('pageConfig.tableMode')">
+            <el-radio-group
+              v-model="options.tableMode"
+              :disabled="busy"
+              :aria-label="t('pageConfig.tableMode')"
+            >
+              <el-radio-button
+                v-for="mode in tableModes"
+                :key="mode"
+                :value="mode"
+              >
+                {{
+                  t(
+                    mode === "normal"
+                      ? "pageConfig.tableNormal"
+                      : "pageConfig.tableVirtual"
+                  )
+                }}
+              </el-radio-button>
+            </el-radio-group>
+          </el-form-item>
           <el-form-item :label="t('pageConfig.pageSize')"
             ><el-input-number
               v-model="options.pageSize"

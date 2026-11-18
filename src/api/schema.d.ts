@@ -1,5 +1,345 @@
 // 此文件由 pnpm gen:api 生成，禁止手改。
 export type paths = {
+  "/admin/ai/config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 读取AI配置状态（无密钥） */
+    get: operations["aiConfigRead"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/config/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存AI配置与加密密钥 */
+    post: operations["aiConfigSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/reconciliation/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AI账单核对记录详情 */
+    post: operations["aiReconciliationInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/reconciliation/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AI账单核对记录分页列表 */
+    post: operations["aiReconciliationPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/reconciliation/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** AI账单核对记录页面描述 */
+    get: operations["aiReconciliationSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/reconciliation/settle": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 依据提供方账单结算或释放不确定预占 */
+    post: operations["aiReconcile"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/reconciliation/uncertain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 待核对任务（不含正文） */
+    get: operations["aiUncertainTasks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/batch": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 批量创建AI草稿任务（最多20项，同事务预占） */
+    post: operations["aiTaskBatch"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 鉴权SSE草稿快照，断开不取消已入队任务 */
+    get: operations["aiTaskEvents"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的AI任务详情 */
+    post: operations["aiTaskInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的AI任务分页列表 */
+    post: operations["aiTaskPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 读取本人当前组织的AI草稿 */
+    post: operations["aiTaskResult"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 我的AI任务页面描述 */
+    get: operations["aiTaskSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/submit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 生成AI草稿任务（只返回编号） */
+    post: operations["aiTaskSubmit"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/task/usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 租户本月UTC Token用量与预占 */
+    get: operations["aiUsage"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/template/available": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 平台默认模板与本租户覆盖 */
+    get: operations["aiTemplatesAvailable"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/template/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AI模板历史详情 */
+    post: operations["aiTemplateInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/template/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** AI模板历史分页列表 */
+    post: operations["aiTemplatePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/template/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增不可变模板修订 */
+    post: operations["aiTemplateSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/ai/template/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** AI模板历史页面描述 */
+    get: operations["aiTemplateSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/auth/captcha": {
     parameters: {
       query?: never;
@@ -669,6 +1009,975 @@ export type paths = {
     get: operations["formSubmissionSchema"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/app/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 企业微信配置详情 */
+    post: operations["integrationAppInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/app/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 企业微信配置分页列表 */
+    post: operations["integrationAppPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/app/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 保存企业微信配置，凭据只写入加密存储 */
+    post: operations["integrationAppSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/app/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 企业微信配置页面描述 */
+    get: operations["integrationAppSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/app/sync": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 同步企业微信可见范围部门和成员 */
+    post: operations["integrationAppSync"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/login/exchange": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 一次性授权码登录已同步的企业成员 */
+    post: operations["integrationLoginExchange"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/login/start": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 生成一次性扫码或免登授权地址 */
+    post: operations["integrationLoginStart"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/sync-log/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 企业微信同步记录详情 */
+    post: operations["integrationSyncLogInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/sync-log/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 企业微信同步记录分页列表 */
+    post: operations["integrationSyncLogPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/integration/sync-log/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 企业微信同步记录页面描述 */
+    get: operations["integrationSyncLogSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 租户MCP启停、资源关闭和追加确认策略 */
+    get: operations["mcpConfiguration"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/config/access": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 角色MCP准入权限登记 */
+    get: operations["mcpAccess"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/config/delegation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 管理员设置审批人或授予/撤销精确免确认 */
+    post: operations["mcpDelegationSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/config/delegations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 服务账号指定审批人和精确免确认授权 */
+    get: operations["mcpDelegations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/config/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 租户管理员保存MCP设置，不能降低内置风险 */
+    post: operations["mcpConfigurationSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/event/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** MCP调用审计详情 */
+    post: operations["mcpEventInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/event/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** MCP调用审计分页列表 */
+    post: operations["mcpEventPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/event/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** MCP调用审计页面描述 */
+    get: operations["mcpEventSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation-list/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** MCP待确认操作详情 */
+    post: operations["mcpOperationListInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation-list/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** MCP待确认操作分页列表 */
+    post: operations["mcpOperationListPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation-list/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** MCP待确认操作页面描述 */
+    get: operations["mcpOperationListSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation/decide": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 本人或指定真人确认/拒绝，服务端直接执行 */
+    post: operations["mcpOperationDecide"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation/details": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 操作参数预览，按原组织及当前字段权限裁剪 */
+    get: operations["mcpOperationDetails"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/mcp/operation/mine": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 本人发起或待本人确认的操作 */
+    get: operations["mcpOperations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/notify/message/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的消息详情 */
+    post: operations["notifyMessageInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/notify/message/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的消息分页列表 */
+    post: operations["notifyMessagePage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/notify/message/read": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 将本人消息标为已读 */
+    post: operations["notifyMessageRead"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/notify/message/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 我的消息页面描述 */
+    get: operations["notifyMessageSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/notify/message/unread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 本人未读消息数量 */
+    get: operations["notifyMessageUnread"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除OAuth应用（整批成败） */
+    post: operations["oauthClientDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** OAuth应用详情 */
+    post: operations["oauthClientInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/integration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 系统对接应用及所选业务角色，不返回密钥 */
+    get: operations["oauthIntegrationInfo"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/integration-save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 创建或修改系统接入凭据，自动绑定服务身份和组织角色 */
+    post: operations["oauthIntegrationSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** OAuth应用分页列表 */
+    post: operations["oauthClientPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/save": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 登记或更新应用与允许scope（密钥仅哈希） */
+    post: operations["oauthClientSave"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** OAuth应用页面描述 */
+    get: operations["oauthClientSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/scopes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 后端定义的scope与权限码映射 */
+    get: operations["oauthScopes"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/client/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 部署启用状态，不返回密钥 */
+    get: operations["oauthStatus"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/event/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** OAuth授权审计详情 */
+    post: operations["oauthEventInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/event/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** OAuth授权审计分页列表 */
+    post: operations["oauthEventPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/event/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** OAuth授权审计页面描述 */
+    get: operations["oauthEventSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的授权详情 */
+    post: operations["oauthGrantInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/mine": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 本人最近200项授权，无额外管理权限 */
+    get: operations["oauthMyGrants"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 我的授权分页列表 */
+    post: operations["oauthGrantPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/revoke": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 撤销本人授权及令牌族 */
+    post: operations["oauthGrantRevoke"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/revoke-mine": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 本人撤销授权，无额外管理权限 */
+    post: operations["oauthMyGrantRevoke"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/grant/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 我的授权页面描述 */
+    get: operations["oauthGrantSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/interaction": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 读取绑定浏览器的授权申请及当前可授予scope */
+    get: operations["oauthInteractionDetails"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/interaction/complete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 本人确认或拒绝固定组织授权 */
+    post: operations["oauthInteractionComplete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/oauth/service-account/create": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 创建无密码、禁止交互登录的服务账号；角色另行分配 */
+    post: operations["oauthServiceAccountCreate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/add": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 新增订单测试 */
+    post: operations["orderTestAdd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 删除订单测试（整批成败） */
+    post: operations["orderTestDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 导出订单测试（Excel / CSV，按列表的查询条件，最多 1 万行） */
+    post: operations["orderTestExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/info": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 订单测试详情 */
+    post: operations["orderTestInfo"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 订单测试分页列表 */
+    post: operations["orderTestPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/schema": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 订单测试页面描述 */
+    get: operations["orderTestSchema"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/admin/order/test/update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 修改订单测试 */
+    post: operations["orderTestUpdate"];
     delete?: never;
     options?: never;
     head?: never;
@@ -3521,6 +4830,339 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
   schemas: {
+    AiBatchBody: {
+      items: components["schemas"]["AiSubmitBody"][];
+    };
+    AiBatchResult: {
+      ids: string[];
+    };
+    AiConfigResult: {
+      enabled: boolean;
+      encryptionReady: boolean;
+      hasPlatformKey: boolean;
+      hasTenantKey: boolean;
+      maxOutputTokens: number;
+      model: string;
+      version: number;
+    };
+    AiConfigSaveBody: {
+      apiKey?: string;
+      enabled: boolean;
+      maxOutputTokens: number;
+      model: string;
+      usePlatformKey?: boolean;
+      version?: number;
+    };
+    AiReceipt: {
+      id: string;
+    };
+    AiReconcileBody: {
+      charged: boolean;
+      /** @description 提供方账单或请求核对依据，不填写密钥/正文 */
+      evidence: string;
+      id: string;
+      inputTokens: number;
+      outputTokens: number;
+      version: number;
+    };
+    AiReconciliationInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    AiReconciliationPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["AiReconciliationPageEq"];
+      /** @description 搜索框，模糊匹配：evidence */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["AiReconciliationPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    AiReconciliationPageEq: {
+      /** @description 确认已计费 */
+      charged?: boolean;
+      /** @description 任务编号 */
+      taskId?: string;
+    };
+    AiReconciliationPageResult: {
+      list: components["schemas"]["AiReconciliationRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    AiReconciliationPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    AiReconciliationRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 确认已计费 */
+      charged?: boolean;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 核对依据 */
+      evidence?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 输入Token */
+      inputTokens?: number;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 输出Token */
+      outputTokens?: number;
+      /** @description 任务编号 */
+      taskId?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    AiSubmitBody: {
+      /** @enum {string} */
+      feature: "generate" | "rewrite" | "translate";
+      instruction?: string;
+      language?: string;
+      text: string;
+    };
+    AiTaskIdBody: {
+      id: string;
+    };
+    AiTaskInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    AiTaskPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["AiTaskPageEq"];
+      /** @description 搜索框，模糊匹配：model、error */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["AiTaskPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    AiTaskPageEq: {
+      /** @description 功能 */
+      feature?: string;
+      /** @description 模型 */
+      model?: string;
+      /** @description 状态 */
+      status?: string;
+    };
+    AiTaskPageResult: {
+      list: components["schemas"]["AiTaskRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    AiTaskPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    AiTaskResult: {
+      error: string;
+      id: string;
+      /** @enum {string} */
+      status: "queued" | "running" | "succeeded" | "failed" | "uncertain";
+      text: string;
+    };
+    AiTaskRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 耗时毫秒 */
+      durationMs?: number;
+      /** @description 错误说明 */
+      error?: string;
+      /** @description 功能 */
+      feature?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 输入Token */
+      inputTokens?: number;
+      /** @description 模型 */
+      model?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 输出Token */
+      outputTokens?: number;
+      /** @description 预占Token */
+      reservedTokens?: string;
+      /** @description 状态 */
+      status?: string;
+      /** @description 模板修订 */
+      templateRevision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    AiTemplateChoice: {
+      code: string;
+      content: string;
+      revision: number;
+      tenantRevision: number;
+    };
+    AiTemplateInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    AiTemplatePageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["AiTemplatePageEq"];
+      /** @description 搜索框，模糊匹配：code、content */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["AiTemplatePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    AiTemplatePageEq: {
+      /** @description 功能 */
+      code?: string;
+      /** @description 修订 */
+      revision?: number;
+    };
+    AiTemplatePageResult: {
+      list: components["schemas"]["AiTemplateRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    AiTemplatePageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    AiTemplateRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 功能 */
+      code?: string;
+      /** @description 提示词 */
+      content?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 修订 */
+      revision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    AiTemplateSaveBody: {
+      /** @enum {string} */
+      code: "generate" | "rewrite" | "translate";
+      content: string;
+      /** @description 本租户最新修订号；无覆盖时为0 */
+      revision: number;
+    };
+    AiTemplatesResult: {
+      list: components["schemas"]["AiTemplateChoice"][];
+    };
+    AiUncertainItem: {
+      createdAt: string;
+      id: string;
+      model: string;
+      reservedTokens: string;
+      version: number;
+    };
+    AiUncertainResult: {
+      list: components["schemas"]["AiUncertainItem"][];
+    };
+    AiUsageResult: {
+      limit: number | null;
+      month: string;
+      reservedTokens: string;
+      usedTokens: string;
+    };
     ApiErrorBody: {
       /**
        * @description 业务码，非 1000 都是失败
@@ -3695,6 +5337,12 @@ export type components = {
       children: components["schemas"]["CrudSchemaChild"][];
       columns: components["schemas"]["CrudSchemaColumn"][];
       defaultSort: components["schemas"]["CrudSchemaSort"][];
+      /**
+       * @description 代码默认的表格模式，生效值在 view.list.tableMode
+       * @default normal
+       * @enum {string}
+       */
+      defaultTableMode: "normal" | "virtual";
       /** @enum {string} */
       deleteMode: "soft" | "hard";
       dictionaries: {
@@ -4412,6 +6060,205 @@ export type components = {
       designer: components["schemas"]["WorkflowDesignerDto"];
       formDefinitionId: string;
     };
+    IntegrationAppInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    IntegrationAppPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["IntegrationAppPageEq"];
+      /** @description 搜索框，模糊匹配：corpId、agentId */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["IntegrationAppPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    IntegrationAppPageEq: {
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 挂载组织 */
+      mountOrgId?: string;
+      /** @description 平台 */
+      platform?: string;
+    };
+    IntegrationAppPageResult: {
+      list: components["schemas"]["IntegrationAppRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    IntegrationAppPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    IntegrationAppRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 后台地址 */
+      adminUrl?: string;
+      /** @description 应用ID */
+      agentId?: string;
+      /** @description 企业ID */
+      corpId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 默认角色 */
+      defaultRoleId?: Record<string, never> | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 挂载组织 */
+      mountOrgId?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 平台 */
+      platform?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    IntegrationIdBody: {
+      id: string;
+    };
+    IntegrationLoginBody: {
+      code: string;
+      state: string;
+    };
+    IntegrationLoginStartBody: {
+      desktop: boolean;
+      returnPath?: string;
+    };
+    IntegrationLoginStartResult: {
+      state: string;
+      url: string;
+    };
+    IntegrationSaveBody: {
+      adminUrl: string;
+      agentId: string;
+      callbackToken?: string;
+      corpId: string;
+      defaultRoleId?: string | null;
+      enabled: boolean;
+      encodingAESKey?: string;
+      id?: string;
+      mountOrgId: string;
+      secret?: string;
+      version?: number;
+    };
+    IntegrationSavedResult: {
+      id: string;
+    };
+    IntegrationSyncLogInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    IntegrationSyncLogPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["IntegrationSyncLogPageEq"];
+      /** @description 搜索框，模糊匹配：detail */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["IntegrationSyncLogPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    IntegrationSyncLogPageEq: {
+      /** @description 应用编号 */
+      appId?: string;
+      /** @description 状态 */
+      status?: string;
+    };
+    IntegrationSyncLogPageResult: {
+      list: components["schemas"]["IntegrationSyncLogRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    IntegrationSyncLogPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    IntegrationSyncLogRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 应用编号 */
+      appId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 说明 */
+      detail?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 处理部门数 */
+      organizations?: number;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 状态 */
+      status?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 处理成员数 */
+      users?: number;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
     LoginDto: {
       /** @description 用户看图输入的验证码，不区分大小写 */
       captchaCode?: string;
@@ -4429,6 +6276,243 @@ export type components = {
       /** @enum {string} */
       code: "phone" | "email" | "idcard" | "last4" | "all";
       label: string;
+    };
+    McpConfigBody: {
+      blocked: string[];
+      confirmPermissions: string[];
+      enabled: boolean;
+    };
+    McpConfigResult: {
+      blocked: string[];
+      confirmPermissions: string[];
+      deployed: boolean;
+      enabled: boolean;
+      permissions: string[];
+      resources: string[];
+    };
+    McpDecisionBody: {
+      approve: boolean;
+      id: string;
+    };
+    McpDelegationBody: {
+      approverId: string;
+      clientId: string;
+      enabled?: boolean;
+      permission?: string;
+    };
+    McpDelegationResult: {
+      approvers: Record<string, never>[];
+      exemptions: Record<string, never>[];
+    };
+    McpEventInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    McpEventPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["McpEventPageEq"];
+      /** @description 搜索框，模糊匹配：event、clientId、resource、action */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["McpEventPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    McpEventPageEq: {
+      /** @description 动作 */
+      action?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /** @description 事件 */
+      event?: string;
+      /** @description 操作编号 */
+      operationId?: string | null;
+      /** @description 资源 */
+      resource?: string;
+    };
+    McpEventPageResult: {
+      list: components["schemas"]["McpEventRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    McpEventPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    McpEventRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 动作 */
+      action?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 事件 */
+      event?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 操作编号 */
+      operationId?: string | null;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 资源 */
+      resource?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    McpOperationList: {
+      list: components["schemas"]["McpReceipt"][];
+    };
+    McpOperationListInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    McpOperationListPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["McpOperationListPageEq"];
+      /** @description 搜索框，模糊匹配：clientId、resource、action */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["McpOperationListPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    McpOperationListPageEq: {
+      /** @description 动作 */
+      action?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /** @description 资源 */
+      resource?: string;
+    };
+    McpOperationListPageResult: {
+      list: components["schemas"]["McpOperationListRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    McpOperationListPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt" | "expiresAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    McpOperationListRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 动作 */
+      action?: string;
+      /** @description 确认人 */
+      approverId?: string | null;
+      /** @description 应用ID */
+      clientId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /**
+       * Format: date-time
+       * @description 确认截止时间
+       */
+      expiresAt?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 发起人 */
+      ownerId?: string;
+      /** @description 资源 */
+      resource?: string;
+      /**
+       * @description 状态
+       * @enum {string}
+       */
+      status?: "pending" | "succeeded" | "rejected" | "expired" | "invalid";
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    McpOperationResult: {
+      action: string;
+      applicationName: string;
+      approverId: string | null;
+      clientId: string;
+      confirmUrl?: string;
+      expiresAt: string;
+      operationId: string;
+      orgId: string | null;
+      ownerId: string;
+      parameters: Record<string, never>;
+      permission: string;
+      resource: string;
+      result?: Record<string, never> | null;
+      status: string;
+      summary: string;
+      targets: Record<string, never>[];
+    };
+    McpReceipt: {
+      confirmUrl?: string;
+      operationId: string;
+      result?: Record<string, never> | null;
+      status: string;
+    };
+    McpSaved: {
+      id: string;
     };
     MenuItemDto: {
       children?: components["schemas"]["MenuItemDto"][];
@@ -4481,6 +6565,594 @@ export type components = {
       tree?: components["schemas"]["SpecTree"];
       /** @enum {number} */
       version: 1;
+    };
+    NotifyMessageInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    NotifyMessagePageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["NotifyMessagePageEq"];
+      /** @description 搜索框，模糊匹配：title */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["NotifyMessagePageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    NotifyMessagePageEq: {
+      /** @description 通知类型 */
+      event?: string;
+      /** @description 业务编号 */
+      instanceId?: string;
+      /**
+       * Format: date-time
+       * @description 阅读时间
+       */
+      readAt?: string | null;
+    };
+    NotifyMessagePageResult: {
+      list: components["schemas"]["NotifyMessageRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    NotifyMessagePageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    NotifyMessageRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 通知类型 */
+      event?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 业务编号 */
+      instanceId?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /**
+       * Format: date-time
+       * @description 阅读时间
+       */
+      readAt?: string | null;
+      /** @description 消息 */
+      title?: string;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    NotifyReadBody: {
+      /** @description 本人消息编号 */
+      id: string;
+    };
+    NotifyReadResult: {
+      id: string;
+    };
+    NotifyUnreadResult: {
+      count: number;
+    };
+    OauthClientDeleteBody: {
+      ids: string[];
+    };
+    OauthClientDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    OauthClientInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    OauthClientPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["OauthClientPageEq"];
+      /** @description 搜索框，模糊匹配：name、clientId */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["OauthClientPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    OauthClientPageEq: {
+      /** @description 认证方式 */
+      authMethod?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /** @description 启用 */
+      enabled?: boolean;
+      /** @description 服务组织 */
+      serviceOrgId?: string | null;
+    };
+    OauthClientPageResult: {
+      list: components["schemas"]["OauthClientRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    OauthClientPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    OauthClientRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 认证方式 */
+      authMethod?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 启用 */
+      enabled?: boolean;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 客户端公钥集 */
+      jwks?: Record<string, never> | null;
+      /** @description 应用名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 回调地址 */
+      redirectUris?: string[];
+      /** @description 允许scope */
+      scopes?: string[];
+      /** @description 服务组织 */
+      serviceOrgId?: string | null;
+      /** @description 服务账号 */
+      serviceUserId?: Record<string, never> | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    OAuthClientSaveBody: {
+      /** @enum {string} */
+      authMethod: "none" | "client_secret_basic" | "private_key_jwt";
+      enabled: boolean;
+      id?: string;
+      jwks?: Record<string, never>;
+      name: string;
+      redirectUris: string[];
+      scopes: string[];
+      secret?: string;
+      serviceOrgId?: string | null;
+      serviceUserId?: string | null;
+      version?: number;
+    };
+    OAuthConsentBody: {
+      approve: boolean;
+      scopes: string[];
+      uid: string;
+    };
+    OAuthConsentResult: {
+      redirectTo: string;
+    };
+    OauthEventInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    OauthEventPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["OauthEventPageEq"];
+      /** @description 搜索框，模糊匹配：action、clientId、grantId */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["OauthEventPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    OauthEventPageEq: {
+      /** @description 事件 */
+      action?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /** @description 授权ID */
+      grantId?: string | null;
+    };
+    OauthEventPageResult: {
+      list: components["schemas"]["OauthEventRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    OauthEventPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    OauthEventRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 事件 */
+      action?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 授权ID */
+      grantId?: string | null;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    OauthGrantInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    OauthGrantPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["OauthGrantPageEq"];
+      /** @description 搜索框，模糊匹配：clientId、grantId、audience */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["OauthGrantPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    OauthGrantPageEq: {
+      /** @description 有效 */
+      active?: boolean;
+      /** @description 使用对象 */
+      audience?: string;
+      /** @description 应用ID */
+      clientId?: string;
+    };
+    OauthGrantPageResult: {
+      list: components["schemas"]["OauthGrantRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    OauthGrantPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    OauthGrantRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /** @description 有效 */
+      active?: boolean;
+      /** @description 使用对象 */
+      audience?: string;
+      /** @description 应用ID */
+      clientId?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 授权ID */
+      grantId?: string;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 授权scope */
+      scopes?: string[];
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    OAuthIdBody: {
+      id: string;
+    };
+    OAuthIntegrationResult: {
+      clientId: string;
+      enabled: boolean;
+      id: string;
+      name: string;
+      orgId: string;
+      roleIds: string[];
+      scopes: string[];
+      version: number;
+    };
+    OAuthIntegrationSaveBody: {
+      enabled: boolean;
+      id?: string;
+      name: string;
+      orgId: string;
+      roleIds: string[];
+      secret?: string;
+      version?: number;
+    };
+    OAuthInteractionResult: {
+      clientName: string;
+      orgId: string;
+      scopes: string[];
+      tenantName: string;
+      uid: string;
+    };
+    OAuthMyGrant: {
+      active: boolean;
+      audience: string;
+      clientId: string;
+      id: string;
+      orgId: string;
+      scopes: string[];
+    };
+    OAuthMyGrantsResult: {
+      list: components["schemas"]["OAuthMyGrant"][];
+    };
+    OAuthSavedResult: {
+      id: string;
+    };
+    OAuthScopeItem: {
+      code: string;
+      permissions: string[];
+    };
+    OAuthScopesResult: {
+      list: components["schemas"]["OAuthScopeItem"][];
+    };
+    OAuthServiceAccountBody: {
+      name: string;
+      orgId: string;
+    };
+    OAuthStatusResult: {
+      cimdEnabled: boolean;
+      dcrEnabled: boolean;
+      enabled: boolean;
+      issuer: string;
+    };
+    OrderTestAddBody: {
+      data: components["schemas"]["OrderTestAddData"];
+    };
+    OrderTestAddData: {
+      /** @description 数量 */
+      qty?: Record<string, never> | null;
+      /** @description 当前状态 */
+      state?: Record<string, never> | null;
+      /** @description 单价最多 12 位整数、2 位小数 */
+      unitPrice?: (string | number) | null;
+    };
+    OrderTestDeleteBody: {
+      ids: string[];
+    };
+    OrderTestDeleteResult: {
+      /** @description 处理的行数 */
+      count: number;
+    };
+    OrderTestExportBody: {
+      /** @description 当前可见列，按传入顺序导出；仍按服务端字段权限裁剪 */
+      columns?: string[];
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["OrderTestPageEq"];
+      /**
+       * @default csv
+       * @enum {string}
+       */
+      format: "csv" | "xlsx";
+      /** @description 搜索框，模糊匹配：orderNo */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["OrderTestPageSort"][];
+      /**
+       * @description 浏览器 IANA 时区；省略时使用服务器本地时区
+       * @example Asia/Shanghai
+       */
+      timeZone?: string;
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    OrderTestInfoBody: {
+      /** @example 1 */
+      id: string;
+    };
+    OrderTestPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["OrderTestPageEq"];
+      /** @description 搜索框，模糊匹配：orderNo */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["OrderTestPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
+    OrderTestPageEq: {
+      /** @description 数量 */
+      qty?: Record<string, never> | null;
+      /** @description 当前状态 */
+      state?: Record<string, never> | null;
+      /** @description 单价最多 12 位整数、2 位小数 */
+      unitPrice?: (string | number) | null;
+    };
+    OrderTestPageResult: {
+      list: components["schemas"]["OrderTestRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    OrderTestPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field:
+        | "id"
+        | "createdAt"
+        | "updatedAt"
+        | "orderNo"
+        | "unitPrice"
+        | "qty"
+        | "state";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    OrderTestRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 订单编码 */
+      orderNo?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 数量 */
+      qty?: Record<string, never> | null;
+      /** @description 当前状态 */
+      state?: Record<string, never> | null;
+      /** @description 单价 */
+      unitPrice?: Record<string, never> | null;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    OrderTestUpdateBody: {
+      /** @description 只传要改的字段 */
+      data: components["schemas"]["OrderTestUpdateData"];
+      /** @example 1 */
+      id: string;
+      /** @description 读到的版本号，原样带回 */
+      version: number;
+    };
+    OrderTestUpdateData: {
+      /** @description 数量 */
+      qty?: Record<string, never> | null;
+      /** @description 当前状态 */
+      state?: Record<string, never> | null;
+      /** @description 单价最多 12 位整数、2 位小数 */
+      unitPrice?: (string | number) | null;
     };
     OrgOption: {
       id: string;
@@ -7825,7 +10497,7 @@ export type components = {
     WorkflowRecordPageBody: {
       /** @description 按等于筛选 */
       eq?: components["schemas"]["WorkflowRecordPageEq"];
-      /** @description 这个资源没有配置搜索字段，传了也不生效 */
+      /** @description 搜索框，模糊匹配：comment */
       keyword?: string;
       /** @default 1 */
       page: number;
@@ -8090,6 +10762,631 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+  aiConfigRead: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiConfigResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiConfigSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiConfigSaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiReconciliationInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiReconciliationInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReconciliationRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiReconciliationPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiReconciliationPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReconciliationPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiReconciliationSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiReconcile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiReconcileBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiUncertainTasks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiUncertainResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTaskBatch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiBatchBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiBatchResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTaskEvents: {
+    parameters: {
+      query: {
+        id: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/event-stream": string;
+        };
+      };
+    };
+  };
+  aiTaskInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTaskInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTaskRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiTaskPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTaskPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTaskPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiTaskResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTaskIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTaskResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTaskSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTaskSubmit: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiSubmitBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiUsage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiUsageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTemplatesAvailable: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTemplatesResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTemplateInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTemplateInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTemplateRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiTemplatePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTemplatePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiTemplatePageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  aiTemplateSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiTemplateSaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["AiReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  aiTemplateSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
   authCaptcha: {
     parameters: {
       query: {
@@ -9973,6 +13270,1914 @@ export interface operations {
             /** @example ok */
             message: string;
           };
+        };
+      };
+    };
+  };
+  integrationAppInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationAppInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationAppRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  integrationAppPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationAppPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationAppPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  integrationAppSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationSaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  integrationAppSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  integrationAppSync: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  integrationLoginExchange: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationLoginBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["TokenResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  integrationLoginStart: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationLoginStartBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationLoginStartResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  integrationSyncLogInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationSyncLogInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationSyncLogRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  integrationSyncLogPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IntegrationSyncLogPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["IntegrationSyncLogPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  integrationSyncLogSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpConfiguration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpConfigResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpAccess: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpSaved"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpDelegationSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpDelegationBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpSaved"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpDelegations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpDelegationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpConfigurationSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpConfigBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpSaved"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpEventInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpEventInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpEventRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  mcpEventPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpEventPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpEventPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  mcpEventSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpOperationListInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpOperationListInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpOperationListRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  mcpOperationListPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpOperationListPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpOperationListPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  mcpOperationListSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpOperationDecide: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["McpDecisionBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpReceipt"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpOperationDetails: {
+    parameters: {
+      query: {
+        id: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpOperationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  mcpOperations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["McpOperationList"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  notifyMessageInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NotifyMessageInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["NotifyMessageRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  notifyMessagePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NotifyMessagePageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["NotifyMessagePageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  notifyMessageRead: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NotifyReadBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["NotifyReadResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  notifyMessageSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  notifyMessageUnread: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["NotifyUnreadResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthClientDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthClientDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthClientDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthClientInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthClientInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthClientRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthIntegrationInfo: {
+    parameters: {
+      query: {
+        id: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthIntegrationResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthIntegrationSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthIntegrationSaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthClientPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthClientPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthClientPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthClientSave: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthClientSaveBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthClientSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthScopes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthScopesResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthStatusResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthEventInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthEventInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthEventRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthEventPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthEventPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthEventPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthEventSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthGrantInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthGrantInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthGrantRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthMyGrants: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthMyGrantsResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthGrantPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OauthGrantPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OauthGrantPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  oauthGrantRevoke: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthMyGrantRevoke: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthIdBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthGrantSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthInteractionDetails: {
+    parameters: {
+      query: {
+        uid: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthInteractionResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthInteractionComplete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthConsentBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthConsentResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  oauthServiceAccountCreate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OAuthServiceAccountBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OAuthSavedResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  orderTestAdd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestAddBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OrderTestRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  orderTestDelete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestDeleteBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OrderTestDeleteResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  orderTestExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestExportBody"];
+      };
+    };
+    responses: {
+      /** @description Excel / CSV 文件（CSV为UTF-8带BOM） */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": Blob;
+          "text/csv": Blob;
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4029：请求太频繁或输错次数过多，data.retryAfterSeconds 是多少秒后再试 */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  orderTestInfo: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestInfoBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OrderTestRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  orderTestPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OrderTestPageResult"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  orderTestSchema: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["CrudSchema"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+    };
+  };
+  orderTestUpdate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["OrderTestUpdateBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["OrderTestRow"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
         };
       };
     };

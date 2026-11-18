@@ -68,6 +68,252 @@ export function createApiClient(
 ) {
   void transport;
   return {
+    aiConfigRead(
+      input: OperationInput<"aiConfigRead"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiConfigRead">>(
+        "get",
+        interpolate("/admin/ai/config", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiConfigSave(
+      input: OperationInput<"aiConfigSave"> & {
+        body: OperationBody<"aiConfigSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiConfigSave">>(
+        "post",
+        interpolate("/admin/ai/config/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiReconciliationInfo(
+      input: OperationInput<"aiReconciliationInfo"> & {
+        body: OperationBody<"aiReconciliationInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiReconciliationInfo">>(
+        "post",
+        interpolate("/admin/ai/reconciliation/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiReconciliationPage(
+      input: OperationInput<"aiReconciliationPage"> & {
+        body: OperationBody<"aiReconciliationPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiReconciliationPage">>(
+        "post",
+        interpolate("/admin/ai/reconciliation/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiReconciliationSchema(
+      input: OperationInput<"aiReconciliationSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiReconciliationSchema">>(
+        "get",
+        interpolate("/admin/ai/reconciliation/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiReconcile(
+      input: OperationInput<"aiReconcile"> & {
+        body: OperationBody<"aiReconcile">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiReconcile">>(
+        "post",
+        interpolate("/admin/ai/reconciliation/settle", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiUncertainTasks(
+      input: OperationInput<"aiUncertainTasks"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiUncertainTasks">>(
+        "get",
+        interpolate("/admin/ai/reconciliation/uncertain", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskBatch(
+      input: OperationInput<"aiTaskBatch"> & {
+        body: OperationBody<"aiTaskBatch">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskBatch">>(
+        "post",
+        interpolate("/admin/ai/task/batch", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskEvents(
+      input: OperationInput<"aiTaskEvents"> & {
+        query: OperationParameter<"aiTaskEvents", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskEvents">>(
+        "get",
+        interpolate("/admin/ai/task/events", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskInfo(
+      input: OperationInput<"aiTaskInfo"> & {
+        body: OperationBody<"aiTaskInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskInfo">>(
+        "post",
+        interpolate("/admin/ai/task/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskPage(
+      input: OperationInput<"aiTaskPage"> & {
+        body: OperationBody<"aiTaskPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskPage">>(
+        "post",
+        interpolate("/admin/ai/task/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskResult(
+      input: OperationInput<"aiTaskResult"> & {
+        body: OperationBody<"aiTaskResult">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskResult">>(
+        "post",
+        interpolate("/admin/ai/task/result", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskSchema(
+      input: OperationInput<"aiTaskSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskSchema">>(
+        "get",
+        interpolate("/admin/ai/task/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTaskSubmit(
+      input: OperationInput<"aiTaskSubmit"> & {
+        body: OperationBody<"aiTaskSubmit">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTaskSubmit">>(
+        "post",
+        interpolate("/admin/ai/task/submit", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiUsage(
+      input: OperationInput<"aiUsage"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiUsage">>(
+        "get",
+        interpolate("/admin/ai/task/usage", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTemplatesAvailable(
+      input: OperationInput<"aiTemplatesAvailable"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTemplatesAvailable">>(
+        "get",
+        interpolate("/admin/ai/template/available", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTemplateInfo(
+      input: OperationInput<"aiTemplateInfo"> & {
+        body: OperationBody<"aiTemplateInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTemplateInfo">>(
+        "post",
+        interpolate("/admin/ai/template/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTemplatePage(
+      input: OperationInput<"aiTemplatePage"> & {
+        body: OperationBody<"aiTemplatePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTemplatePage">>(
+        "post",
+        interpolate("/admin/ai/template/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTemplateSave(
+      input: OperationInput<"aiTemplateSave"> & {
+        body: OperationBody<"aiTemplateSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTemplateSave">>(
+        "post",
+        interpolate("/admin/ai/template/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    aiTemplateSchema(
+      input: OperationInput<"aiTemplateSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"aiTemplateSchema">>(
+        "get",
+        interpolate("/admin/ai/template/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     authCaptcha(
       input: OperationInput<"authCaptcha"> & {
         query: OperationParameter<"authCaptcha", "query">;
@@ -555,6 +801,713 @@ export function createApiClient(
       return transport.request<OperationResponse<"formSubmissionSchema">>(
         "get",
         interpolate("/admin/form/submission/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationAppInfo(
+      input: OperationInput<"integrationAppInfo"> & {
+        body: OperationBody<"integrationAppInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationAppInfo">>(
+        "post",
+        interpolate("/admin/integration/app/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationAppPage(
+      input: OperationInput<"integrationAppPage"> & {
+        body: OperationBody<"integrationAppPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationAppPage">>(
+        "post",
+        interpolate("/admin/integration/app/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationAppSave(
+      input: OperationInput<"integrationAppSave"> & {
+        body: OperationBody<"integrationAppSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationAppSave">>(
+        "post",
+        interpolate("/admin/integration/app/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationAppSchema(
+      input: OperationInput<"integrationAppSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationAppSchema">>(
+        "get",
+        interpolate("/admin/integration/app/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationAppSync(
+      input: OperationInput<"integrationAppSync"> & {
+        body: OperationBody<"integrationAppSync">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationAppSync">>(
+        "post",
+        interpolate("/admin/integration/app/sync", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationLoginExchange(
+      input: OperationInput<"integrationLoginExchange"> & {
+        body: OperationBody<"integrationLoginExchange">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationLoginExchange">>(
+        "post",
+        interpolate("/admin/integration/login/exchange", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationLoginStart(
+      input: OperationInput<"integrationLoginStart"> & {
+        body: OperationBody<"integrationLoginStart">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationLoginStart">>(
+        "post",
+        interpolate("/admin/integration/login/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationSyncLogInfo(
+      input: OperationInput<"integrationSyncLogInfo"> & {
+        body: OperationBody<"integrationSyncLogInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationSyncLogInfo">>(
+        "post",
+        interpolate("/admin/integration/sync-log/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationSyncLogPage(
+      input: OperationInput<"integrationSyncLogPage"> & {
+        body: OperationBody<"integrationSyncLogPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationSyncLogPage">>(
+        "post",
+        interpolate("/admin/integration/sync-log/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    integrationSyncLogSchema(
+      input: OperationInput<"integrationSyncLogSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"integrationSyncLogSchema">>(
+        "get",
+        interpolate("/admin/integration/sync-log/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpConfiguration(
+      input: OperationInput<"mcpConfiguration"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpConfiguration">>(
+        "get",
+        interpolate("/admin/mcp/config", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpAccess(
+      input: OperationInput<"mcpAccess"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpAccess">>(
+        "get",
+        interpolate("/admin/mcp/config/access", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpDelegationSave(
+      input: OperationInput<"mcpDelegationSave"> & {
+        body: OperationBody<"mcpDelegationSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpDelegationSave">>(
+        "post",
+        interpolate("/admin/mcp/config/delegation", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpDelegations(
+      input: OperationInput<"mcpDelegations"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpDelegations">>(
+        "get",
+        interpolate("/admin/mcp/config/delegations", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpConfigurationSave(
+      input: OperationInput<"mcpConfigurationSave"> & {
+        body: OperationBody<"mcpConfigurationSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpConfigurationSave">>(
+        "post",
+        interpolate("/admin/mcp/config/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpEventInfo(
+      input: OperationInput<"mcpEventInfo"> & {
+        body: OperationBody<"mcpEventInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpEventInfo">>(
+        "post",
+        interpolate("/admin/mcp/event/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpEventPage(
+      input: OperationInput<"mcpEventPage"> & {
+        body: OperationBody<"mcpEventPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpEventPage">>(
+        "post",
+        interpolate("/admin/mcp/event/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpEventSchema(
+      input: OperationInput<"mcpEventSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpEventSchema">>(
+        "get",
+        interpolate("/admin/mcp/event/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperationListInfo(
+      input: OperationInput<"mcpOperationListInfo"> & {
+        body: OperationBody<"mcpOperationListInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperationListInfo">>(
+        "post",
+        interpolate("/admin/mcp/operation-list/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperationListPage(
+      input: OperationInput<"mcpOperationListPage"> & {
+        body: OperationBody<"mcpOperationListPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperationListPage">>(
+        "post",
+        interpolate("/admin/mcp/operation-list/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperationListSchema(
+      input: OperationInput<"mcpOperationListSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperationListSchema">>(
+        "get",
+        interpolate("/admin/mcp/operation-list/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperationDecide(
+      input: OperationInput<"mcpOperationDecide"> & {
+        body: OperationBody<"mcpOperationDecide">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperationDecide">>(
+        "post",
+        interpolate("/admin/mcp/operation/decide", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperationDetails(
+      input: OperationInput<"mcpOperationDetails"> & {
+        query: OperationParameter<"mcpOperationDetails", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperationDetails">>(
+        "get",
+        interpolate("/admin/mcp/operation/details", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    mcpOperations(
+      input: OperationInput<"mcpOperations"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"mcpOperations">>(
+        "get",
+        interpolate("/admin/mcp/operation/mine", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    notifyMessageInfo(
+      input: OperationInput<"notifyMessageInfo"> & {
+        body: OperationBody<"notifyMessageInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"notifyMessageInfo">>(
+        "post",
+        interpolate("/admin/notify/message/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    notifyMessagePage(
+      input: OperationInput<"notifyMessagePage"> & {
+        body: OperationBody<"notifyMessagePage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"notifyMessagePage">>(
+        "post",
+        interpolate("/admin/notify/message/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    notifyMessageRead(
+      input: OperationInput<"notifyMessageRead"> & {
+        body: OperationBody<"notifyMessageRead">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"notifyMessageRead">>(
+        "post",
+        interpolate("/admin/notify/message/read", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    notifyMessageSchema(
+      input: OperationInput<"notifyMessageSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"notifyMessageSchema">>(
+        "get",
+        interpolate("/admin/notify/message/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    notifyMessageUnread(
+      input: OperationInput<"notifyMessageUnread"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"notifyMessageUnread">>(
+        "get",
+        interpolate("/admin/notify/message/unread", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthClientDelete(
+      input: OperationInput<"oauthClientDelete"> & {
+        body: OperationBody<"oauthClientDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthClientDelete">>(
+        "post",
+        interpolate("/admin/oauth/client/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthClientInfo(
+      input: OperationInput<"oauthClientInfo"> & {
+        body: OperationBody<"oauthClientInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthClientInfo">>(
+        "post",
+        interpolate("/admin/oauth/client/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthIntegrationInfo(
+      input: OperationInput<"oauthIntegrationInfo"> & {
+        query: OperationParameter<"oauthIntegrationInfo", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthIntegrationInfo">>(
+        "get",
+        interpolate("/admin/oauth/client/integration", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthIntegrationSave(
+      input: OperationInput<"oauthIntegrationSave"> & {
+        body: OperationBody<"oauthIntegrationSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthIntegrationSave">>(
+        "post",
+        interpolate("/admin/oauth/client/integration-save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthClientPage(
+      input: OperationInput<"oauthClientPage"> & {
+        body: OperationBody<"oauthClientPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthClientPage">>(
+        "post",
+        interpolate("/admin/oauth/client/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthClientSave(
+      input: OperationInput<"oauthClientSave"> & {
+        body: OperationBody<"oauthClientSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthClientSave">>(
+        "post",
+        interpolate("/admin/oauth/client/save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthClientSchema(
+      input: OperationInput<"oauthClientSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthClientSchema">>(
+        "get",
+        interpolate("/admin/oauth/client/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthScopes(
+      input: OperationInput<"oauthScopes"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthScopes">>(
+        "get",
+        interpolate("/admin/oauth/client/scopes", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthStatus(
+      input: OperationInput<"oauthStatus"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthStatus">>(
+        "get",
+        interpolate("/admin/oauth/client/status", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthEventInfo(
+      input: OperationInput<"oauthEventInfo"> & {
+        body: OperationBody<"oauthEventInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthEventInfo">>(
+        "post",
+        interpolate("/admin/oauth/event/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthEventPage(
+      input: OperationInput<"oauthEventPage"> & {
+        body: OperationBody<"oauthEventPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthEventPage">>(
+        "post",
+        interpolate("/admin/oauth/event/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthEventSchema(
+      input: OperationInput<"oauthEventSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthEventSchema">>(
+        "get",
+        interpolate("/admin/oauth/event/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthGrantInfo(
+      input: OperationInput<"oauthGrantInfo"> & {
+        body: OperationBody<"oauthGrantInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthGrantInfo">>(
+        "post",
+        interpolate("/admin/oauth/grant/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthMyGrants(
+      input: OperationInput<"oauthMyGrants"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthMyGrants">>(
+        "get",
+        interpolate("/admin/oauth/grant/mine", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthGrantPage(
+      input: OperationInput<"oauthGrantPage"> & {
+        body: OperationBody<"oauthGrantPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthGrantPage">>(
+        "post",
+        interpolate("/admin/oauth/grant/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthGrantRevoke(
+      input: OperationInput<"oauthGrantRevoke"> & {
+        body: OperationBody<"oauthGrantRevoke">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthGrantRevoke">>(
+        "post",
+        interpolate("/admin/oauth/grant/revoke", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthMyGrantRevoke(
+      input: OperationInput<"oauthMyGrantRevoke"> & {
+        body: OperationBody<"oauthMyGrantRevoke">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthMyGrantRevoke">>(
+        "post",
+        interpolate("/admin/oauth/grant/revoke-mine", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthGrantSchema(
+      input: OperationInput<"oauthGrantSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthGrantSchema">>(
+        "get",
+        interpolate("/admin/oauth/grant/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthInteractionDetails(
+      input: OperationInput<"oauthInteractionDetails"> & {
+        query: OperationParameter<"oauthInteractionDetails", "query">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthInteractionDetails">>(
+        "get",
+        interpolate("/admin/oauth/interaction", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthInteractionComplete(
+      input: OperationInput<"oauthInteractionComplete"> & {
+        body: OperationBody<"oauthInteractionComplete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthInteractionComplete">>(
+        "post",
+        interpolate("/admin/oauth/interaction/complete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    oauthServiceAccountCreate(
+      input: OperationInput<"oauthServiceAccountCreate"> & {
+        body: OperationBody<"oauthServiceAccountCreate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"oauthServiceAccountCreate">>(
+        "post",
+        interpolate("/admin/oauth/service-account/create", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestAdd(
+      input: OperationInput<"orderTestAdd"> & {
+        body: OperationBody<"orderTestAdd">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestAdd">>(
+        "post",
+        interpolate("/admin/order/test/add", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestDelete(
+      input: OperationInput<"orderTestDelete"> & {
+        body: OperationBody<"orderTestDelete">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestDelete">>(
+        "post",
+        interpolate("/admin/order/test/delete", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestExport(
+      input: OperationInput<"orderTestExport"> & {
+        body: OperationBody<"orderTestExport">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestExport">>(
+        "post",
+        interpolate("/admin/order/test/export", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        { ...config, responseType: "blob", responseMode: "raw" }
+      );
+    },
+    orderTestInfo(
+      input: OperationInput<"orderTestInfo"> & {
+        body: OperationBody<"orderTestInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestInfo">>(
+        "post",
+        interpolate("/admin/order/test/info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestPage(
+      input: OperationInput<"orderTestPage"> & {
+        body: OperationBody<"orderTestPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestPage">>(
+        "post",
+        interpolate("/admin/order/test/page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestSchema(
+      input: OperationInput<"orderTestSchema"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestSchema">>(
+        "get",
+        interpolate("/admin/order/test/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    orderTestUpdate(
+      input: OperationInput<"orderTestUpdate"> & {
+        body: OperationBody<"orderTestUpdate">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"orderTestUpdate">>(
+        "post",
+        interpolate("/admin/order/test/update", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

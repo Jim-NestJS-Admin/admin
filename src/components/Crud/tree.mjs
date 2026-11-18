@@ -21,3 +21,29 @@ export function treeRows(rows, parentField) {
   }
   return roots;
 }
+
+export function* walkTreeRows(rows) {
+  for (const row of rows) {
+    yield row;
+    yield* walkTreeRows(row.__crudTreeChildren ?? []);
+  }
+}
+
+/** 和普通树表格一致，子节点全选时选中父节点，部分选中时标记半选。 */
+export function treeSelection(rows, selected) {
+  const states = new Map();
+  function visit(row) {
+    const id = String(row.id);
+    const children = (row.__crudTreeChildren ?? []).map(visit);
+    const checked = children.length
+      ? children.every(child => child.checked)
+      : selected.has(id);
+    const indeterminate =
+      !checked && children.some(child => child.checked || child.indeterminate);
+    const state = { checked, indeterminate };
+    states.set(id, state);
+    return state;
+  }
+  rows.forEach(visit);
+  return states;
+}

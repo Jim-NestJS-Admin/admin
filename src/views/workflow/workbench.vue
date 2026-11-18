@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount } from "vue";
+import { computed, ref, onBeforeUnmount, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
@@ -20,6 +21,21 @@ const tab = ref(
   start = ref(false),
   detail = ref<{ instanceId: string; taskId?: string }>();
 const list = ref<InstanceType<typeof CrudPage>>();
+const route = useRoute();
+watch(
+  () => route.query.instanceId,
+  value => {
+    if (typeof value === "string" && /^[1-9]\d{0,19}$/.test(value))
+      detail.value = {
+        instanceId: value,
+        ...(typeof route.query.taskId === "string" &&
+        /^[1-9]\d{0,19}$/.test(route.query.taskId)
+          ? { taskId: route.query.taskId }
+          : {})
+      };
+  },
+  { immediate: true }
+);
 const port = computed<CrudPort>(() => {
   const resource = tab.value === "mine" ? "workflowInstance" : "workflowTask";
   const g = generatedCrud(resource);

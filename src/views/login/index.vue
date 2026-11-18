@@ -63,7 +63,74 @@ onMounted(async () => {
     tenantCode.value = "";
     writeTenantCode("");
   }
+  const url = new URL(window.location.href);
+  const next = safeReturnPath(url.searchParams.get("next"));
+  const code = url.searchParams.get("code"),
+    state = url.searchParams.get("state");
+  if (code && state) {
+    url.searchParams.delete("code");
+    url.searchParams.delete("state");
+    url.searchParams.delete("wecom");
+    url.searchParams.delete("next");
+    history.replaceState(history.state, "", url);
+    busy.value = true;
+    try {
+      await useUserStoreHook().loginByWecom({ code, state });
+      await router.replace(next ?? "/welcome");
+    } catch (reason) {
+      message(
+        reason instanceof Error
+          ? reason.message
+          : t("admin.serviceUnavailable"),
+        { type: "error" }
+      );
+    } finally {
+      busy.value = false;
+    }
+  } else if (/wxwork/i.test(navigator.userAgent)) await wecomLogin();
 });
+async function wecomLogin() {
+  if (busy.value) return;
+  busy.value = true;
+  try {
+    const start = getAdminGateway().wecomStart;
+    if (!start) throw new Error(t("admin.serviceUnavailable"));
+    const next = safeReturnPath(router.currentRoute.value.query.next);
+    const result = await start(!/wxwork/i.test(navigator.userAgent), next);
+    const url = new URL(result.url);
+    if (
+      url.protocol !== "https:" ||
+      !["open.work.weixin.qq.com", "open.weixin.qq.com"].includes(url.hostname)
+    )
+      throw new Error(t("admin.serviceUnavailable"));
+    window.location.assign(url.toString());
+  } catch (reason) {
+    message(
+      reason instanceof Error ? reason.message : t("admin.serviceUnavailable"),
+      { type: "error" }
+    );
+  } finally {
+    busy.value = false;
+  }
+}
+function safeReturnPath(value: unknown): string | undefined {
+  if (
+    typeof value === "string" &&
+    /^\/automation\/confirm\?operation=[1-9]\d{0,19}$/.test(value)
+  )
+    return value;
+  if (
+    typeof value === "string" &&
+    /^\/authorization\/consent\?uid=[a-zA-Z0-9_-]{10,150}$/.test(value)
+  )
+    return value;
+  return typeof value === "string" &&
+    /^\/workflow\/workbench\?instanceId=[1-9]\d{0,19}(?:&taskId=[1-9]\d{0,19})?$/.test(
+      value
+    )
+    ? value
+    : undefined;
+}
 watch(tenantCode, value => writeTenantCode(value));
 watch([account, locale, tenantCode], () => {
   proof.value = "";
@@ -95,7 +162,9 @@ async function signIn() {
       captchaCode: proof.value
     });
     writeRemembered(remember.value ? account.value.trim() : "");
-    await router.replace("/welcome");
+    await router.replace(
+      safeReturnPath(router.currentRoute.value.query.next) ?? "/welcome"
+    );
   } catch (reason) {
     const view = failureView(
       reason instanceof RequestFailure ? reason.failure : null
@@ -222,6 +291,9 @@ async function signIn() {
               >{{ t("admin.signIn") }}</el-button
             >
           </form>
+          <el-button link :disabled="busy" @click="wecomLogin">{{
+            t("notifications.login")
+          }}</el-button>
         </div>
       </section>
     </div>

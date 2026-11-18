@@ -1,6 +1,13 @@
 import type { components } from "@/api/schema";
 export type CrudSchema = components["schemas"]["CrudSchema"];
+export type CrudTableMode = NonNullable<CrudSchema["defaultTableMode"]>;
 export type CrudColumn = components["schemas"]["CrudSchemaColumn"];
+/** 页面自行渲染的附加列，普通和虚拟表格共用。 */
+export interface CrudExtraColumn {
+  field: string;
+  label: string;
+  width?: number;
+}
 export type CrudChild = components["schemas"]["CrudSchemaChild"];
 /** 内部编辑变化，适配器须映射到生成的资源请求 DTO；不是直接发送的请求体。 */
 export interface CrudRelatedChange {

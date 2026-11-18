@@ -53,6 +53,7 @@ export function useCrud(
     { group: string; key: string; field: string; message: string }[]
   >([]);
   const recycledView = ref(false);
+  const sortRequested = ref(false);
   const groupCell = (resource: string) => (row: CrudRecord, field: string) =>
     relatedCell(resource, row, field);
   const retryUntil = ref(0);
@@ -69,6 +70,16 @@ export function useCrud(
     sorting: [],
     equality: {}
   });
+  const fullTree = computed(
+    () =>
+      !recycledView.value &&
+      !!schema.value?.tree &&
+      !!port.tree &&
+      !sortRequested.value &&
+      !query.search &&
+      !query.advanced &&
+      !Object.keys(query.equality).length
+  );
   const editor = reactive({
     open: false,
     readOnly: false,
@@ -106,6 +117,7 @@ export function useCrud(
     editor.related = [];
     rowIssues.value = [];
     recycledView.value = false;
+    sortRequested.value = false;
     query.search = "";
     query.equality = {};
     query.sorting = [];
@@ -211,14 +223,7 @@ export function useCrud(
     try {
       const list = recycledView.value ? port.recycled : port.list;
       if (!list) throw Error("crud.requestFailed");
-      const useTree =
-        !recycledView.value &&
-        schema.value.tree &&
-        port.tree &&
-        !query.search &&
-        !query.advanced &&
-        !Object.keys(query.equality).length;
-      const flat = useTree ? await port.tree(request.signal) : undefined;
+      const flat = fullTree.value ? await port.tree(request.signal) : undefined;
       const result = flat
         ? { rows: flat, totalRows: flat.length }
         : await list.call(
@@ -305,6 +310,7 @@ export function useCrud(
   function sort(field: string, order: "ascending" | "descending" | null) {
     if (recycledView.value) return;
     if (order && !schema.value?.actions.page?.sortable.includes(field)) return;
+    sortRequested.value = !!order;
     query.sorting = order
       ? [{ field, direction: order === "ascending" ? "asc" : "desc" }]
       : [];
@@ -510,6 +516,7 @@ export function useCrud(
       return;
     closeEditor();
     recycledView.value = value;
+    sortRequested.value = false;
     query.pageNumber = 1;
     query.equality = {};
     query.sorting = [];
@@ -587,6 +594,8 @@ export function useCrud(
   );
   return {
     treeOptions,
+    fullTree,
+    sortRequested,
     schema,
     rows,
     selected,
