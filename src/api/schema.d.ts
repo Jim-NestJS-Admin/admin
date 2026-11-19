@@ -3449,6 +3449,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/page-config/catalog": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 当前租户的模块配置目录 */
+    get: operations["systemPageConfigCatalog"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/page-config/history": {
     parameters: {
       query?: never;
@@ -7168,6 +7185,18 @@ export type components = {
       title: string;
       /** @enum {string} */
       type: "directory" | "page" | "button";
+    };
+    PageConfigCatalogDto: {
+      menus: components["schemas"]["PageConfigMenuNodeDto"][];
+    };
+    PageConfigMenuNodeDto: {
+      children?: components["schemas"]["PageConfigMenuNodeDto"][];
+      id: string;
+      /** @description 页面对应的 CRUD 资源 */
+      resource?: string;
+      /** @description 当前角色能否读取该资源的页面描述 */
+      selectable?: boolean;
+      title: string;
     };
     PermissionItem: {
       code: string;
@@ -18783,6 +18812,49 @@ export interface operations {
       };
       /** @description 4004：数据不存在或无权访问 */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemPageConfigCatalog: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["PageConfigCatalogDto"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 5003：服务暂不可用 */
+      503: {
         headers: {
           [name: string]: unknown;
         };

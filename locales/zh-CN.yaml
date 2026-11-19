@@ -298,7 +298,7 @@ fieldPerm:
   mask: 脱敏规则
   delegable: 可委派上限
   followDefault: 跟随默认
-  bulkState: 批量状态
+  bulkState: 批量设置
   applyModule: 应用到所选模块全部字段
   copyRole: 从其他角色复制
   copy: 复制到当前草稿
@@ -566,6 +566,12 @@ codegen:
 
 pageConfig:
   title: 模块配置
+  searchModules: 搜索模块
+  selectModule: 请从菜单树选择要配置的模块
+  noModules: 暂无可配置的模块
+  noReadPermission: 当前角色没有此页面的读取权限
+  unsavedSwitch: 当前模块有未保存的改动，切换后会丢弃这些改动。
+  discardAndSwitch: 丢弃并切换
   version: "当前版本 {version}"
   versionLabel: 版本
   history: 修改历史
@@ -583,9 +589,29 @@ pageConfig:
   asc: 升序
   desc: 降序
   addSort: 添加排序
-  reorder: 调整顺序
+  defaultSort: 默认排序
+  reorder: 顺序
+  dragField: 调整「{field}」顺序
+  dragHint: 拖动排序，也可按 Alt + 上下方向键调整
   hidden: 隐藏列
-  preview: 效果预览
+  preview: 预览
+  pageSizeHelp: 选择常用条数，也可输入整数后按回车。
+  pageSizeRange: 每页条数必须是 1 到 {max} 的整数。
+  tableModeHelp: 普通表格适合日常使用，虚拟表格适合每页记录较多时使用。
+  treeHelp: 开启后按父子层级展示记录。
+  keyWordsHelp: 列表顶部的搜索框会匹配这些字段。
+  filterableHelp: 这些字段会出现在高级筛选中。
+  sortHelp: 页面第一次打开时按这里排序，靠前的规则优先。
+  columnsHelp: 拖动手柄可排序。列宽留空会自动分配，隐藏列默认收起，固定列在横向滚动时保持可见。内容和表头可分别对齐，「默认」沿用字段类型的设置。
+  listPreview: 表头预览
+  noPreviewColumns: 当前所有列都已隐藏。
+  formOpenMode: 打开方式
+  formPreview: 预览表单
+  formPreviewHelp: 拖动手柄可排序。同组字段填写相同的分组名称，宽度可选半行或整行，输入提示在字段为空时显示。
+  align: 内容对齐
+  headerAlign: 表头对齐
+  defaultAlignment: 默认
+  center: 居中
   group: 分组名称
   span: 字段宽度
   half: 半行

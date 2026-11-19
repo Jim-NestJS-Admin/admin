@@ -2590,6 +2590,17 @@ export function createApiClient(
         config
       );
     },
+    systemPageConfigCatalog(
+      input: OperationInput<"systemPageConfigCatalog"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"systemPageConfigCatalog">>(
+        "get",
+        interpolate("/admin/system/page-config/catalog", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemPageConfigHistory(
       input: OperationInput<"systemPageConfigHistory"> & {
         body: OperationBody<"systemPageConfigHistory">;

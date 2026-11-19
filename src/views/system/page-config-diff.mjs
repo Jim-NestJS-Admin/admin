@@ -57,6 +57,9 @@ export function minimalPageConfig(state, defaults) {
         out.hidden = column.hidden;
       if (column.fixed === "left" || column.fixed === "right")
         out.fixed = column.fixed;
+      for (const key of ["align", "headerAlign"])
+        if (column[key] === "left" || column[key] === "center")
+          out[key] = column[key];
       return out;
     }
   );

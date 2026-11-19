@@ -9,6 +9,10 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
+import { useRenderIcon } from "@/components/ReIcon/src/hooks";
+import InfoIcon from "~icons/ri/information-line";
+import RefreshIcon from "~icons/ri/refresh-line";
+import SearchIcon from "~icons/ri/search-line";
 
 const props = defineProps<{
   mode: "role" | "default";
@@ -48,13 +52,18 @@ const stateValue = (row: Entry) =>
 const dirty = computed(() =>
   rows.value.filter(row => stateValue(row) !== baseline.get(key(row)))
 );
+defineExpose({
+  hasUnsavedChanges: computed(() => dirty.value.length > 0),
+  busy
+});
 const resources = computed(() => [
   ...new Map(rows.value.map(row => [row.resource, row.resourceLabel])).entries()
 ]);
+const activeResource = computed(() => props.resourceFilter || resource.value);
 const visible = computed(() =>
   rows.value.filter(
     row =>
-      (!resource.value || row.resource === resource.value) &&
+      (!activeResource.value || row.resource === activeResource.value) &&
       `${row.resourceLabel} ${row.label} ${row.field}`
         .toLowerCase()
         .includes(search.value.toLowerCase())
@@ -158,10 +167,10 @@ function updateState(row: Entry, state: Entry["state"] | "__default__") {
     row.mask = row.defaultMask ?? row.codeMask ?? "all";
 }
 function applyBulk() {
-  if (!resource.value) return;
+  if (!activeResource.value) return;
   // 整模块设置不受搜索词截断，避免只改屏幕上命中的少数字段。
   rows.value
-    .filter(row => row.resource === resource.value)
+    .filter(row => row.resource === activeResource.value)
     .forEach(row => updateState(row, bulkState.value));
 }
 async function copy() {
@@ -181,7 +190,8 @@ async function copy() {
       return;
     const source = new Map(result.data.fields.map(row => [key(row), row]));
     for (const row of rows.value) {
-      if (resource.value && row.resource !== resource.value) continue;
+      if (activeResource.value && row.resource !== activeResource.value)
+        continue;
       const original = source.get(key(row));
       if (original) {
         updateState(row, original.state);
@@ -248,100 +258,138 @@ onMounted(async () => {
 </script>
 <template>
   <section class="field-permissions">
-    <el-alert
-      :title="t('fieldPerm.explanation')"
-      type="info"
-      :closable="false"
-    />
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <div class="field-toolbar">
-      <el-select
-        v-if="mode === 'role' && !fixedRoleId"
-        v-model="roleId"
-        filterable
-        :placeholder="t('fieldPerm.chooseRole')"
-        :aria-label="t('fieldPerm.chooseRole')"
-        :disabled="busy || loading || !!dirty.length"
-        @change="load"
-      >
-        <el-option
-          v-for="role in allowedRoles"
-          :key="role.id"
-          :value="role.id"
-          :label="role.name"
+      <div v-if="canSave">
+        <el-button
+          v-perm="
+            permission(
+              mode === 'role' ? 'systemRoleFieldSave' : 'systemFieldSave'
+            )
+          "
+          type="primary"
+          :disabled="!ready || !dirty.length || loading"
+          :loading="busy"
+          @click="save"
+          >{{ t("fieldPerm.saveCount", { count: dirty.length }) }}</el-button
+        >
+      </div>
+      <div class="field-filters">
+        <el-select
+          v-if="mode === 'role' && !fixedRoleId"
+          v-model="roleId"
+          filterable
+          :placeholder="t('fieldPerm.chooseRole')"
+          :aria-label="t('fieldPerm.chooseRole')"
+          :disabled="busy || loading || !!dirty.length"
+          @change="load"
+        >
+          <el-option
+            v-for="role in allowedRoles"
+            :key="role.id"
+            :value="role.id"
+            :label="role.name"
+          />
+        </el-select>
+        <el-select
+          v-if="!resourceFilter"
+          v-model="resource"
+          clearable
+          filterable
+          :aria-label="t('fieldPerm.module')"
+          :placeholder="t('fieldPerm.module')"
+          :disabled="busy"
+        >
+          <el-option
+            v-for="[value, label] in resources"
+            :key="value"
+            :value="value"
+            :label="label"
+          />
+        </el-select>
+        <el-input
+          v-model="search"
+          clearable
+          :prefix-icon="useRenderIcon(SearchIcon)"
+          :placeholder="t('fieldPerm.search')"
+          :aria-label="t('fieldPerm.search')"
         />
-      </el-select>
-      <el-select
-        v-model="resource"
-        clearable
-        :aria-label="t('fieldPerm.module')"
-        :placeholder="t('fieldPerm.module')"
-        :disabled="busy"
-        ><el-option
-          v-for="[value, label] in resources"
-          :key="value"
-          :value="value"
-          :label="label"
-      /></el-select>
-      <el-input
-        v-model="search"
-        clearable
-        :placeholder="t('fieldPerm.search')"
-        :aria-label="t('fieldPerm.search')"
-      />
-      <el-button :disabled="!ready || busy" :loading="loading" @click="load">{{
-        t("crud.reload")
-      }}</el-button>
-      <el-button
-        v-perm="
-          permission(
-            mode === 'role' ? 'systemRoleFieldSave' : 'systemFieldSave'
-          )
-        "
-        type="primary"
-        :disabled="!ready || !dirty.length || loading"
-        :loading="busy"
-        @click="save"
-        >{{ t("fieldPerm.saveCount", { count: dirty.length }) }}</el-button
-      >
+        <el-tooltip :content="t('crud.reload')">
+          <el-button
+            :icon="useRenderIcon(RefreshIcon)"
+            :aria-label="t('crud.reload')"
+            :disabled="!ready || busy"
+            :loading="loading"
+            @click="load"
+          />
+        </el-tooltip>
+        <el-tooltip :content="t('fieldPerm.explanation')">
+          <el-button
+            :icon="useRenderIcon(InfoIcon)"
+            :aria-label="t('fieldPerm.explanation')"
+          />
+        </el-tooltip>
+      </div>
     </div>
-    <div v-if="canSave" class="field-toolbar">
-      <el-select
-        v-model="bulkState"
+    <div v-if="canSave" class="field-batch">
+      <div
+        class="field-operation"
+        role="group"
         :aria-label="t('fieldPerm.bulkState')"
-        :disabled="busy || loading"
-        ><el-option
-          value="__default__"
-          :label="t('fieldPerm.followDefault')" /><el-option
-          v-for="state in states"
-          :key="state"
-          :value="state"
-          :label="t(`fieldPerm.states.${state}`)"
-      /></el-select>
-      <el-button
-        :disabled="!resource || !ready || busy || loading"
-        @click="applyBulk"
-        >{{ t("fieldPerm.applyModule") }}</el-button
       >
-      <template v-if="mode === 'role'">
+        <span class="field-operation-label">{{
+          t("fieldPerm.bulkState")
+        }}</span>
+        <el-select
+          v-model="bulkState"
+          :aria-label="t('fieldPerm.bulkState')"
+          :disabled="busy || loading"
+        >
+          <el-option
+            value="__default__"
+            :label="t('fieldPerm.followDefault')"
+          />
+          <el-option
+            v-for="state in states"
+            :key="state"
+            :value="state"
+            :label="t(`fieldPerm.states.${state}`)"
+          />
+        </el-select>
+        <el-button
+          :disabled="!activeResource || !ready || busy || loading"
+          @click="applyBulk"
+        >
+          {{ t("fieldPerm.applyModule") }}
+        </el-button>
+      </div>
+      <div
+        v-if="mode === 'role'"
+        class="field-operation"
+        role="group"
+        :aria-label="t('fieldPerm.copyRole')"
+      >
         <el-select
           v-model="copyRoleId"
           filterable
           :aria-label="t('fieldPerm.copyRole')"
           :placeholder="t('fieldPerm.copyRole')"
           :disabled="busy || loading"
-          ><el-option
+        >
+          <el-option
             v-for="role in allowedRoles.filter(item => item.id !== roleId)"
             :key="role.id"
             :value="role.id"
             :label="role.name"
-        /></el-select>
+          />
+        </el-select>
         <el-button
           :disabled="!roleId || !copyRoleId || busy || loading"
           @click="copy"
-          >{{ t("fieldPerm.copy") }}</el-button
         >
-      </template>
+          {{ t("fieldPerm.copy") }}
+        </el-button>
+      </div>
     </div>
     <el-table
       v-loading="loading"
@@ -428,7 +476,7 @@ onMounted(async () => {
 .field-permissions {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
 }
 
@@ -439,14 +487,46 @@ onMounted(async () => {
   border-radius: 4px;
 }
 
-.field-toolbar {
+.field-toolbar,
+.field-filters,
+.field-batch,
+.field-operation {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
 }
 
-.field-toolbar :deep(.el-select),
-.field-toolbar :deep(.el-input) {
-  width: 210px;
+.field-toolbar {
+  min-height: var(--crud-control-height, 32px);
+}
+
+.field-filters {
+  min-width: 0;
+  margin-left: auto;
+}
+
+.field-filters :deep(.el-select),
+.field-operation :deep(.el-select) {
+  width: 164px;
+  max-width: 100%;
+}
+
+.field-filters :deep(.el-input) {
+  width: 200px;
+  max-width: 100%;
+}
+
+.field-toolbar :deep(.el-button + .el-button),
+.field-operation :deep(.el-button + .el-button) {
+  margin-left: 0;
+}
+
+.field-batch {
+  column-gap: 24px;
+}
+
+.field-operation-label {
+  color: var(--el-text-color-regular);
 }
 </style>

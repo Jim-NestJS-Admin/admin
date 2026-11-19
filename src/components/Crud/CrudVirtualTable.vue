@@ -123,9 +123,12 @@ const tableColumns = computed(() => {
     title: column.label,
     width: column.width,
     fixed: column.fixed ? fixedDirections[column.fixed] : undefined,
-    align: centeredTypes.has(column.type)
-      ? TableV2Alignment.CENTER
-      : TableV2Alignment.LEFT,
+    align:
+      (column.align ?? (centeredTypes.has(column.type) ? "center" : "left")) ===
+      "center"
+        ? TableV2Alignment.CENTER
+        : TableV2Alignment.LEFT,
+    headerClass: `crud-virtual-header-${column.headerAlign ?? (centeredTypes.has(column.type) ? "center" : "left")}`,
     sortable: column.sortable,
     source: column
   }));
@@ -280,5 +283,13 @@ function headerCellProps({ column }: { column: Column }) {
 
 .crud-tree-empty {
   color: var(--el-text-color-secondary);
+}
+
+:deep(.el-table-v2__header-cell.crud-virtual-header-left) {
+  justify-content: flex-start;
+}
+
+:deep(.el-table-v2__header-cell.crud-virtual-header-center) {
+  justify-content: center;
 }
 </style>

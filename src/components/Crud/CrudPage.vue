@@ -108,6 +108,7 @@ const fill = computed(() => props.fill);
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
+const treePaneSize = "220px";
 const mobile = useMediaQuery("(max-width: 760px)");
 /** 平板及更窄时左侧树收进「分类筛选」抽屉，让表格占满宽度 */
 const treeInDrawer = useMediaQuery("(max-width: 1024px)");
@@ -568,10 +569,15 @@ defineExpose({
       </slot>
       <slot name="row-actions-extra" :row="row" :disabled="saving" />
     </DefineRowActions>
-    <el-splitter v-if="schema" class="crud-splitter" lazy>
+    <el-splitter
+      v-if="schema"
+      class="crud-splitter page-splitter"
+      :style="{ '--page-splitter-side-size': treePaneSize }"
+      lazy
+    >
       <el-splitter-panel
         v-if="slots.tree && !treeInDrawer && !recycledView"
-        size="220px"
+        :size="treePaneSize"
         min="180px"
         max="400px"
         collapsible
@@ -835,7 +841,8 @@ defineExpose({
                 :label="column.label"
                 :min-width="column.width ?? autoWidth(column)"
                 :fixed="column.fixed"
-                :align="columnAlign(column)"
+                :align="column.align ?? columnAlign(column)"
+                :header-align="column.headerAlign ?? columnAlign(column)"
                 show-overflow-tooltip
                 :sortable="sortable(column) ? 'custom' : false"
               >
