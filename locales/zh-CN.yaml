@@ -648,6 +648,13 @@ forms:
   saved: 表单版本已保存
   immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
   versionListHint: 每条记录都是一个保留的表单版本
+  archivedVersions: 查看已归档
+  viewArchived: 查看
+  archiveVersion: 归档版本
+  restoreVersion: 恢复版本
+  archiveConfirm: 确定归档「{name}」v{revision}？归档后可以恢复。
+  archivedSuccess: 版本已归档
+  restoredSuccess: 版本已恢复
   searchHint: 搜索名称或编码
   empty: 暂无表单，点击“新建表单”开始设计
   revision: 版本

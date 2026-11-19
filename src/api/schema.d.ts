@@ -913,6 +913,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/form/definition/set-archived": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 归档未使用的旧表单版本，或恢复归档版本 */
+    post: operations["formDefinitionSetArchived"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/form/definition/validate": {
     parameters: {
       query?: never;
@@ -5693,6 +5710,8 @@ export type components = {
       name: string;
     };
     FormDefinition: {
+      /** @description 已归档 */
+      archived?: boolean;
       /** @description 表单编码 */
       code?: string;
       /**
@@ -5749,6 +5768,8 @@ export type components = {
       where?: components["schemas"]["QueryGroupDto"];
     };
     FormDefinitionPageEq: {
+      /** @description 已归档 */
+      archived?: boolean;
       /** @description 表单编码 */
       code?: string;
       /** @description 表单版本 */
@@ -5778,6 +5799,8 @@ export type components = {
       _fieldState?: {
         [key: string]: "readonly" | "masked" | "hidden";
       };
+      /** @description 已归档 */
+      archived?: boolean;
       /** @description 表单编码 */
       code?: string;
       /**
@@ -7647,6 +7670,11 @@ export type components = {
       id?: string;
       spec: components["schemas"]["ModuleSpec"];
       version?: number;
+    };
+    SetFormVersionArchivedBody: {
+      archived: boolean;
+      id: string;
+      version: number;
     };
     SpecBody: {
       spec: components["schemas"]["ModuleSpec"];
@@ -13066,6 +13094,71 @@ export interface operations {
             /** @example ok */
             message: string;
           };
+        };
+      };
+    };
+  };
+  formDefinitionSetArchived: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetFormVersionArchivedBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["SetFormVersionArchivedBody"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4004：数据不存在或无权访问 */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4009：数据已被他人修改，请刷新后重试 */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
         };
       };
     };

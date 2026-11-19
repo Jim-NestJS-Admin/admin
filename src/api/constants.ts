@@ -236,6 +236,7 @@ export const OPERATION_PERMISSIONS = {
   formDefinitionPage: ["form:definition:page"],
   formDefinitionRevise: ["form:definition:update"],
   formDefinitionSchema: ["form:definition:page"],
+  formDefinitionSetArchived: ["form:definition:update"],
   formDefinitionValidate: ["form:definition:validate"],
   formSubmissionAdd: ["form:submission:add"],
   formSubmissionInfo: ["form:submission:info"],

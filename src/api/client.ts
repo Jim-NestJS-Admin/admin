@@ -729,6 +729,19 @@ export function createApiClient(
         config
       );
     },
+    formDefinitionSetArchived(
+      input: OperationInput<"formDefinitionSetArchived"> & {
+        body: OperationBody<"formDefinitionSetArchived">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionSetArchived">>(
+        "post",
+        interpolate("/admin/form/definition/set-archived", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     formDefinitionValidate(
       input: OperationInput<"formDefinitionValidate"> & {
         body: OperationBody<"formDefinitionValidate">;

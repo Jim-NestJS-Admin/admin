@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { api } from "@/api/client";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { onSessionReset } from "@/platform/lifecycle";
 import type { FormRecord } from "./model";
 
@@ -25,10 +25,19 @@ defineOptions({ name: "FormDefinitionPage" });
 const FormPreview = defineAsyncComponent(() => import("./FormPreview.vue"));
 const { t } = useI18n();
 const generated = generatedCrud("formDefinition");
+const showArchived = ref(false);
+const archiveBusy = ref(false);
 // 版本快照只开放列表读取；创建和修订由设计工作区办理。
 const port: CrudPort = {
   describe: generated.port.describe,
-  list: generated.port.list,
+  list: (query, meta) =>
+    generated.port.list(
+      {
+        ...query,
+        equality: { ...query.equality, archived: showArchived.value }
+      },
+      meta
+    ),
   detail: generated.port.detail,
   preferences: generated.port.preferences
 };
@@ -40,6 +49,48 @@ const targetForm = ref<FormRecord>();
 const action = ref<"" | "fill" | "records">("");
 const actionError = ref("");
 let actionRequest: AbortController | undefined;
+let archiveRequest: AbortController | undefined;
+async function setArchived(row: CrudRecord, archived: boolean) {
+  if (
+    archiveBusy.value ||
+    typeof row.id !== "string" ||
+    typeof row.version !== "number"
+  )
+    return;
+  const { id, version } = row;
+  archiveBusy.value = true;
+  actionError.value = "";
+  const request = (archiveRequest = new AbortController());
+  try {
+    if (archived) {
+      const confirmed = await ElMessageBox.confirm(
+        t("forms.archiveConfirm", { name: row.name, revision: row.revision }),
+        t("forms.archiveVersion"),
+        { type: "warning" }
+      ).then(
+        () => true,
+        () => false
+      );
+      if (!confirmed || request.signal.aborted) return;
+    }
+    await api.formDefinitionSetArchived(
+      { body: { id, version, archived } },
+      {
+        signal: request.signal,
+        headers: { "Idempotency-Key": crypto.randomUUID() }
+      }
+    );
+    if (request.signal.aborted) return;
+    ElMessage.success(
+      t(archived ? "forms.archivedSuccess" : "forms.restoredSuccess")
+    );
+    await list.value?.reload();
+  } catch (reason) {
+    if (!request.signal.aborted) actionError.value = requestText(reason);
+  } finally {
+    if (archiveRequest === request) archiveBusy.value = false;
+  }
+}
 async function openAction(row: CrudRecord, mode: "fill" | "records") {
   if (typeof row.id !== "string") return;
   actionRequest?.abort();
@@ -59,6 +110,8 @@ async function openAction(row: CrudRecord, mode: "fill" | "records") {
 }
 const stopSession = onSessionReset(() => {
   actionRequest?.abort();
+  archiveRequest?.abort();
+  showArchived.value = false;
   action.value = "";
   targetForm.value = undefined;
   actionError.value = "";
@@ -66,6 +119,7 @@ const stopSession = onSessionReset(() => {
 onBeforeUnmount(() => {
   stopSession();
   actionRequest?.abort();
+  archiveRequest?.abort();
 });
 function submitted() {
   action.value = "";
@@ -130,6 +184,12 @@ onBeforeUnmount(workspace.dispose);
             >{{ t("forms.newForm") }}</el-button
           >
           <span class="list-hint">{{ t("forms.versionListHint") }}</span>
+          <el-switch
+            v-model="showArchived"
+            :active-text="t('forms.archivedVersions')"
+            :disabled="archiveBusy"
+            @change="list?.reload()"
+          />
         </template>
         <template #cell-revision="{ value }">
           <el-tag size="small" effect="plain">v{{ value }}</el-tag>
@@ -142,8 +202,11 @@ onBeforeUnmount(workspace.dispose);
             :icon="useRenderIcon(ViewIcon)"
             :disabled="disabled || busy"
             @click="open(row, 'view')"
-            >{{ t("forms.view") }}</el-button
+            >{{
+              t(showArchived ? "forms.viewArchived" : "forms.view")
+            }}</el-button
           ><el-button
+            v-if="!showArchived"
             v-perm="permission('formDefinitionRevise')"
             link
             type="primary"
@@ -152,12 +215,25 @@ onBeforeUnmount(workspace.dispose);
             @click="open(row, 'revise')"
             >{{ t("forms.newRevision") }}</el-button
           >
+          <el-button
+            v-if="showArchived"
+            v-perm="permission('formDefinitionSetArchived')"
+            link
+            type="primary"
+            :disabled="disabled || busy || archiveBusy"
+            @click="setArchived(row, false)"
+            >{{ t("forms.restoreVersion") }}</el-button
+          >
           <el-dropdown
+            v-else
             class="form-more"
             trigger="click"
-            :disabled="disabled || busy"
+            :disabled="disabled || busy || archiveBusy"
           >
-            <el-button link type="primary" :disabled="disabled || busy"
+            <el-button
+              link
+              type="primary"
+              :disabled="disabled || busy || archiveBusy"
               >{{ t("codeRules.more") }}<ArrowDownIcon class="more-arrow"
             /></el-button>
             <template #dropdown
@@ -170,6 +246,11 @@ onBeforeUnmount(workspace.dispose);
                 <Perms :value="permission('formSubmissionPage')">
                   <el-dropdown-item @click="openAction(row, 'records')">{{
                     t("autoCodes.submissions")
+                  }}</el-dropdown-item>
+                </Perms>
+                <Perms :value="permission('formDefinitionSetArchived')">
+                  <el-dropdown-item divided @click="setArchived(row, true)">{{
+                    t("forms.archiveVersion")
                   }}</el-dropdown-item>
                 </Perms>
               </el-dropdown-menu></template
