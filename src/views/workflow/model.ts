@@ -59,6 +59,15 @@ export function newNode(type: Node["type"], name: string): Node {
     ];
   return node;
 }
+export function addWorkflowBranch(node: Node, name: string, field: string) {
+  const branches = node.branches;
+  if (!branches || branches.length >= 10) return;
+  const branch: Branch = { id: uid(), name, nodes: [] };
+  if (node.type === "condition") {
+    branch.condition = { source: "field", field, operator: "eq", value: "" };
+    branches.splice(branches.length - 1, 0, branch);
+  } else branches.push(branch);
+}
 export function text(value: unknown) {
   return value == null || value === ""
     ? "—"

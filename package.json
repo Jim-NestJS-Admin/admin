@@ -59,6 +59,7 @@
     "js-cookie": "^3.0.8",
     "localforage": "^1.10.0",
     "mitt": "^3.0.1",
+    "mldong-flow-designer-dingtalk": "3.2.8",
     "nprogress": "^0.2.0",
     "path-browserify": "^1.0.1",
     "pinia": "^3.0.4",
