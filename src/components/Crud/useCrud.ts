@@ -37,7 +37,8 @@ export function useCrud(
   /** 新增时表单的初始值（例如「启用」默认打开）；不传为空 */
   addDefaults: () => CrudRecord = () => ({}),
   /** 新增接口的额外 DTO 字段，只允许页面显式声明，不能覆盖实体字段权限。 */
-  addExtraFields: () => readonly string[] = () => []
+  addExtraFields: () => readonly string[] = () => [],
+  confirmRecordUnavailable?: (message: string) => Promise<unknown>
 ) {
   const schema = shallowRef<CrudSchema>();
   const rows = shallowRef<CrudRecord[]>([]),
@@ -83,6 +84,7 @@ export function useCrud(
   const editor = reactive({
     open: false,
     readOnly: false,
+    unavailable: false,
     mode: "add" as "add" | "update",
     values: {} as CrudRecord,
     record: undefined as CrudRecord | undefined,
@@ -112,6 +114,7 @@ export function useCrud(
     baselineChoices.value = { columns: [], density: "default" };
     total.value = 0;
     editor.open = false;
+    editor.unavailable = false;
     editor.values = {};
     editor.record = undefined;
     editor.related = [];
@@ -212,6 +215,36 @@ export function useCrud(
       }
     );
   }
+  async function recordFailure(
+    reason: unknown,
+    scope: "page" | "editor" = "page",
+    multiple = false
+  ) {
+    if (
+      !(reason instanceof RequestFailure) ||
+      reason.failure.status !== 404 ||
+      reason.failure.code !== 4004
+    ) {
+      failure(reason, scope);
+      return;
+    }
+    intent = undefined;
+    if (scope === "editor") {
+      editor.unavailable = true;
+      editorError.value = "crud.recordUnavailable";
+    } else if (confirmRecordUnavailable) {
+      const context = generation;
+      try {
+        await confirmRecordUnavailable(
+          multiple ? "crud.recordsUnavailable" : "crud.recordUnavailable"
+        );
+      } catch {
+        return;
+      }
+      if (context !== generation) return;
+    }
+    await load();
+  }
   async function load() {
     if (!schema.value) return;
     const context = generation,
@@ -223,25 +256,38 @@ export function useCrud(
     try {
       const list = recycledView.value ? port.recycled : port.list;
       if (!list) throw Error("crud.requestFailed");
-      const flat = fullTree.value ? await port.tree(request.signal) : undefined;
-      const result = flat
-        ? { rows: flat, totalRows: flat.length }
-        : await list.call(
-            port,
-            JSON.parse(JSON.stringify(query)),
-            request.signal
-          );
-      if (context !== generation || sequence !== listSequence) return;
-      if (flat) treeOptions.value = flat;
-      rows.value =
-        schema.value.tree && !recycledView.value
-          ? treeRows(result.rows, schema.value.tree.parentField)
-          : result.rows;
-      total.value = result.totalRows;
+      if (fullTree.value) {
+        const flat = await port.tree(request.signal);
+        if (context !== generation || sequence !== listSequence) return;
+        treeOptions.value = flat;
+        rows.value = treeRows(flat, schema.value.tree.parentField);
+        total.value = flat.length;
+        return;
+      }
+      const requested: CrudQuery = JSON.parse(JSON.stringify(query));
+      while (true) {
+        const result = await list.call(port, { ...requested }, request.signal);
+        if (context !== generation || sequence !== listSequence) return;
+        const lastPage = Math.max(
+          1,
+          Math.ceil(result.totalRows / requested.pageSize)
+        );
+        if (requested.pageNumber > lastPage && result.totalRows > 0) {
+          requested.pageNumber = lastPage;
+          continue;
+        }
+        // 页码和总数同时提交，避免分页组件再触发一次回退请求。
+        query.pageNumber = Math.min(requested.pageNumber, lastPage);
+        total.value = result.totalRows;
+        rows.value =
+          schema.value.tree && !recycledView.value
+            ? treeRows(result.rows, schema.value.tree.parentField)
+            : result.rows;
+        break;
+      }
     } catch (reason) {
       if (context === generation && sequence === listSequence) {
         rows.value = [];
-        total.value = 0;
         failure(reason);
       }
     } finally {
@@ -318,13 +364,9 @@ export function useCrud(
   }
   async function edit(row?: CrudRecord, readOnly = false) {
     if (saving.value || !schema.value || recycledView.value) return;
-    editorError.value = "";
-    fields.value = {};
-    rowIssues.value = [];
-    intent = undefined;
-    editor.readOnly = readOnly;
     const sequence = ++detailSequence;
     if (!row) {
+      beginEditor(false);
       editor.mode = "add";
       editor.record = undefined;
       editor.values = { ...addDefaults() };
@@ -340,6 +382,7 @@ export function useCrud(
       const result = await port.detail(identity(row).id, request.signal);
       if (context !== generation || sequence !== detailSequence) return;
       identity(result);
+      beginEditor(readOnly);
       editor.mode = "update";
       editor.record = result;
       editor.values = editableValues(
@@ -362,15 +405,24 @@ export function useCrud(
       editor.open = true;
     } catch (reason) {
       if (context === generation && sequence === detailSequence)
-        failure(reason);
+        await recordFailure(reason);
     } finally {
       pending.delete(request);
     }
+  }
+  function beginEditor(readOnly: boolean) {
+    editorError.value = "";
+    fields.value = {};
+    rowIssues.value = [];
+    intent = undefined;
+    editor.readOnly = readOnly;
+    editor.unavailable = false;
   }
   function closeEditor() {
     if (!saving.value) {
       detailSequence++;
       editor.open = false;
+      editor.unavailable = false;
       editorError.value = "";
       fields.value = {};
       editor.values = {};
@@ -386,7 +438,13 @@ export function useCrud(
     return intent.key;
   }
   function validateEditor() {
-    if (!schema.value || !editor.open || editor.readOnly || saving.value)
+    if (
+      !schema.value ||
+      !editor.open ||
+      editor.readOnly ||
+      editor.unavailable ||
+      saving.value
+    )
       return false;
     editorError.value = "";
     const missing = requiredFields(
@@ -475,7 +533,10 @@ export function useCrud(
       rowIssues.value = [];
       await load();
     } catch (reason) {
-      if (context === generation) failure(reason, "editor");
+      if (context === generation) {
+        if (current) await recordFailure(reason, "editor");
+        else failure(reason, "editor");
+      }
     } finally {
       pending.delete(request);
       if (context === generation) saving.value = false;
@@ -501,7 +562,8 @@ export function useCrud(
       intent = undefined;
       await load();
     } catch (reason) {
-      if (context === generation) failure(reason);
+      if (context === generation)
+        await recordFailure(reason, "page", ids.length > 1);
     } finally {
       pending.delete(request);
       if (context === generation) saving.value = false;
@@ -556,7 +618,8 @@ export function useCrud(
       intent = undefined;
       await load();
     } catch (reason) {
-      if (context === generation) failure(reason);
+      if (context === generation)
+        await recordFailure(reason, "page", items.length > 1);
     } finally {
       pending.delete(request);
       if (context === generation) saving.value = false;

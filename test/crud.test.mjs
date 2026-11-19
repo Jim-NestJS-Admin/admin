@@ -280,6 +280,167 @@ test("控制器拒绝旧上下文/乱序回填，保留失败表单和重试幂�
       ]);
     });
     await t.test(
+      "记录不可用时刷新原查询，空末页回退，保存后保留抽屉",
+      async () => {
+        const unavailable = new RequestFailure({
+          code: 4004,
+          status: 404,
+          message: "数据不存在或无权访问",
+          data: null
+        });
+        const queries = [],
+          messages = [];
+        let staleView,
+          totalRows = 6,
+          listFails = false,
+          detailFails = true;
+        let rejectDetail;
+        let writes = 0;
+        let notifyOpened, confirmNotice;
+        const noticeOpened = new Promise(resolve => {
+          notifyOpened = resolve;
+        });
+        const noticeConfirmed = new Promise(resolve => {
+          confirmNotice = resolve;
+        });
+        const list = async query => {
+          queries.push(query);
+          if (listFails) throw new Error("列表刷新失败");
+          return {
+            rows:
+              (query.pageNumber - 1) * query.pageSize < totalRows ? [row] : [],
+            totalRows
+          };
+        };
+        const missing = async () => {
+          throw unavailable;
+        };
+        await renderToString(
+          createSSRApp(
+            defineComponent({
+              setup() {
+                staleView = useCrud(
+                  {
+                    describe: port.describe,
+                    list,
+                    recycled: list,
+                    detail: async () => {
+                      if (rejectDetail === true)
+                        return new Promise((_, reject) => {
+                          rejectDetail = reject;
+                        });
+                      if (detailFails) throw unavailable;
+                      return structuredClone(row);
+                    },
+                    update: async () => {
+                      writes++;
+                      throw unavailable;
+                    },
+                    remove: missing,
+                    restore: missing,
+                    purge: missing
+                  },
+                  "unavailable-user",
+                  undefined,
+                  undefined,
+                  undefined,
+                  undefined,
+                  async message => {
+                    messages.push(message);
+                    if (messages.length === 1) {
+                      notifyOpened();
+                      await noticeConfirmed;
+                    }
+                  }
+                );
+                return () => h("div");
+              }
+            })
+          )
+        );
+        await staleView.initialize();
+        Object.assign(staleView.query, {
+          pageNumber: 2,
+          pageSize: 2,
+          search: "alpha",
+          sorting: [{ field: "nickname", direction: "desc" }],
+          equality: { status: "enabled" }
+        });
+        const activeQuery = JSON.parse(JSON.stringify(staleView.query));
+        queries.length = 0;
+        const openingUnavailableRecord = staleView.edit(row, true);
+        await noticeOpened;
+        assert.deepEqual(queries, []);
+        confirmNotice();
+        await openingUnavailableRecord;
+        assert.deepEqual(queries, [activeQuery]);
+        assert.equal(staleView.editor.open, false);
+        assert.deepEqual(messages, ["crud.recordUnavailable"]);
+
+        rejectDetail = true;
+        const olderDetail = staleView.edit(row);
+        await staleView.edit();
+        rejectDetail(unavailable);
+        await olderDetail;
+        assert.equal(staleView.editor.mode, "add");
+        assert.deepEqual(messages, ["crud.recordUnavailable"]);
+        assert.equal(queries.length, 1);
+        staleView.closeEditor();
+
+        staleView.query.pageNumber = 3;
+        totalRows = 2;
+        queries.length = 0;
+        staleView.selected.value = [row.id, "13"];
+        await staleView.remove([...staleView.selected.value]);
+        assert.deepEqual(queries, [
+          { ...activeQuery, pageNumber: 3 },
+          { ...activeQuery, pageNumber: 1 }
+        ]);
+        assert.equal(staleView.query.pageNumber, 1);
+        assert.deepEqual(staleView.selected.value, []);
+        assert.equal(messages.at(-1), "crud.recordsUnavailable");
+
+        detailFails = false;
+        await staleView.edit(row);
+        staleView.editor.values.nickname = "未保存的名字";
+        staleView.query.pageNumber = 2;
+        queries.length = 0;
+        totalRows = 0;
+        await staleView.save();
+        assert.equal(queries.length, 1);
+        assert.equal(staleView.query.pageNumber, 1);
+        assert.equal(staleView.editor.open, true);
+        assert.equal(staleView.editor.unavailable, true);
+        assert.equal(staleView.editor.values.nickname, "未保存的名字");
+        assert.equal(staleView.editorError.value, "crud.recordUnavailable");
+        assert.equal(staleView.validateEditor(), false);
+        await staleView.save();
+        assert.equal(writes, 1);
+        assert.equal(messages.length, 2);
+        staleView.closeEditor();
+        await staleView.edit(row);
+        assert.equal(staleView.editor.unavailable, false);
+        assert.equal(staleView.editorError.value, "");
+
+        staleView.query.pageNumber = 2;
+        listFails = true;
+        await staleView.remove([row.id]);
+        assert.equal(staleView.query.pageNumber, 2);
+        assert.equal(staleView.error.value, "crud.requestFailed");
+
+        listFails = false;
+        await staleView.showRecycled(true);
+        queries.length = 0;
+        await staleView.recycleAction("restore", [row]);
+        await staleView.recycleAction("purge", [row]);
+        assert.equal(queries.length, 2);
+        assert.deepEqual(messages.slice(-2), [
+          "crud.recordUnavailable",
+          "crud.recordUnavailable"
+        ]);
+      }
+    );
+    await t.test(
       "树默认加载完整层级，显式排序走服务端分页，清除排序恢复完整树",
       async () => {
         const calls = [];
