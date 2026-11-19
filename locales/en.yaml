@@ -164,6 +164,9 @@ crud:
   required: This field is required
   invalidData: Invalid record ID or version. Refresh the list
   requestFailed: Operation failed. Please try again later
+  recordUnavailable: This record no longer exists or is inaccessible
+  recordUnavailableTitle: Record unavailable
+  recordsUnavailable: Some records no longer exist or are inaccessible. The operation was not completed.
   addRow: Add row
   copyRow: Copy
   rowCount: "{count} rows loaded; allowed {min}–{max}"

@@ -133,7 +133,16 @@ const view = useCrud(
       ? props.childCell(resource, row, field)
       : defaultCell(row, field),
   () => ({ ...props.addDefaults }),
-  () => props.addExtraFields ?? []
+  () => props.addExtraFields ?? [],
+  message =>
+    ElMessageBox.confirm(t(message), t("crud.recordUnavailableTitle"), {
+      type: "warning",
+      confirmButtonText: t("crud.confirm"),
+      showCancelButton: false,
+      showClose: false,
+      closeOnClickModal: false,
+      closeOnPressEscape: false
+    })
 );
 const {
   schema,
@@ -1230,13 +1239,13 @@ defineExpose({
           :values="editor.values"
           :record="editor.record"
           :readonly="editor.readOnly"
-          :disabled="saving"
+          :disabled="saving || editor.unavailable"
         />
         <el-button
           v-if="!editor.readOnly"
           type="primary"
           :loading="saving"
-          :disabled="retrySeconds > 0"
+          :disabled="editor.unavailable || retrySeconds > 0"
           @click="view.save"
           >{{ t("crud.save") }}</el-button
         ></template
