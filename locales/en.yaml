@@ -589,9 +589,29 @@ pageConfig:
   asc: Ascending
   desc: Descending
   addSort: Add sort field
-  reorder: Reorder
+  defaultSort: Default sort
+  reorder: Order
+  dragField: "Reorder {field}"
+  dragHint: Drag to reorder or use Alt and the up/down arrow keys
   hidden: Hide column
   preview: Preview
+  pageSizeHelp: Pick a preset or enter an integer and press Enter.
+  pageSizeRange: Enter an integer from 1 to {max}.
+  tableModeHelp: Use the standard table for everyday lists or the virtual table for larger pages.
+  treeHelp: Display records in their parent-child hierarchy.
+  keyWordsHelp: The main search box matches these fields.
+  filterableHelp: These fields appear in advanced filters.
+  sortHelp: The list opens with this order. Rules at the top take priority.
+  columnsHelp: Drag handles to reorder columns. Blank widths size automatically, hidden columns start collapsed, and pinned columns stay in view when scrolling sideways. The default alignment follows the field type.
+  listPreview: Header preview
+  noPreviewColumns: All columns are currently hidden.
+  formOpenMode: Open as
+  formPreview: Preview form
+  formPreviewHelp: Drag the handles to reorder fields. Use the same group name for related fields. Choose a half or full row, and use placeholders to guide input in empty fields.
+  align: Cell alignment
+  headerAlign: Header alignment
+  defaultAlignment: Default
+  center: Center
   group: Group name
   span: Field width
   half: Half row

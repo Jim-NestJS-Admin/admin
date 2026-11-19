@@ -50,6 +50,7 @@ const can = (code: Parameters<typeof permission>[0]) =>
 const pageEl = ref<HTMLElement>();
 const fillHeight = useFillHeight(pageEl);
 const headStyle = useHeadStyle();
+const dictionaryPaneSize = "260px";
 
 /** 系统字典所有租户共用，只有平台超级管理员能看到和维护（阶段 2）；其他人固定在业务字典 */
 const systemManager = computed(
@@ -291,8 +292,17 @@ onMounted(load);
     class="dict-page"
     :style="[headStyle, { height: `${fillHeight}px` }]"
   >
-    <el-splitter lazy>
-      <el-splitter-panel size="260px" min="200px" max="420px" collapsible>
+    <el-splitter
+      class="page-splitter"
+      :style="{ '--page-splitter-side-size': dictionaryPaneSize }"
+      lazy
+    >
+      <el-splitter-panel
+        :size="dictionaryPaneSize"
+        min="200px"
+        max="420px"
+        collapsible
+      >
         <aside class="dict-card dict-side">
           <div class="side-header">
             <div

@@ -74,6 +74,15 @@ test("宽度与代码默认相同、隐藏状态与默认相同都不写", () =>
   assert.deepEqual(minimalPageConfig(state, defaults), {});
 });
 
+test("列内容和表头的对齐方式独立保存", () => {
+  const state = untouched();
+  state.columns[0].align = "center";
+  state.columns[0].headerAlign = "left";
+  assert.deepEqual(minimalPageConfig(state, defaults), {
+    list: { columns: [{ field: "name", align: "center", headerAlign: "left" }] }
+  });
+});
+
 test("调整顺序时写出足以还原顺序的前缀", () => {
   const state = untouched();
   const [status] = state.columns.splice(2, 1);

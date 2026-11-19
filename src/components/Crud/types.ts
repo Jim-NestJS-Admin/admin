@@ -1,7 +1,15 @@
 import type { components } from "@/api/schema";
-export type CrudSchema = components["schemas"]["CrudSchema"];
+export type CrudSchema = Omit<
+  components["schemas"]["CrudSchema"],
+  "columns"
+> & {
+  columns: CrudColumn[];
+};
 export type CrudTableMode = NonNullable<CrudSchema["defaultTableMode"]>;
-export type CrudColumn = components["schemas"]["CrudSchemaColumn"];
+export type CrudColumn = components["schemas"]["CrudSchemaColumn"] & {
+  align?: "left" | "center";
+  headerAlign?: "left" | "center";
+};
 /** 页面自行渲染的附加列，普通和虚拟表格共用。 */
 export interface CrudExtraColumn {
   field: string;

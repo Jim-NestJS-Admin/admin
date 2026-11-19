@@ -12,7 +12,10 @@
 /* fade-transform */
 .fade-transform-leave-active,
 .fade-transform-enter-active {
-  transition: all 0.5s;
+  // 页面挂载后会测量内容区高度，切页动画只处理淡入淡出和横移。
+  transition:
+    opacity 0.5s,
+    transform 0.5s;
 }
 
 .fade-transform-enter-from {

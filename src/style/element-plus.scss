@@ -11,6 +11,21 @@
   padding: 0 !important;
 }
 
+// Splitter 测量容器前会把所有面板的基准尺寸设为 0，先按页面默认值布局。
+.page-splitter:not(:has(> .el-splitter-panel:not([style*="flex-basis: 0px"]))) {
+  > .el-splitter-panel:first-child:not(:last-child) {
+    flex-basis: var(--page-splitter-side-size) !important;
+  }
+
+  > .el-splitter-panel:last-child {
+    flex-basis: calc(100% - var(--page-splitter-side-size)) !important;
+  }
+
+  > .el-splitter-panel:only-child {
+    flex-basis: 100% !important;
+  }
+}
+
 .is-dark {
   z-index: 9999 !important;
 }

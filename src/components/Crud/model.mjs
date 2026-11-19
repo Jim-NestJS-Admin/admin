@@ -189,7 +189,13 @@ export function applyPageView(schema) {
       ...column,
       width: width(choice.width ?? column.width),
       hidden: choice.hidden === true,
-      fixed: ["left", "right"].includes(choice.fixed) ? choice.fixed : false
+      fixed: ["left", "right"].includes(choice.fixed) ? choice.fixed : false,
+      ...(["left", "center"].includes(choice.align)
+        ? { align: choice.align }
+        : {}),
+      ...(["left", "center"].includes(choice.headerAlign)
+        ? { headerAlign: choice.headerAlign }
+        : {})
     });
   }
   for (const column of schema.columns)
