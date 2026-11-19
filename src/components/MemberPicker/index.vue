@@ -17,6 +17,8 @@ const props = withDefaults(
     multiple?: boolean;
     disabled?: boolean;
     limit?: number;
+    showAvatars?: boolean;
+    blockedMembers?: Record<string, string>;
   }>(),
   { limit: 50 }
 );
@@ -59,6 +61,9 @@ const ids = computed(() =>
 const maximum = computed(() =>
   props.multiple ? Math.max(1, Math.min(props.limit, 50)) : 1
 );
+const selectableRows = computed(() =>
+  rows.value.filter(row => !props.blockedMembers?.[row.id])
+);
 const treeRows = computed(() => {
   const map = new Map(
     organizations.value.map(org => [
@@ -81,8 +86,10 @@ const currentOrg = computed(
 );
 const allChecked = computed(
   () =>
-    rows.value.length > 0 &&
-    rows.value.every(row => draft.value.some(item => item.id === row.id))
+    selectableRows.value.length > 0 &&
+    selectableRows.value.every(row =>
+      draft.value.some(item => item.id === row.id)
+    )
 );
 const partlyChecked = computed(
   () =>
@@ -91,8 +98,9 @@ const partlyChecked = computed(
 );
 const invalid = computed(
   () =>
-    draft.value.some(item => item.unavailable) ||
-    draft.value.length > maximum.value
+    draft.value.some(
+      item => item.unavailable || props.blockedMembers?.[item.id]
+    ) || draft.value.length > maximum.value
 );
 function message(e: unknown) {
   return e instanceof RequestFailure ? e.message : t("crud.requestFailed");
@@ -233,7 +241,10 @@ function chooseOrg(value: string) {
 }
 function toggle(member: MemberChoice, checked: boolean) {
   if (!checked) draft.value = draft.value.filter(item => item.id !== member.id);
-  else if (!draft.value.some(item => item.id === member.id)) {
+  else if (
+    !props.blockedMembers?.[member.id] &&
+    !draft.value.some(item => item.id === member.id)
+  ) {
     if (!props.multiple) draft.value = [member];
     else if (draft.value.length < maximum.value) draft.value.push(member);
   }
@@ -302,7 +313,15 @@ onBeforeUnmount(() => {
       aria-haspopup="dialog"
       @click="open"
     >
-      <span class="member-trigger-text">{{
+      <span v-if="showAvatars && selected.length" class="member-trigger-text">
+        <span v-for="item in selected" :key="item.id" class="member-identity">
+          <el-avatar :size="20" :src="item.avatar">{{
+            Array.from(item.label)[0]
+          }}</el-avatar
+          >{{ item.label }}
+        </span>
+      </span>
+      <span v-else class="member-trigger-text">{{
         selected.length
           ? selected.map(item => item.label).join("、")
           : t("memberPicker.choose")
@@ -423,7 +442,7 @@ onBeforeUnmount(() => {
                     v-if="multiple"
                     :model-value="allChecked"
                     :indeterminate="partlyChecked"
-                    :disabled="busy || !rows.length"
+                    :disabled="busy || !selectableRows.length"
                     :aria-label="t('memberPicker.selectPage')"
                     @change="togglePage(Boolean($event))"
                 /></template>
@@ -432,6 +451,8 @@ onBeforeUnmount(() => {
                     :model-value="draft.some(item => item.id === row.id)"
                     :disabled="
                       busy ||
+                      (Boolean(blockedMembers?.[row.id]) &&
+                        !draft.some(item => item.id === row.id)) ||
                       (multiple &&
                         draft.length >= maximum &&
                         !draft.some(item => item.id === row.id))
@@ -446,7 +467,24 @@ onBeforeUnmount(() => {
                 prop="label"
                 :label="t('memberPicker.name')"
                 show-overflow-tooltip
-              />
+              >
+                <template #default="{ row }">
+                  <span class="member-identity">
+                    <el-avatar
+                      v-if="showAvatars"
+                      :size="24"
+                      :src="row.avatar"
+                      >{{ Array.from(String(row.label))[0] }}</el-avatar
+                    >
+                    {{ row.label }}
+                    <small v-if="blockedMembers?.[row.id]">{{
+                      t("workflow.memberInBranch", {
+                        name: blockedMembers[row.id]
+                      })
+                    }}</small>
+                  </span>
+                </template>
+              </el-table-column>
             </el-table>
           </div>
           <el-pagination
@@ -481,10 +519,24 @@ onBeforeUnmount(() => {
           <el-tag
             v-for="member in draft"
             :key="member.id"
-            :type="member.unavailable ? 'danger' : 'primary'"
+            :type="
+              member.unavailable || blockedMembers?.[member.id]
+                ? 'danger'
+                : 'primary'
+            "
             closable
             @close="toggle(member, false)"
-            >{{ member.label }}</el-tag
+            ><span class="member-identity">
+              <el-avatar v-if="showAvatars" :size="16" :src="member.avatar">{{
+                Array.from(member.label)[0]
+              }}</el-avatar
+              >{{ member.label }}
+              <small v-if="blockedMembers?.[member.id]">{{
+                t("workflow.memberInBranch", {
+                  name: blockedMembers[member.id]
+                })
+              }}</small>
+            </span></el-tag
           ><span v-if="!draft.length" class="member-muted">{{
             t("memberPicker.noneSelected")
           }}</span>
@@ -507,6 +559,13 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.member-identity {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-inline-end: 6px;
+}
+
 .member-picker,
 .member-trigger {
   width: 100%;

@@ -3432,6 +3432,45 @@ export function createApiClient(
         config
       );
     },
+    workflowInstanceDraftInfo(
+      input: OperationInput<"workflowInstanceDraftInfo"> & {
+        body: OperationBody<"workflowInstanceDraftInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftInfo">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceDraftPage(
+      input: OperationInput<"workflowInstanceDraftPage"> & {
+        body: OperationBody<"workflowInstanceDraftPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftPage">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceDraftSave(
+      input: OperationInput<"workflowInstanceDraftSave"> & {
+        body: OperationBody<"workflowInstanceDraftSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftSave">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowInstanceInfo(
       input: OperationInput<"workflowInstanceInfo"> & {
         body: OperationBody<"workflowInstanceInfo">;
@@ -3504,6 +3543,21 @@ export function createApiClient(
       return transport.request<OperationResponse<"workflowInstanceStart">>(
         "post",
         interpolate("/admin/workflow/instance/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceStartApplication(
+      input: OperationInput<"workflowInstanceStartApplication"> & {
+        body: OperationBody<"workflowInstanceStartApplication">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowInstanceStartApplication">
+      >(
+        "post",
+        interpolate("/admin/workflow/instance/start-application", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

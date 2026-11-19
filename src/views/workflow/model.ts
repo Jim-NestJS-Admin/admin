@@ -25,7 +25,6 @@ export function allNodes(nodes: Node[]): Node[] {
 export function newNode(type: Node["type"], name: string): Node {
   const node: Node = { id: uid(), name, type };
   if (type === "approve" || type === "copy") {
-    node.actor = { type: "applicant" };
     if (type === "approve")
       Object.assign(node, {
         empty: "stop",
@@ -58,6 +57,23 @@ export function newNode(type: Node["type"], name: string): Node {
       }
     ];
   return node;
+}
+export function parallelApproverBlocks(nodes: Node[], selectedId: string) {
+  const blocked: Record<string, string> = {};
+  for (const group of allNodes(nodes)) {
+    if (group.type !== "parallel" || !group.branches) continue;
+    const current = group.branches.find(branch =>
+      allNodes(branch.nodes).some(node => node.id === selectedId)
+    );
+    if (!current) continue;
+    for (const branch of group.branches) {
+      if (branch === current) continue;
+      for (const node of allNodes(branch.nodes))
+        if (node.type === "approve" && node.actor?.type === "users")
+          for (const id of node.actor.ids ?? []) blocked[id] = branch.name;
+    }
+  }
+  return blocked;
 }
 export function addWorkflowBranch(node: Node, name: string, field: string) {
   const branches = node.branches;

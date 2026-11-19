@@ -2,6 +2,7 @@
 export interface MemberChoice {
   id: string;
   label: string;
+  avatar?: string;
 }
 export interface MemberOrganization extends MemberChoice {
   parentId: string | null;

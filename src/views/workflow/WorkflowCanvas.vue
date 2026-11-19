@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
+import { ElMessageBox } from "element-plus";
 import NodeChain from "mldong-flow-designer-dingtalk/packages/flow-designer/src/dingtalk/components/NodeChain.vue";
 import { setLocale } from "mldong-flow-designer-dingtalk/packages/flow-designer/src/locales/index";
 import "mldong-flow-designer-dingtalk/lib/style.css";
-import { addWorkflowBranch, copy, newNode, type Node } from "./model";
+import { addWorkflowBranch, allNodes, copy, newNode, type Node } from "./model";
 
 const props = defineProps<{
   nodes: Node[];
@@ -135,9 +136,37 @@ function insert(kind: string, id: string) {
   target.nodes.splice(target.index + 1, 0, node);
   emit("update:nodes", nodes);
 }
-function remove(id: string) {
+async function remove(id: string) {
   if (props.readonly || id.startsWith("@")) return;
+  const branch = allNodes(props.nodes)
+    .filter(node => node.type === "parallel")
+    .flatMap(node => node.branches ?? [])
+    .find(item => item.id === id);
+  if (branch?.nodes.length) {
+    const confirmed = await ElMessageBox.confirm(
+      t("workflow.removeBranchConfirm", { name: branch.name }),
+      t("workflow.removeBranch"),
+      { type: "warning" }
+    ).then(
+      () => true,
+      () => false
+    );
+    if (!confirmed || props.readonly) return;
+  }
   const nodes = copy(props.nodes);
+  if (branch) {
+    const branches = allNodes(nodes).find(
+      node =>
+        node.type === "parallel" && node.branches?.some(item => item.id === id)
+    )?.branches;
+    if (!branches || branches.length <= 2) return;
+    branches.splice(
+      branches.findIndex(item => item.id === id),
+      1
+    );
+    emit("update:nodes", nodes);
+    return;
+  }
   const target = locate(nodes, id);
   if (!target || target.index < 0) return;
   target.nodes.splice(target.index, 1);
@@ -155,7 +184,7 @@ function addBranch(id: string) {
     props.firstField
   );
   emit("update:nodes", nodes);
-  emit("select", id);
+  if (node.type !== "parallel") emit("select", id);
 }
 </script>
 

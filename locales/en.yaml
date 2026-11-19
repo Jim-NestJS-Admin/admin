@@ -883,6 +883,18 @@ autoCodes:
     digits: Digits only
 
 workflow:
+  applicationItems: Approval items
+  applicationCategory: Item group
+  applicationDraft: Application draft
+  applicationDrafts: My drafts
+  applicationDraftSaved: Draft saved
+  saveApplicationDraft: Save draft
+  continueApplication: Continue editing
+  draftUpdated: Last saved
+  searchApplication: Search items
+  uncategorized: Ungrouped
+  memberInBranch: Already assigned to branch “{name}”
+  removeBranchConfirm: Delete branch “{name}” and its nodes?
   definitionDetails: "Workflow settings"
   submitApplication: "Submit application"
   create: "New workflow"

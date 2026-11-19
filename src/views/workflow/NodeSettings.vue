@@ -17,6 +17,7 @@ const props = defineProps<{
   formLabel: string;
   formState: "loading" | "ready" | "unavailable" | "error";
   initialTab: "approval" | "fields";
+  blockedMembers?: Record<string, string>;
   readonly?: boolean;
 }>();
 const emit = defineEmits<{
@@ -60,7 +61,11 @@ function fieldState(key: string, state: string) {
 </script>
 <template>
   <div class="node-settings">
-    <el-tabs v-if="modelValue.actor" v-model="tab" stretch>
+    <el-tabs
+      v-if="modelValue.type === 'approve' || modelValue.type === 'copy'"
+      v-model="tab"
+      stretch
+    >
       <el-tab-pane name="approval" :label="t('workflow.approvalSettings')">
         <el-form label-position="top" :disabled="readonly">
           <el-form-item :label="t('workflow.nodeName')" required
@@ -72,7 +77,7 @@ function fieldState(key: string, state: string) {
           /></el-form-item>
           <el-form-item :label="t('workflow.actorSource')" required
             ><el-select
-              :model-value="modelValue.actor.type"
+              :model-value="modelValue.actor?.type"
               @update:model-value="
                 set({
                   actor: {
@@ -98,7 +103,10 @@ function fieldState(key: string, state: string) {
                 :label="t(`workflow.actors.${kind}`)" /></el-select
           ></el-form-item>
           <el-form-item
-            v-if="['users', 'roles'].includes(modelValue.actor.type)"
+            v-if="
+              modelValue.actor &&
+              ['users', 'roles'].includes(modelValue.actor.type)
+            "
             :label="t('workflow.people')"
             required
             ><ResourceSelect
@@ -106,6 +114,10 @@ function fieldState(key: string, state: string) {
               :model-value="modelValue.actor.ids ?? []"
               multiple
               :disabled="readonly"
+              :blocked-members="
+                modelValue.type === 'approve' ? blockedMembers : undefined
+              "
+              show-avatars
               @update:model-value="
                 set({
                   actor: { ...modelValue.actor!, ids: $event as string[] }
@@ -114,6 +126,7 @@ function fieldState(key: string, state: string) {
           /></el-form-item>
           <el-form-item
             v-if="
+              modelValue.actor &&
               ['supervisor', 'department_leader'].includes(
                 modelValue.actor.type
               )

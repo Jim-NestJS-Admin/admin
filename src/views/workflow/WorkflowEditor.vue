@@ -12,6 +12,7 @@ import {
   allNodes,
   copy,
   newNode,
+  parallelApproverBlocks,
   useRequestScope,
   type Definition,
   type Designer,
@@ -31,6 +32,7 @@ const { busy, error, run } = useRequestScope();
 const form = ref({
   name: props.record?.name ?? "",
   description: props.record?.description ?? "",
+  category: props.record?.category ?? "",
   formDefinitionId: props.record?.formDefinitionId ?? ""
 });
 const designer = ref<Designer>(
@@ -147,11 +149,21 @@ function validateLocal() {
   for (const node of nodes) {
     if (!node.name.trim()) issues.value.push(t("workflow.needNodeName"));
     if (
-      node.actor &&
-      ["users", "roles"].includes(node.actor.type) &&
-      !node.actor.ids?.length
+      (node.type === "approve" || node.type === "copy") &&
+      (!node.actor ||
+        (["users", "roles"].includes(node.actor.type) &&
+          !node.actor.ids?.length))
     )
       issues.value.push(`${node.name}：${t("workflow.needPeople")}`);
+    if (node.type === "approve" && node.actor?.type === "users") {
+      const blocked = parallelApproverBlocks(designer.value.nodes, node.id);
+      for (const branch of new Set(
+        node.actor.ids?.map(id => blocked[id]).filter(Boolean)
+      ))
+        issues.value.push(
+          `${node.name}：${t("workflow.memberInBranch", { name: branch })}`
+        );
+    }
     for (const b of node.branches ?? [])
       if (!b.name.trim()) issues.value.push(t("workflow.needBranchName"));
   }
@@ -383,6 +395,9 @@ onBeforeRouteUpdate(confirmLeave);
               :disabled="readonly || busy"
               @update:model-value="form.formDefinitionId = String($event)"
           /></el-form-item>
+          <el-form-item :label="t('workflow.applicationCategory')">
+            <el-input v-model="form.category" maxlength="50" />
+          </el-form-item>
           <el-form-item :label="t('workflow.description')"
             ><el-input
               v-model="form.description"
@@ -409,6 +424,7 @@ onBeforeRouteUpdate(confirmLeave);
         :form-label="formLabel"
         :form-state="formState"
         :initial-tab="nodeTab"
+        :blocked-members="parallelApproverBlocks(designer.nodes, selected.id)"
         :readonly="readonly || busy"
         @update:model-value="setNode"
         @bind-form="bindFormForNode"

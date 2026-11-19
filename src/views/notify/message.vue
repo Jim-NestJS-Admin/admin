@@ -15,7 +15,7 @@ const router = useRouter();
 const { busy, error, run } = useRequestScope();
 const generated = generatedCrud("notifyMessage");
 const list = ref<InstanceType<typeof CrudPage>>();
-const detail = ref<string>();
+const detail = ref<{ instanceId: string; taskId?: string }>();
 async function open(row: CrudRecord) {
   await run(async (signal, key) => {
     const body = { id: String(row.id) };
@@ -29,7 +29,13 @@ async function open(row: CrudRecord) {
         path: "/automation/confirm",
         query: { operation: String(row.instanceId) }
       });
-    else detail.value = String(row.instanceId);
+    else
+      detail.value = {
+        instanceId: String(row.instanceId),
+        ...(typeof row.taskId === "string" && /^[1-9]\d{0,19}$/.test(row.taskId)
+          ? { taskId: row.taskId }
+          : {})
+      };
     await list.value?.refresh();
   });
 }
@@ -55,7 +61,8 @@ onBeforeUnmount(stop);
     </CrudPage>
     <WorkflowDocument
       v-if="detail"
-      :instance-id="detail"
+      :instance-id="detail.instanceId"
+      :task-id="detail.taskId"
       @close="detail = undefined"
       @changed="list?.refresh()"
     />

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
@@ -8,7 +8,6 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { onSessionReset } from "@/platform/lifecycle";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
-import StartApplication from "./StartApplication.vue";
 import WorkflowDocument from "./WorkflowDocument.vue";
 defineOptions({ name: "WorkflowWorkbenchPage" });
 const { t } = useI18n();
@@ -18,10 +17,10 @@ const tab = ref(
       ? "pending"
       : "mine"
   ),
-  start = ref(false),
   detail = ref<{ instanceId: string; taskId?: string }>();
 const list = ref<InstanceType<typeof CrudPage>>();
 const route = useRoute();
+const router = useRouter();
 watch(
   () => route.query.instanceId,
   value => {
@@ -33,6 +32,11 @@ watch(
           ? { taskId: route.query.taskId }
           : {})
       };
+    if (
+      route.query.mine === "1" &&
+      user.permissions.includes(permission("workflowInstancePage"))
+    )
+      tab.value = "mine";
   },
   { immediate: true }
 );
@@ -83,14 +87,7 @@ function open(row: CrudRecord) {
     ...(tab.value !== "mine" ? { taskId: String(row.id) } : {})
   };
 }
-function started(id: string) {
-  start.value = false;
-  tab.value = "mine";
-  detail.value = { instanceId: id };
-  void list.value?.refresh();
-}
 const stop = onSessionReset(() => {
-  start.value = false;
   detail.value = undefined;
 });
 onBeforeUnmount(stop);
@@ -121,7 +118,7 @@ onBeforeUnmount(stop);
         ><el-button
           v-perm="permission('workflowInstanceStart')"
           type="primary"
-          @click="start = true"
+          @click="router.push({ name: 'WorkflowApplicationCatalog' })"
           >+ {{ t("workflow.startApplication") }}</el-button
         ></template
       ><template #cell-revision="{ value }"
@@ -142,11 +139,7 @@ onBeforeUnmount(stop);
           }}</el-button
         ></template
       ></CrudPage
-    ><StartApplication
-      v-if="start"
-      @close="start = false"
-      @started="started"
-    /><WorkflowDocument
+    ><WorkflowDocument
       v-if="detail"
       :instance-id="detail.instanceId"
       :task-id="detail.taskId"

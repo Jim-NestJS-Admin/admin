@@ -162,7 +162,10 @@
     ],
     "ignoredBuiltDependencies": [
       "@tailwindcss/oxide"
-    ]
+    ],
+    "patchedDependencies": {
+      "mldong-flow-designer-dingtalk@3.2.8": "patches/mldong-flow-designer-dingtalk@3.2.8.patch"
+    }
   },
   "description": "jim-nestjs-admin 后台管理前端（Vue 3 + Element Plus，基于 Pure Admin）"
 }

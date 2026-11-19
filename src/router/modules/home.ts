@@ -39,6 +39,24 @@ export default {
       name: "WorkflowView",
       component: () => import("@/views/workflow/design.vue"),
       meta: { title: $t("workflow.viewDefinition"), showLink: false }
+    },
+    {
+      path: "/workflow/apply",
+      name: "WorkflowApplicationCatalog",
+      component: () => import("@/views/workflow/ApplicationCatalog.vue"),
+      meta: { title: $t("workflow.startApplication"), showLink: false }
+    },
+    {
+      path: "/workflow/apply/new/:id",
+      name: "WorkflowApplicationNew",
+      component: () => import("@/views/workflow/StartApplication.vue"),
+      meta: { title: $t("workflow.startApplication"), showLink: false }
+    },
+    {
+      path: "/workflow/apply/draft/:id",
+      name: "WorkflowApplicationDraft",
+      component: () => import("@/views/workflow/StartApplication.vue"),
+      meta: { title: $t("workflow.applicationDraft"), showLink: false }
     }
   ]
 } satisfies RouteConfigsTable;

@@ -14,6 +14,8 @@ const props = defineProps<{
   definitionId?: string;
   disabled?: boolean;
   published?: boolean;
+  showAvatars?: boolean;
+  blockedMembers?: Record<string, string>;
 }>();
 const emit = defineEmits<{ "update:modelValue": [value: string | string[]] }>();
 const { t } = useI18n();
@@ -259,6 +261,8 @@ onBeforeUnmount(() => {
       :source="workflowMemberDirectory"
       :multiple="multiple"
       :disabled="disabled"
+      :show-avatars="showAvatars"
+      :blocked-members="blockedMembers"
       @update:model-value="emit('update:modelValue', $event)"
     />
     <el-select

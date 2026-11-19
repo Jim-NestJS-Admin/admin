@@ -883,6 +883,18 @@ autoCodes:
     digits: 纯数字
 
 workflow:
+  applicationItems: 审批事项
+  applicationCategory: 事项分组
+  applicationDraft: 申请草稿
+  applicationDrafts: 我的草稿
+  applicationDraftSaved: 草稿已保存
+  saveApplicationDraft: 保存草稿
+  continueApplication: 继续填写
+  draftUpdated: 上次保存
+  searchApplication: 搜索事项
+  uncategorized: 未分组
+  memberInBranch: 已在「{name}」分支选为审批人
+  removeBranchConfirm: 删除分支「{name}」及其节点？
   definitionDetails: "流程设置"
   submitApplication: "提交申请"
   create: "新建流程"
