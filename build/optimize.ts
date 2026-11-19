@@ -25,6 +25,7 @@ const include = [
   "@form-create/designer > codemirror/addon/hint/anyword-hint",
   "@form-create/designer > codemirror/addon/display/placeholder",
   "@form-create/designer > js-beautify",
+  "mldong-flow-designer-dingtalk/packages/flow-designer/src/locales/index",
   "@vueuse/core",
   "@pureadmin/utils",
   "responsive-storage"
