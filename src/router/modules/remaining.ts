@@ -1,4 +1,5 @@
 import { $t } from "@/plugins/i18n";
+import Login from "@/views/login/index.vue";
 const Layout = () => import("@/layout/index.vue");
 
 export default [
@@ -23,7 +24,8 @@ export default [
   {
     path: "/login",
     name: "Login",
-    component: () => import("@/views/login/index.vue"),
+    // 退出时即使静态资源服务已断开，也能打开登录页。
+    component: Login,
     meta: {
       title: $t("menus.pureLogin"),
       showLink: false
