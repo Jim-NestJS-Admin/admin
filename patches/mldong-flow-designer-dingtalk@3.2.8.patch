@@ -11,7 +11,6 @@ index aa6137048cee85c8d128ca9e0cf0fed78c8e3fa8..ca3934b0764c3b229fd7d5b79246ebb9
        </template>
        <template v-else>
 diff --git a/packages/flow-designer/src/dingtalk/components/NodeCard.vue b/packages/flow-designer/src/dingtalk/components/NodeCard.vue
-index ffa462654f6c6cb4ab1ec91c877173fb42f10232..371d64987134176ed5eac856174c690b59ca9984 100644
 --- a/packages/flow-designer/src/dingtalk/components/NodeCard.vue
 +++ b/packages/flow-designer/src/dingtalk/components/NodeCard.vue
 @@ -28,6 +28,6 @@
@@ -22,6 +21,26 @@ index ffa462654f6c6cb4ab1ec91c877173fb42f10232..371d64987134176ed5eac856174c690b
 +      <span v-if="node.name !== ''" class="ding-join-marker__name">{{ node.name || t('fd.ding.node.mergePoint') }}</span>
      </div>
    </div>
+@@ -64,6 +64,12 @@
+         {{ node.name || t('fd.ding.node.unnamed') }}
+       </div>
+     </FDTooltip>
++    <div v-if="configuredMembers.length" class="ding-node-card__configured-members">
++      <div v-for="member in configuredMembers" :key="member.id" class="ding-node-card__configured-member">
++        <el-avatar :size="20" :src="member.avatar">{{ member.initial }}</el-avatar>
++        <span class="ding-node-card__configured-member-name" :title="member.name">{{ member.name }}</span>
++      </div>
++    </div>
+     <!-- 成员列表：highLight.nodeProgress 存在时回显（已处理打勾 / 当前轮到高亮 / 未到灰色） -->
+     <div v-if="nodeProgressMembers.length" class="ding-node-card__members">
+       <div
+@@ -170,2 +176,6 @@
+   return ''
+ })
++type ConfiguredMember = { id: string; name: string; avatar?: string; initial?: string }
++const configuredMembers = computed(() =>
++  (props.node.properties?.configuredMembers as ConfiguredMember[] | undefined) ?? []
++)
 diff --git a/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue b/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue
 index 3a922d56bfc5292c1feaebb1149b7308b56175e6..519cb8e23e476828a7ee1ca2e3ebf7fe3cec69cf 100644
 --- a/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue

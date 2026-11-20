@@ -12,7 +12,7 @@ overrides:
 
 patchedDependencies:
   mldong-flow-designer-dingtalk@3.2.8:
-    hash: b9cb883eee45beba8e56f0aa146c17f5b8c9ae72b2d97a525a84e0db94cd48d4
+    hash: f69995c8b0a39444d167500aefb4ebed5fa418ce87ef3a55195d9f0cf67162ea
     path: patches/mldong-flow-designer-dingtalk@3.2.8.patch
 
 importers:
@@ -66,7 +66,7 @@ importers:
         version: 3.0.1
       mldong-flow-designer-dingtalk:
         specifier: 3.2.8
-        version: 3.2.8(patch_hash=b9cb883eee45beba8e56f0aa146c17f5b8c9ae72b2d97a525a84e0db94cd48d4)(vue@3.5.44(typescript@5.9.3))
+        version: 3.2.8(patch_hash=f69995c8b0a39444d167500aefb4ebed5fa418ce87ef3a55195d9f0cf67162ea)(vue@3.5.44(typescript@5.9.3))
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -6701,7 +6701,7 @@ snapshots:
 
   mitt@3.0.1: {}
 
-  mldong-flow-designer-dingtalk@3.2.8(patch_hash=b9cb883eee45beba8e56f0aa146c17f5b8c9ae72b2d97a525a84e0db94cd48d4)(vue@3.5.44(typescript@5.9.3)):
+  mldong-flow-designer-dingtalk@3.2.8(patch_hash=f69995c8b0a39444d167500aefb4ebed5fa418ce87ef3a55195d9f0cf67162ea)(vue@3.5.44(typescript@5.9.3)):
     dependencies:
       vue: 3.5.44(typescript@5.9.3)
 

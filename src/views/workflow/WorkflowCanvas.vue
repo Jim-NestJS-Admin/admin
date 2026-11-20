@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, watchEffect } from "vue";
+import { computed, onBeforeUnmount, ref, watch, watchEffect } from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessageBox } from "element-plus";
 import NodeChain from "mldong-flow-designer-dingtalk/packages/flow-designer/src/dingtalk/components/NodeChain.vue";
 import { setLocale } from "mldong-flow-designer-dingtalk/packages/flow-designer/src/locales/index";
 import "mldong-flow-designer-dingtalk/lib/style.css";
+import type { MemberChoice } from "@/components/MemberPicker/types";
+import { onSessionReset } from "@/platform/lifecycle";
 import { addWorkflowBranch, allNodes, copy, newNode, type Node } from "./model";
+import { workflowMemberDirectory } from "./member-directory";
 
 const props = defineProps<{
   nodes: Node[];
@@ -20,6 +23,51 @@ const emit = defineEmits<{
 }>();
 const { t, locale } = useI18n();
 watchEffect(() => setLocale(locale.value.startsWith("en") ? "en-US" : "zh-CN"));
+
+const configuredIds = computed(() => [
+  ...new Set(
+    allNodes(props.nodes).flatMap(node =>
+      node.actor?.type === "users" ? (node.actor.ids ?? []) : []
+    )
+  )
+]);
+const members = ref(new Map<string, MemberChoice | null>());
+let memberRequest: AbortController | undefined;
+watch(
+  configuredIds,
+  async ids => {
+    memberRequest?.abort();
+    const missing = ids.filter(id => !members.value.has(id));
+    if (!missing.length) return;
+    const request = (memberRequest = new AbortController());
+    // 审批目录每次最多解析 50 个成员，逐批加载以兼顾大流程。
+    try {
+      for (let offset = 0; offset < missing.length; offset += 50) {
+        const batch = missing.slice(offset, offset + 50);
+        const resolved = await workflowMemberDirectory.resolve(
+          batch,
+          request.signal
+        );
+        if (request.signal.aborted) return;
+        for (const id of batch)
+          members.value.set(id, resolved.find(item => item.id === id) ?? null);
+      }
+    } catch {
+      if (!request.signal.aborted)
+        for (const id of missing)
+          if (!members.value.has(id)) members.value.set(id, null);
+    }
+  },
+  { immediate: true }
+);
+const stop = onSessionReset(() => {
+  memberRequest?.abort();
+  members.value.clear();
+});
+onBeforeUnmount(() => {
+  stop();
+  memberRequest?.abort();
+});
 
 type Card = {
   id: string;
@@ -62,14 +110,24 @@ function toChain(nodes: Node[], tail?: Card): Card | undefined {
       id: node.id,
       name: node.name,
       type: node.type === "approve" ? `${prefix}task` : `${prefix}copy`,
-      properties:
-        node.type === "approve" && node.mode !== "any"
-          ? {
-              performType: "ALL",
-              countersignType:
-                node.mode === "sequential" ? "SEQUENTIAL" : "PARALLEL"
-            }
-          : {}
+      properties: {
+        ...(node.type === "approve" &&
+          node.mode !== "any" && {
+            performType: "ALL",
+            countersignType:
+              node.mode === "sequential" ? "SEQUENTIAL" : "PARALLEL"
+          }),
+        ...(node.actor?.type === "users" && {
+          configuredMembers: (node.actor.ids ?? []).flatMap(id => {
+            const member = members.value.get(id);
+            if (member === undefined) return [];
+            const name = member?.label || t("workflow.unavailableChoice");
+            return [
+              { id, name, avatar: member?.avatar, initial: Array.from(name)[0] }
+            ];
+          })
+        })
+      }
     };
     if (node.branches) {
       card.branches = node.branches.map(branch => ({
@@ -232,5 +290,29 @@ function addBranch(id: string) {
   width: max-content;
   min-width: 100%;
   padding: 20px 32px 64px;
+}
+
+.workflow-canvas :deep(.ding-node-card__configured-members) {
+  display: grid;
+  gap: 6px;
+  margin-block-start: 8px;
+}
+
+.workflow-canvas :deep(.ding-node-card__configured-member) {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.workflow-canvas :deep(.ding-node-card__configured-member .el-avatar) {
+  flex: none;
+}
+
+.workflow-canvas :deep(.ding-node-card__configured-member-name) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
