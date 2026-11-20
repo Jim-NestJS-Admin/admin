@@ -15,9 +15,15 @@ import { onSessionReset } from "@/platform/lifecycle";
 import type { CrudPort } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { issuesFrom } from "../form/model";
-import { useRequestScope, copy, type Document, type Task } from "./model";
+import {
+  useRequestScope,
+  copy,
+  pendingNodes,
+  type Document,
+  type Task
+} from "./model";
 import DocumentFields from "./DocumentFields.vue";
-import ProgressTree from "./ProgressTree.vue";
+import WorkflowCanvas from "./WorkflowCanvas.vue";
 import ResourceSelect from "./ResourceSelect.vue";
 const props = defineProps<{ instanceId: string; taskId?: string }>();
 const emit = defineEmits<{ close: []; changed: [] }>();
@@ -29,6 +35,9 @@ const document = ref<Document>(),
   values = ref<Record<string, unknown>>({}),
   original = ref<Record<string, unknown>>({}),
   patch = ref<Record<string, unknown>>({});
+const currentNodes = computed(() =>
+  pendingNodes(document.value?.progress ?? [])
+);
 const comment = ref(""),
   target = ref(""),
   action = ref<
@@ -510,9 +519,20 @@ onBeforeUnmount(() => {
             >
           </section>
         </main>
-        <aside>
+        <aside class="document-flow">
           <h4>{{ t("workflow.progressTitle") }}</h4>
-          <ProgressTree :nodes="document.progress" />
+          <div v-if="currentNodes.length" class="current-nodes">
+            <strong>{{ t("workflow.currentNodes") }}</strong>
+            <el-tag v-for="node in currentNodes" :key="node.id" size="small">{{
+              node.name
+            }}</el-tag>
+          </div>
+          <WorkflowCanvas
+            :progress="document.progress"
+            readonly
+            show-status
+            embedded
+          />
         </aside>
       </div>
       <section class="approval-records">
@@ -522,7 +542,10 @@ onBeforeUnmount(() => {
           :port="recordPort"
           page-key="workflow:record"
           :fill="false"
-          ><template #cell-attachmentIds="{ row, value }"
+          ><template #cell-comment="{ value }"
+            ><span class="record-comment">{{ value || "—" }}</span></template
+          >
+          <template #cell-attachmentIds="{ row, value }"
             ><el-space wrap
               ><el-button
                 v-for="(id, i) in Array.isArray(value) ? value : []"
@@ -565,13 +588,32 @@ onBeforeUnmount(() => {
 
 .document-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
   gap: 28px;
 }
 
 .document-layout > main,
 .document-layout > aside {
   min-width: 0;
+}
+
+.document-flow :deep(.workflow-canvas) {
+  height: min(440px, 58dvh);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--el-border-radius-base);
+}
+
+.current-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-block-end: 12px;
+}
+
+.record-comment {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .document-layout > aside {

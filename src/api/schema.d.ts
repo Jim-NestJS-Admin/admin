@@ -10160,6 +10160,9 @@ export type components = {
       keyword: string;
       /** @default 1 */
       page: number;
+      selections?: {
+        [key: string]: string[];
+      };
       /** @default 20 */
       size: number;
     };
@@ -10174,6 +10177,7 @@ export type components = {
       formDefinitionId: string;
       id: string;
       name?: string;
+      progress?: components["schemas"]["WorkflowProgressNode"][];
       revision?: number;
       selections: components["schemas"]["WorkflowSelection"][];
     };
@@ -10435,6 +10439,11 @@ export type components = {
         [key: string]: unknown;
       };
     };
+    WorkflowGraphMember: {
+      avatar?: string;
+      id: string;
+      name: string;
+    };
     WorkflowInspection: {
       /** @description 仅由服务端生成的BPMN模板，执行需T38运行时服务 */
       bpmn: string;
@@ -10647,9 +10656,21 @@ export type components = {
       nodes: components["schemas"]["WorkflowProgressNode"][];
     };
     WorkflowProgressNode: {
+      actorLevel?: number;
+      /** @enum {string} */
+      actorType?:
+        | "users"
+        | "roles"
+        | "department_leader"
+        | "supervisor"
+        | "self_select"
+        | "applicant";
       branches?: components["schemas"]["WorkflowProgressBranch"][];
       chosenBranch?: string;
       id: string;
+      members?: components["schemas"]["WorkflowGraphMember"][];
+      /** @enum {string} */
+      mode?: "all" | "any" | "sequential";
       name: string;
       /** @enum {string} */
       status:

@@ -883,6 +883,13 @@ autoCodes:
     digits: 纯数字
 
 workflow:
+  approvalFlow: 审批流程
+  currentNodes: 当前审批节点
+  cardDepartmentLeader: 部门负责人
+  cardDepartmentLeaderLevel: 第 {level} 级部门负责人
+  cardSupervisor: 直属上级
+  cardSupervisorLevel: 第 {level} 级上级
+  noResolvedMembers: 未找到办理人
   applicationItems: 审批事项
   applicationCategory: 事项分组
   applicationDraft: 申请草稿

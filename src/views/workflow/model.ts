@@ -13,6 +13,14 @@ export type Condition =
   | S["WorkflowConditionValue"];
 export type Definition = S["WorkflowDefinitionRow"];
 export type Document = S["WorkflowDocumentResult"];
+export function pendingNodes(
+  nodes: Document["progress"]
+): Document["progress"] {
+  return nodes.flatMap(node => [
+    ...(node.type === "approve" && node.status === "pending" ? [node] : []),
+    ...pendingNodes(node.branches?.flatMap(branch => branch.nodes) ?? [])
+  ]);
+}
 export type Task = S["WorkflowTaskRow"];
 export type Field = S["FormFieldDto"];
 export const uid = () => `n_${crypto.randomUUID().replaceAll("-", "")}`;

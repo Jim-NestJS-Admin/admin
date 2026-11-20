@@ -43,7 +43,7 @@ export default {
     {
       path: "/workflow/apply",
       name: "WorkflowApplicationCatalog",
-      component: () => import("@/views/workflow/ApplicationCatalog.vue"),
+      redirect: "/workflow/instance?apply=1",
       meta: { title: $t("workflow.startApplication"), showLink: false }
     },
     {

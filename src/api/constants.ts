@@ -1466,6 +1466,19 @@ export const ENUMS = {
     "condition",
     "parallel"
   ],
+  "components.schemas.WorkflowProgressNode.properties.actorType": [
+    "users",
+    "roles",
+    "department_leader",
+    "supervisor",
+    "self_select",
+    "applicant"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.mode": [
+    "all",
+    "any",
+    "sequential"
+  ],
   "components.schemas.WorkflowProgressNode.properties.status": [
     "waiting",
     "pending",

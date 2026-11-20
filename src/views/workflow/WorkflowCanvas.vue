@@ -7,15 +7,30 @@ import { setLocale } from "mldong-flow-designer-dingtalk/packages/flow-designer/
 import "mldong-flow-designer-dingtalk/lib/style.css";
 import type { MemberChoice } from "@/components/MemberPicker/types";
 import { onSessionReset } from "@/platform/lifecycle";
-import { addWorkflowBranch, allNodes, copy, newNode, type Node } from "./model";
+import {
+  addWorkflowBranch,
+  allNodes,
+  copy,
+  newNode,
+  pendingNodes,
+  type Document,
+  type Node
+} from "./model";
 import { workflowMemberDirectory } from "./member-directory";
 
-const props = defineProps<{
-  nodes: Node[];
-  readonly: boolean;
-  activeId: string;
-  firstField: string;
-}>();
+type ProgressNode = Document["progress"][number];
+const props = withDefaults(
+  defineProps<{
+    nodes?: Node[];
+    progress?: ProgressNode[];
+    showStatus?: boolean;
+    embedded?: boolean;
+    readonly: boolean;
+    activeId?: string;
+    firstField?: string;
+  }>(),
+  { nodes: () => [], activeId: "", firstField: "" }
+);
 const emit = defineEmits<{
   "update:nodes": [nodes: Node[]];
   select: [id: string];
@@ -104,21 +119,47 @@ const endpoint = (id: string, type: string, name: string): Card => ({
   name,
   properties: {}
 });
-function toChain(nodes: Node[], tail?: Card): Card | undefined {
+function toChain(
+  nodes: (Node | ProgressNode)[],
+  tail?: Card
+): Card | undefined {
   return nodes.reduceRight<Card | undefined>((next, node) => {
+    const progress = "status" in node ? node : undefined;
+    const actor = "actor" in node ? node.actor : undefined;
+    const actorType = progress?.actorType ?? actor?.type;
+    const level = progress?.actorLevel ?? actor?.level ?? 1;
+    const actorLabel =
+      actorType === "department_leader"
+        ? t(
+            level > 1
+              ? "workflow.cardDepartmentLeaderLevel"
+              : "workflow.cardDepartmentLeader",
+            { level }
+          )
+        : actorType === "supervisor"
+          ? t(
+              level > 1
+                ? "workflow.cardSupervisorLevel"
+                : "workflow.cardSupervisor",
+              { level }
+            )
+          : actorType && actorType !== "users"
+            ? t(`workflow.actors.${actorType}`)
+            : "";
     const card: Card = {
       id: node.id,
       name: node.name,
       type: node.type === "approve" ? `${prefix}task` : `${prefix}copy`,
       properties: {
         ...(node.type === "approve" &&
+          node.mode &&
           node.mode !== "any" && {
             performType: "ALL",
             countersignType:
               node.mode === "sequential" ? "SEQUENTIAL" : "PARALLEL"
           }),
-        ...(node.actor?.type === "users" && {
-          configuredMembers: (node.actor.ids ?? []).flatMap(id => {
+        ...(actor?.type === "users" && {
+          configuredMembers: (actor.ids ?? []).flatMap(id => {
             const member = members.value.get(id);
             if (member === undefined) return [];
             const name = member?.label || t("workflow.unavailableChoice");
@@ -126,13 +167,34 @@ function toChain(nodes: Node[], tail?: Card): Card | undefined {
               { id, name, avatar: member?.avatar, initial: Array.from(name)[0] }
             ];
           })
-        })
+        }),
+        ...(progress && {
+          configuredMembers: (progress.members ?? []).map(member => ({
+            ...member,
+            initial: Array.from(member.name)[0]
+          })),
+          statusLabel: props.showStatus
+            ? t(`workflow.progress.${progress.status}`)
+            : "",
+          pending: props.showStatus && progress.status === "pending",
+          actorHint:
+            !props.showStatus &&
+            actorType &&
+            actorType !== "self_select" &&
+            !progress.members?.length
+              ? t("workflow.noResolvedMembers")
+              : ""
+        }),
+        actorLabel
       }
     };
     if (node.branches) {
       card.branches = node.branches.map(branch => ({
         id: branch.id,
-        name: branch.name,
+        name:
+          props.showStatus && progress?.chosenBranch === branch.id
+            ? `${branch.name} · ${t("workflow.chosenBranch")}`
+            : branch.name,
         properties: {},
         children: toChain(branch.nodes)
       }));
@@ -154,7 +216,10 @@ const chain = computed(() => ({
   ...endpoint(startId, "start", ""),
   children: {
     ...endpoint(applicantId, "task", t("workflow.submitApplication")),
-    children: toChain(props.nodes, endpoint(endId, "end", t("workflow.end")))
+    children: toChain(
+      props.progress ?? props.nodes,
+      endpoint(endId, "end", t("workflow.end"))
+    )
   }
 }));
 
@@ -247,7 +312,11 @@ function addBranch(id: string) {
 </script>
 
 <template>
-  <div class="workflow-canvas">
+  <div
+    class="workflow-canvas"
+    :class="{ 'workflow-canvas--embedded': embedded }"
+    :tabindex="embedded ? 0 : undefined"
+  >
     <div class="workflow-canvas__content">
       <NodeChain
         :node="chain"
@@ -255,7 +324,12 @@ function addBranch(id: string) {
         :type-prefix="prefix"
         :depth="0"
         :dnd-panel="palette"
-        :high-light="{ activeNodeNames: [activeId] }"
+        :high-light="{
+          activeNodeNames:
+            showStatus && progress
+              ? pendingNodes(progress).map(node => node.id)
+              : [activeId]
+        }"
         :can-delete-checker="node => !node.id.startsWith('@')"
         @edit="node => select(node.id)"
         @delete="node => remove(node.id)"
@@ -290,6 +364,25 @@ function addBranch(id: string) {
   width: max-content;
   min-width: 100%;
   padding: 20px 32px 64px;
+}
+
+.workflow-canvas--embedded {
+  height: 100%;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.workflow-canvas :deep(.ding-node-card__actor-label),
+.workflow-canvas :deep(.ding-node-card__actor-hint),
+.workflow-canvas :deep(.ding-node-card__status) {
+  margin-block-start: 6px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.workflow-canvas :deep(.ding-node-card__status.is-pending) {
+  font-weight: 600;
+  color: var(--el-color-primary);
 }
 
 .workflow-canvas :deep(.ding-node-card__configured-members) {

@@ -21,10 +21,13 @@ diff --git a/packages/flow-designer/src/dingtalk/components/NodeCard.vue b/packa
 +      <span v-if="node.name !== ''" class="ding-join-marker__name">{{ node.name || t('fd.ding.node.mergePoint') }}</span>
      </div>
    </div>
-@@ -64,6 +64,12 @@
+@@ -64,6 +64,15 @@
          {{ node.name || t('fd.ding.node.unnamed') }}
        </div>
      </FDTooltip>
++    <div v-if="node.properties?.actorLabel" class="ding-node-card__actor-label">{{ node.properties.actorLabel }}</div>
++    <div v-if="node.properties?.statusLabel" :class="['ding-node-card__status', { 'is-pending': node.properties.pending }]">{{ node.properties.statusLabel }}</div>
++    <div v-if="node.properties?.actorHint" class="ding-node-card__actor-hint">{{ node.properties.actorHint }}</div>
 +    <div v-if="configuredMembers.length" class="ding-node-card__configured-members">
 +      <div v-for="member in configuredMembers" :key="member.id" class="ding-node-card__configured-member">
 +        <el-avatar :size="20" :src="member.avatar">{{ member.initial }}</el-avatar>
@@ -34,7 +37,7 @@ diff --git a/packages/flow-designer/src/dingtalk/components/NodeCard.vue b/packa
      <!-- 成员列表：highLight.nodeProgress 存在时回显（已处理打勾 / 当前轮到高亮 / 未到灰色） -->
      <div v-if="nodeProgressMembers.length" class="ding-node-card__members">
        <div
-@@ -170,2 +176,6 @@
+@@ -170,2 +179,6 @@
    return ''
  })
 +type ConfiguredMember = { id: string; name: string; avatar?: string; initial?: string }

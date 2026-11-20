@@ -883,6 +883,13 @@ autoCodes:
     digits: Digits only
 
 workflow:
+  approvalFlow: Approval flow
+  currentNodes: Current approval steps
+  cardDepartmentLeader: Department lead
+  cardDepartmentLeaderLevel: Level {level} department lead
+  cardSupervisor: Direct supervisor
+  cardSupervisorLevel: Level {level} supervisor
+  noResolvedMembers: No eligible members found
   applicationItems: Approval items
   applicationCategory: Item group
   applicationDraft: Application draft
