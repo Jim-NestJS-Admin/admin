@@ -375,6 +375,7 @@ function addBranch(id: string) {
 .workflow-canvas :deep(.ding-node-card__actor-label),
 .workflow-canvas :deep(.ding-node-card__actor-hint),
 .workflow-canvas :deep(.ding-node-card__status) {
+  padding-inline: 12px;
   margin-block-start: 6px;
   font-size: 12px;
   color: var(--el-text-color-secondary);
@@ -388,6 +389,7 @@ function addBranch(id: string) {
 .workflow-canvas :deep(.ding-node-card__configured-members) {
   display: grid;
   gap: 6px;
+  padding: 0 12px 10px;
   margin-block-start: 8px;
 }
 

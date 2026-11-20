@@ -38,6 +38,18 @@ const document = ref<Document>(),
 const currentNodes = computed(() =>
   pendingNodes(document.value?.progress ?? [])
 );
+const detailTab = ref("form");
+const nodeNames = computed(() => {
+  const names = new Map<string, string>();
+  function visit(nodes: Document["progress"]) {
+    for (const node of nodes) {
+      names.set(node.id, node.name);
+      for (const branch of node.branches ?? []) visit(branch.nodes);
+    }
+  }
+  visit(document.value?.progress ?? []);
+  return names;
+});
 const comment = ref(""),
   target = ref(""),
   action = ref<
@@ -94,8 +106,28 @@ watch(permittedActions, list => {
   if (!list.includes(action.value) && list.length) action.value = list[0];
 });
 const generated = generatedCrud("workflowRecord");
+const recordFields = [
+  "action",
+  "nodeId",
+  "actorId",
+  "comment",
+  "createdAt",
+  "attachmentIds"
+];
 const recordPort: CrudPort = {
-  describe: generated.port.describe,
+  describe: async signal => {
+    const schema = await generated.port.describe(signal);
+    const byField = new Map(
+      schema.columns.map(column => [column.field, column])
+    );
+    return {
+      ...schema,
+      columns: recordFields.flatMap(field => {
+        const column = byField.get(field);
+        return column ? [column] : [];
+      })
+    };
+  },
   detail: generated.port.detail,
   preferences: generated.port.preferences,
   list: (query, signal) =>
@@ -340,10 +372,12 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <el-dialog
+    class="workflow-document-dialog"
+    body-class="workflow-document-body"
     :model-value="true"
     :title="t('workflow.applicationDetail')"
-    width="min(1320px,96vw)"
-    top="3vh"
+    width="min(1440px, calc(100vw - 32px))"
+    top="16px"
     append-to-body
     :close-on-click-modal="false"
     :before-close="close"
@@ -351,6 +385,7 @@ onBeforeUnmount(() => {
     <el-skeleton v-if="!document && busy" :rows="6" animated />
     <el-alert
       v-if="error"
+      class="document-feedback"
       :title="t(error)"
       type="error"
       :closable="false"
@@ -369,156 +404,204 @@ onBeforeUnmount(() => {
         ><span>{{ t("workflow.round") }} {{ document.instance.round }}</span>
       </header>
       <div class="document-layout">
-        <main>
-          <h4>{{ document.form.name }}</h4>
-          <el-alert
-            v-if="previewError"
-            :title="t(previewError)"
-            type="error"
-            :closable="false"
-            ><el-button link @click="preview">{{
-              t("workflow.retry")
-            }}</el-button></el-alert
-          ><DocumentFields
-            ref="fieldForm"
-            :form="document.form"
-            :model-value="values"
-            :disabled="busy || (!canAct && !canResubmit)"
-            @update:model-value="change"
-          />
-          <section
-            v-if="
-              canAct ||
-              canResubmit ||
-              (own &&
-                ['running', 'returned'].includes(
-                  document.instance.status ?? ''
-                ))
-            "
-            class="action-form"
-          >
-            <el-form label-position="top" :disabled="busy"
-              ><el-form-item :label="t('workflow.action')"
-                ><el-select v-model="action"
-                  ><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskApprove')
-                      )
-                    "
-                    value="approve"
-                    :label="t('workflow.actions.approve')" /><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskReject')
-                      )
-                    "
-                    value="reject"
-                    :label="t('workflow.actions.reject')" /><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskTransfer')
-                      )
-                    "
-                    value="transfer"
-                    :label="t('workflow.actions.transfer')" /><el-option
-                    v-if="
-                      canResubmit &&
-                      user.permissions.includes(
-                        permission('workflowInstanceResubmit')
-                      )
-                    "
-                    value="resubmit"
-                    :label="t('workflow.actions.resubmit')" /><el-option
-                    v-if="
-                      own &&
-                      ['running', 'returned'].includes(
-                        document.instance.status ?? ''
-                      ) &&
-                      user.permissions.includes(
-                        permission('workflowInstanceWithdraw')
-                      )
-                    "
-                    value="withdraw"
-                    :label="t('workflow.actions.withdraw')" /><el-option
-                    v-if="
-                      own &&
-                      document.instance.status === 'running' &&
-                      user.permissions.includes(
-                        permission('workflowInstanceUrge')
-                      )
-                    "
-                    value="urge"
-                    :label="t('workflow.actions.urge')" /></el-select
-              ></el-form-item>
-              <el-form-item
-                v-if="action === 'transfer'"
-                :label="t('workflow.transferTarget')"
-                required
-                ><ResourceSelect
-                  v-model="target"
-                  kind="users"
-                  :disabled="busy" /></el-form-item
-              ><el-form-item :label="t('workflow.comment')"
-                ><el-input
-                  v-model="comment"
-                  type="textarea"
-                  :rows="3"
-                  maxlength="1000"
-                  show-word-limit
-              /></el-form-item>
-              <el-form-item v-if="canAct" :label="t('workflow.attachments')"
-                ><el-upload
-                  v-model:file-list="uploads"
-                  v-perm="permission('fileAssetUpload')"
-                  :http-request="upload"
-                  :limit="10"
-                  :disabled="busy || uploading > 0"
-                  :on-remove="
-                    file => {
-                      attachments = attachments.filter(a => a.uid !== file.uid);
-                    }
-                  "
-                  ><el-button>{{ t("workflow.uploadAttachment") }}</el-button
-                  ><template #tip
-                    ><div class="hint">
-                      {{ t("workflow.attachmentHint") }}
-                    </div></template
-                  ></el-upload
-                ></el-form-item
-              >
-            </el-form>
-            <el-button
-              type="primary"
-              :loading="busy"
-              :disabled="
-                uploading > 0 ||
-                previewing ||
-                Boolean(previewError) ||
-                !user.permissions.includes(
-                  permission(
-                    action === 'approve'
-                      ? 'workflowTaskApprove'
-                      : action === 'reject'
-                        ? 'workflowTaskReject'
-                        : action === 'transfer'
-                          ? 'workflowTaskTransfer'
-                          : action === 'withdraw'
-                            ? 'workflowInstanceWithdraw'
-                            : action === 'urge'
-                              ? 'workflowInstanceUrge'
-                              : 'workflowInstanceResubmit'
-                  )
-                )
-              "
-              @click="submit"
-              >{{ t(`workflow.actions.${action}`) }}</el-button
+        <el-tabs v-model="detailTab" class="document-tabs">
+          <el-tab-pane :label="t('workflow.formValues')" name="form">
+            <section
+              class="document-form-pane"
+              tabindex="0"
+              :aria-label="t('workflow.formValues')"
             >
-          </section>
-        </main>
+              <h4>{{ document.form.name }}</h4>
+              <el-alert
+                v-if="previewError"
+                :title="t(previewError)"
+                type="error"
+                :closable="false"
+                ><el-button link @click="preview">{{
+                  t("workflow.retry")
+                }}</el-button></el-alert
+              ><DocumentFields
+                ref="fieldForm"
+                :form="document.form"
+                :model-value="values"
+                :disabled="busy || (!canAct && !canResubmit)"
+                @update:model-value="change"
+              />
+              <section
+                v-if="
+                  canAct ||
+                  canResubmit ||
+                  (own &&
+                    ['running', 'returned'].includes(
+                      document.instance.status ?? ''
+                    ))
+                "
+                class="action-form"
+              >
+                <el-form label-position="top" :disabled="busy"
+                  ><el-form-item :label="t('workflow.action')"
+                    ><el-select v-model="action"
+                      ><el-option
+                        v-if="
+                          canAct &&
+                          user.permissions.includes(
+                            permission('workflowTaskApprove')
+                          )
+                        "
+                        value="approve"
+                        :label="t('workflow.actions.approve')" /><el-option
+                        v-if="
+                          canAct &&
+                          user.permissions.includes(
+                            permission('workflowTaskReject')
+                          )
+                        "
+                        value="reject"
+                        :label="t('workflow.actions.reject')" /><el-option
+                        v-if="
+                          canAct &&
+                          user.permissions.includes(
+                            permission('workflowTaskTransfer')
+                          )
+                        "
+                        value="transfer"
+                        :label="t('workflow.actions.transfer')" /><el-option
+                        v-if="
+                          canResubmit &&
+                          user.permissions.includes(
+                            permission('workflowInstanceResubmit')
+                          )
+                        "
+                        value="resubmit"
+                        :label="t('workflow.actions.resubmit')" /><el-option
+                        v-if="
+                          own &&
+                          ['running', 'returned'].includes(
+                            document.instance.status ?? ''
+                          ) &&
+                          user.permissions.includes(
+                            permission('workflowInstanceWithdraw')
+                          )
+                        "
+                        value="withdraw"
+                        :label="t('workflow.actions.withdraw')" /><el-option
+                        v-if="
+                          own &&
+                          document.instance.status === 'running' &&
+                          user.permissions.includes(
+                            permission('workflowInstanceUrge')
+                          )
+                        "
+                        value="urge"
+                        :label="t('workflow.actions.urge')" /></el-select
+                  ></el-form-item>
+                  <el-form-item
+                    v-if="action === 'transfer'"
+                    :label="t('workflow.transferTarget')"
+                    required
+                    ><ResourceSelect
+                      v-model="target"
+                      kind="users"
+                      :disabled="busy" /></el-form-item
+                  ><el-form-item :label="t('workflow.comment')"
+                    ><el-input
+                      v-model="comment"
+                      type="textarea"
+                      :rows="3"
+                      maxlength="1000"
+                      show-word-limit
+                  /></el-form-item>
+                  <el-form-item v-if="canAct" :label="t('workflow.attachments')"
+                    ><el-upload
+                      v-model:file-list="uploads"
+                      v-perm="permission('fileAssetUpload')"
+                      :http-request="upload"
+                      :limit="10"
+                      :disabled="busy || uploading > 0"
+                      :on-remove="
+                        file => {
+                          attachments = attachments.filter(
+                            a => a.uid !== file.uid
+                          );
+                        }
+                      "
+                      ><el-button>{{
+                        t("workflow.uploadAttachment")
+                      }}</el-button
+                      ><template #tip
+                        ><div class="hint">
+                          {{ t("workflow.attachmentHint") }}
+                        </div></template
+                      ></el-upload
+                    ></el-form-item
+                  >
+                </el-form>
+                <el-button
+                  type="primary"
+                  :loading="busy"
+                  :disabled="
+                    uploading > 0 ||
+                    previewing ||
+                    Boolean(previewError) ||
+                    !user.permissions.includes(
+                      permission(
+                        action === 'approve'
+                          ? 'workflowTaskApprove'
+                          : action === 'reject'
+                            ? 'workflowTaskReject'
+                            : action === 'transfer'
+                              ? 'workflowTaskTransfer'
+                              : action === 'withdraw'
+                                ? 'workflowInstanceWithdraw'
+                                : action === 'urge'
+                                  ? 'workflowInstanceUrge'
+                                  : 'workflowInstanceResubmit'
+                      )
+                    )
+                  "
+                  @click="submit"
+                  >{{ t(`workflow.actions.${action}`) }}</el-button
+                >
+              </section>
+            </section>
+          </el-tab-pane>
+          <el-tab-pane :label="t('workflow.records')" name="records" lazy>
+            <section
+              class="approval-records"
+              tabindex="0"
+              :aria-label="t('workflow.records')"
+            >
+              <CrudPage
+                ref="records"
+                :port="recordPort"
+                page-key="workflow:record"
+                :fill="false"
+              >
+                <template #cell-nodeId="{ value }">{{
+                  nodeNames.get(String(value)) ?? value ?? "—"
+                }}</template>
+                <template #cell-comment="{ value }"
+                  ><span class="record-comment">{{
+                    value || "—"
+                  }}</span></template
+                >
+                <template #cell-attachmentIds="{ row, value }">
+                  <el-space wrap>
+                    <el-button
+                      v-for="(id, i) in Array.isArray(value) ? value : []"
+                      :key="id"
+                      link
+                      type="primary"
+                      :disabled="busy"
+                      @click="download(String(row.id), String(id), i)"
+                      >{{ t("workflow.attachment") }} {{ i + 1 }}</el-button
+                    >
+                  </el-space>
+                </template>
+              </CrudPage>
+            </section>
+          </el-tab-pane>
+        </el-tabs>
         <aside class="document-flow">
           <h4>{{ t("workflow.progressTitle") }}</h4>
           <div v-if="currentNodes.length" class="current-nodes">
@@ -535,38 +618,39 @@ onBeforeUnmount(() => {
           />
         </aside>
       </div>
-      <section class="approval-records">
-        <h4>{{ t("workflow.records") }}</h4>
-        <CrudPage
-          ref="records"
-          :port="recordPort"
-          page-key="workflow:record"
-          :fill="false"
-          ><template #cell-comment="{ value }"
-            ><span class="record-comment">{{ value || "—" }}</span></template
-          >
-          <template #cell-attachmentIds="{ row, value }"
-            ><el-space wrap
-              ><el-button
-                v-for="(id, i) in Array.isArray(value) ? value : []"
-                :key="id"
-                link
-                type="primary"
-                :disabled="busy"
-                @click="download(String(row.id), String(id), i)"
-                >{{ t("workflow.attachment") }} {{ i + 1 }}</el-button
-              ></el-space
-            ></template
-          ></CrudPage
-        >
-      </section>
     </div>
   </el-dialog>
 </template>
 <style scoped>
+:global(.workflow-document-dialog.el-dialog) {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 32px);
+  margin-block-end: 16px;
+  overflow: hidden;
+}
+
+:global(.workflow-document-body.el-dialog__body) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.document-feedback {
+  max-height: 30%;
+  overflow: auto;
+}
+
 .application-detail {
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
 }
 
 .document-header {
@@ -588,17 +672,40 @@ onBeforeUnmount(() => {
 
 .document-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
-  gap: 28px;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
 }
 
-.document-layout > main,
-.document-layout > aside {
+.document-tabs,
+.document-flow {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
+}
+
+.document-tabs :deep(.el-tabs__content) {
+  flex: 1;
+  min-height: 0;
+}
+
+.document-tabs :deep(.el-tab-pane) {
+  height: 100%;
+}
+
+.document-form-pane,
+.approval-records {
+  height: 100%;
+  padding: 4px 12px 12px 2px;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .document-flow :deep(.workflow-canvas) {
-  height: min(440px, 58dvh);
+  flex: 1;
+  height: auto;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: var(--el-border-radius-base);
 }
@@ -616,8 +723,8 @@ onBeforeUnmount(() => {
   white-space: pre-wrap;
 }
 
-.document-layout > aside {
-  padding-left: 20px;
+.document-flow {
+  padding-inline-start: 16px;
   border-left: 1px solid var(--el-border-color-lighter);
 }
 
@@ -631,11 +738,6 @@ h4 {
   border-top: 1px solid var(--el-border-color-lighter);
 }
 
-.approval-records {
-  padding-top: 20px;
-  border-top: 1px solid var(--el-border-color-lighter);
-}
-
 .hint {
   font-size: 12px;
   color: var(--el-text-color-secondary);
@@ -643,11 +745,12 @@ h4 {
 
 @media (width<=850px) {
   .document-layout {
-    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .document-layout > aside {
-    padding: 20px 0 0;
+  .document-flow {
+    padding: 8px 0 0;
     border-top: 1px solid var(--el-border-color-lighter);
     border-left: 0;
   }
