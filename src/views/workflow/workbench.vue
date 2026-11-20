@@ -153,11 +153,14 @@ onBeforeUnmount(stop);
           name="drafts"
         />
       </el-tabs>
-      <el-button v-if="canApply" type="primary" @click="catalogOpen = true"
-        >+ {{ t("workflow.startApplication") }}</el-button
-      >
     </header>
-    <ApplicationDrafts v-if="tab === 'drafts'" class="workbench-body" />
+    <ApplicationDrafts v-if="tab === 'drafts'" class="workbench-body">
+      <template v-if="canApply" #toolbar>
+        <el-button type="primary" @click="catalogOpen = true"
+          >+ {{ t("workflow.startApplication") }}</el-button
+        >
+      </template>
+    </ApplicationDrafts>
     <CrudPage
       v-else
       :key="tab"
@@ -166,7 +169,13 @@ onBeforeUnmount(stop);
       :port="port"
       :page-key="tab === 'mine' ? 'workflow:instance' : 'workflow:task'"
       :row-actions-width="150"
-      ><template #cell-revision="{ value }"
+    >
+      <template v-if="canApply" #toolbar>
+        <el-button type="primary" @click="catalogOpen = true"
+          >+ {{ t("workflow.startApplication") }}</el-button
+        >
+      </template>
+      <template #cell-revision="{ value }"
         ><el-tag size="small">v{{ value }}</el-tag></template
       ><template #row-actions="{ row, disabled }"
         ><el-button
@@ -207,17 +216,8 @@ onBeforeUnmount(stop);
 }
 
 .workbench-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 16px;
-  align-items: center;
-  justify-content: space-between;
   padding: 6px 16px;
   border-bottom: 1px solid var(--el-border-color-lighter);
-}
-
-.workbench-header :deep(.el-tabs) {
-  min-width: 0;
 }
 
 .workbench-header :deep(.el-tabs__header) {

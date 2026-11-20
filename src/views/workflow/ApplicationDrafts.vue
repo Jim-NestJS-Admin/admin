@@ -29,6 +29,9 @@ watch(page, load, { immediate: true });
 
 <template>
   <div class="application-drafts">
+    <div v-if="$slots.toolbar" class="drafts-toolbar">
+      <slot name="toolbar" />
+    </div>
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false">
       <el-button link @click="load">{{ t("workflow.retry") }}</el-button>
     </el-alert>
@@ -76,5 +79,11 @@ watch(page, load, { immediate: true });
 .application-drafts :deep(.el-table) {
   flex: 1;
   min-height: 0;
+}
+
+.drafts-toolbar {
+  display: flex;
+  flex-shrink: 0;
+  padding-top: 8px;
 }
 </style>
