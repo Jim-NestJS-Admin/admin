@@ -198,7 +198,15 @@ onBeforeUnmount(stop);
   width: 40px;
   height: 48px;
   color: inherit;
+  appearance: none;
   cursor: pointer;
+  background-color: transparent;
+  border: 0;
+}
+
+.dropdown-badge:focus-visible {
+  outline: 2px solid var(--el-color-primary);
+  outline-offset: -2px;
 }
 
 .header-notice-icon {
