@@ -39,6 +39,14 @@ const emit = defineEmits<{
 const { t, locale } = useI18n();
 watchEffect(() => setLocale(locale.value.startsWith("en") ? "en-US" : "zh-CN"));
 
+const approvedNodeIds = computed(() =>
+  props.showStatus
+    ? allNodes(props.progress ?? [])
+        .filter(node => node.type === "approve" && node.status === "approved")
+        .map(node => node.id)
+    : []
+);
+
 const configuredIds = computed(() => [
   ...new Set(
     allNodes(props.nodes).flatMap(node =>
@@ -314,7 +322,10 @@ function addBranch(id: string) {
 <template>
   <div
     class="workflow-canvas"
-    :class="{ 'workflow-canvas--embedded': embedded }"
+    :class="{
+      'workflow-canvas--embedded': embedded,
+      'workflow-canvas--progress': showStatus
+    }"
     :tabindex="embedded ? 0 : undefined"
   >
     <div class="workflow-canvas__content">
@@ -328,7 +339,8 @@ function addBranch(id: string) {
           activeNodeNames:
             showStatus && progress
               ? pendingNodes(progress).map(node => node.id)
-              : [activeId]
+              : [activeId],
+          historyNodeNames: approvedNodeIds
         }"
         :can-delete-checker="node => !node.id.startsWith('@')"
         @edit="node => select(node.id)"
@@ -350,6 +362,7 @@ function addBranch(id: string) {
   --ding-text-secondary: var(--el-text-color-secondary);
   --ding-primary-color: var(--el-color-primary);
   --ding-active-color: var(--el-color-primary);
+  --ding-history-color: var(--el-color-success);
   --ding-border-color: var(--el-border-color);
 
   min-width: 0;
@@ -384,6 +397,23 @@ function addBranch(id: string) {
 .workflow-canvas :deep(.ding-node-card__status.is-pending) {
   font-weight: 600;
   color: var(--el-color-primary);
+}
+
+.workflow-canvas--progress :deep(.ding-node-card__icon) {
+  display: none;
+}
+
+.workflow-canvas--progress
+  :deep(.ding-node-card--history .ding-node-card__icon) {
+  display: inline;
+}
+
+.workflow-canvas--progress
+  :deep(.ding-node-card--history .ding-node-card__icon),
+.workflow-canvas--progress
+  :deep(.ding-node-card--history .ding-node-card__status) {
+  font-weight: 600;
+  color: var(--el-color-success);
 }
 
 .workflow-canvas :deep(.ding-node-card__configured-members) {

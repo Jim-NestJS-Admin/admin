@@ -24,7 +24,9 @@ export function pendingNodes(
 export type Task = S["WorkflowTaskRow"];
 export type Field = S["FormFieldDto"];
 export const uid = () => `n_${crypto.randomUUID().replaceAll("-", "")}`;
-export function allNodes(nodes: Node[]): Node[] {
+export function allNodes<T extends { branches?: { nodes: T[] }[] }>(
+  nodes: T[]
+): T[] {
   return nodes.flatMap(node => [
     node,
     ...allNodes(node.branches?.flatMap(b => b.nodes) ?? [])

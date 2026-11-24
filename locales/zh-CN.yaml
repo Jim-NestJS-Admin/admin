@@ -1062,7 +1062,7 @@ workflow:
     withdrawn: "已撤回"
   progress:
     waiting: "未进入"
-    pending: "处理中"
+    pending: "待审批"
     approved: "已通过"
     cancelled: "已取消"
     returned: "已退回"

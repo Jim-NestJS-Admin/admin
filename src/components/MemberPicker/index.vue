@@ -16,6 +16,8 @@ const props = withDefaults(
     source: MemberDirectory;
     multiple?: boolean;
     disabled?: boolean;
+    required?: boolean;
+    confirmLabel?: string;
     limit?: number;
     showAvatars?: boolean;
     blockedMembers?: Record<string, string>;
@@ -258,7 +260,13 @@ function togglePage(checked: boolean) {
   }
 }
 function confirm() {
-  if (props.disabled || invalid.value || selectionError.value) return;
+  if (
+    props.disabled ||
+    invalid.value ||
+    selectionError.value ||
+    (props.required && !draft.value.length)
+  )
+    return;
   selected.value = draft.value.map(item => ({ ...item }));
   emit(
     "update:modelValue",
@@ -306,30 +314,32 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="member-picker">
-    <el-button
-      class="member-trigger"
-      :disabled="disabled || resolving"
-      :loading="resolving"
-      aria-haspopup="dialog"
-      @click="open"
-    >
-      <span v-if="showAvatars && selected.length" class="member-trigger-text">
-        <span v-for="item in selected" :key="item.id" class="member-identity">
-          <el-avatar :size="20" :src="item.avatar">{{
-            Array.from(item.label)[0]
-          }}</el-avatar
-          >{{ item.label }}
+    <slot name="trigger" :open="open" :disabled="disabled || resolving">
+      <el-button
+        class="member-trigger"
+        :disabled="disabled || resolving"
+        :loading="resolving"
+        aria-haspopup="dialog"
+        @click="open"
+      >
+        <span v-if="showAvatars && selected.length" class="member-trigger-text">
+          <span v-for="item in selected" :key="item.id" class="member-identity">
+            <el-avatar :size="20" :src="item.avatar">{{
+              Array.from(item.label)[0]
+            }}</el-avatar
+            >{{ item.label }}
+          </span>
         </span>
-      </span>
-      <span v-else class="member-trigger-text">{{
-        selected.length
-          ? selected.map(item => item.label).join("、")
-          : t("memberPicker.choose")
-      }}</span>
-      <span v-if="multiple && selected.length" class="member-count">{{
-        selected.length
-      }}</span>
-    </el-button>
+        <span v-else class="member-trigger-text">{{
+          selected.length
+            ? selected.map(item => item.label).join("、")
+            : t("memberPicker.choose")
+        }}</span>
+        <span v-if="multiple && selected.length" class="member-count">{{
+          selected.length
+        }}</span>
+      </el-button>
+    </slot>
     <small v-if="selectionError" role="alert" class="member-error"
       >{{ selectionError }}
       <el-button link @click="hydrate">{{
@@ -549,9 +559,14 @@ onBeforeUnmount(() => {
         ><el-button @click="close">{{ t("memberPicker.cancel") }}</el-button
         ><el-button
           type="primary"
-          :disabled="invalid || Boolean(selectionError) || disabled"
+          :disabled="
+            invalid ||
+            Boolean(selectionError) ||
+            disabled ||
+            (required && !draft.length)
+          "
           @click="confirm"
-          >{{ t("memberPicker.confirm") }}</el-button
+          >{{ confirmLabel || t("memberPicker.confirm") }}</el-button
         ></template
       >
     </el-dialog>

@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import type { FormInstance } from "element-plus";
 import { useI18n } from "vue-i18n";
-import { type Document, text } from "./model";
+import { type Document, type Field, text } from "./model";
 const props = defineProps<{
   form: Document["form"];
   modelValue: Record<string, unknown>;
@@ -16,8 +16,25 @@ const formRef = ref<FormInstance>();
 function set(field: string, value: unknown) {
   emit("update:modelValue", { ...props.modelValue, [field]: value ?? null });
 }
+function displayValue(field: Field) {
+  const value = props.modelValue[field.field];
+  if (props.form.fieldStates[field.field] === "masked" || !field.options.length)
+    return text(value);
+  const label = (item: unknown) =>
+    field.options.find(option => option.value === item)?.label ??
+    field.options.find(option => String(option.value) === item)?.label ??
+    text(item);
+  return Array.isArray(value)
+    ? value.map(label).join("、") || text(null)
+    : label(value);
+}
 const editable = computed(() =>
   props.form.fields.some(f => props.form.fieldStates[f.field] === "editable")
+);
+const visibleFields = computed(() =>
+  props.form.fields.filter(
+    field => props.form.fieldStates[field.field] !== "hidden"
+  )
 );
 defineExpose({
   editable,
@@ -28,11 +45,12 @@ defineExpose({
   <el-form
     ref="formRef"
     :model="modelValue"
-    label-position="top"
+    label-position="left"
+    label-width="clamp(88px, 22vw, 180px)"
     :disabled="disabled"
     class="document-fields"
     ><el-form-item
-      v-for="field in form.fields"
+      v-for="field in visibleFields"
       :key="field.field"
       :prop="field.field"
       :label="field.title"
@@ -51,7 +69,7 @@ defineExpose({
     >
       <template v-if="form.fieldStates[field.field] !== 'editable'"
         ><div class="readonly-value">
-          <span>{{ text(modelValue[field.field]) }}</span
+          <span>{{ displayValue(field) }}</span
           ><el-tag
             v-if="form.fieldStates[field.field] === 'masked'"
             type="info"
@@ -102,7 +120,7 @@ defineExpose({
         @update:model-value="set(field.field, $event)"
       /> </el-form-item
     ><el-empty
-      v-if="!form.fields.length"
+      v-if="!visibleFields.length"
       :description="t('workflow.noVisibleFields')"
       :image-size="60"
   /></el-form>
@@ -110,6 +128,13 @@ defineExpose({
 <style scoped>
 .document-fields {
   min-width: 0;
+}
+
+.document-fields :deep(.el-form-item__label) {
+  height: auto;
+  padding-block: 6px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .document-fields :deep(.el-select),
@@ -121,10 +146,16 @@ defineExpose({
 
 .readonly-value {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+  min-width: 0;
   min-height: 32px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+.readonly-value span {
+  max-width: 100%;
 }
 </style>
