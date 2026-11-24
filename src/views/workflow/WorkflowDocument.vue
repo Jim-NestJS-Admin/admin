@@ -375,13 +375,26 @@ onBeforeUnmount(() => {
     class="workflow-document-dialog"
     body-class="workflow-document-body"
     :model-value="true"
-    :title="t('workflow.applicationDetail')"
     width="min(1440px, calc(100vw - 32px))"
     top="16px"
     append-to-body
     :close-on-click-modal="false"
     :before-close="close"
   >
+    <template #header="{ titleId, titleClass }">
+      <div class="document-header">
+        <h3 :id="titleId" :class="titleClass">
+          {{ document?.instance.name ?? t("workflow.applicationDetail") }}
+        </h3>
+        <template v-if="document">
+          <el-tag>{{
+            t(`workflow.instanceStatus.${document.instance.status}`)
+          }}</el-tag>
+          <el-tag effect="plain">v{{ document.instance.revision }}</el-tag>
+          <span>{{ t("workflow.round") }} {{ document.instance.round }}</span>
+        </template>
+      </div>
+    </template>
     <el-skeleton v-if="!document && busy" :rows="6" animated />
     <el-alert
       v-if="error"
@@ -395,17 +408,13 @@ onBeforeUnmount(() => {
       </ul></el-alert
     >
     <div v-if="document" class="application-detail">
-      <header class="document-header">
-        <h3>{{ document.instance.name }}</h3>
-        <el-tag>{{
-          t(`workflow.instanceStatus.${document.instance.status}`)
-        }}</el-tag
-        ><el-tag effect="plain">v{{ document.instance.revision }}</el-tag
-        ><span>{{ t("workflow.round") }} {{ document.instance.round }}</span>
-      </header>
       <div class="document-layout">
         <el-tabs v-model="detailTab" class="document-tabs">
-          <el-tab-pane :label="t('workflow.formValues')" name="form">
+          <el-tab-pane
+            :label="t('workflow.formValues')"
+            name="form"
+            class="document-form-layout"
+          >
             <section
               class="document-form-pane"
               tabindex="0"
@@ -427,17 +436,7 @@ onBeforeUnmount(() => {
                 :disabled="busy || (!canAct && !canResubmit)"
                 @update:model-value="change"
               />
-              <section
-                v-if="
-                  canAct ||
-                  canResubmit ||
-                  (own &&
-                    ['running', 'returned'].includes(
-                      document.instance.status ?? ''
-                    ))
-                "
-                class="action-form"
-              >
+              <section v-if="permittedActions.length" class="action-form">
                 <el-form label-position="top" :disabled="busy"
                   ><el-form-item :label="t('workflow.action')"
                     ><el-select v-model="action"
@@ -536,34 +535,22 @@ onBeforeUnmount(() => {
                     ></el-form-item
                   >
                 </el-form>
-                <el-button
-                  type="primary"
-                  :loading="busy"
-                  :disabled="
-                    uploading > 0 ||
-                    previewing ||
-                    Boolean(previewError) ||
-                    !user.permissions.includes(
-                      permission(
-                        action === 'approve'
-                          ? 'workflowTaskApprove'
-                          : action === 'reject'
-                            ? 'workflowTaskReject'
-                            : action === 'transfer'
-                              ? 'workflowTaskTransfer'
-                              : action === 'withdraw'
-                                ? 'workflowInstanceWithdraw'
-                                : action === 'urge'
-                                  ? 'workflowInstanceUrge'
-                                  : 'workflowInstanceResubmit'
-                      )
-                    )
-                  "
-                  @click="submit"
-                  >{{ t(`workflow.actions.${action}`) }}</el-button
-                >
               </section>
             </section>
+            <footer v-if="permittedActions.length" class="document-actions">
+              <el-button
+                type="primary"
+                :loading="busy"
+                :disabled="
+                  uploading > 0 ||
+                  previewing ||
+                  Boolean(previewError) ||
+                  !permittedActions.includes(action)
+                "
+                @click="submit"
+                >{{ t(`workflow.actions.${action}`) }}</el-button
+              >
+            </footer>
           </el-tab-pane>
           <el-tab-pane :label="t('workflow.records')" name="records" lazy>
             <section
@@ -573,6 +560,7 @@ onBeforeUnmount(() => {
             >
               <CrudPage
                 ref="records"
+                class="approval-record-list"
                 :port="recordPort"
                 page-key="workflow:record"
                 :fill="false"
@@ -649,7 +637,6 @@ onBeforeUnmount(() => {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 12px;
   min-height: 0;
 }
 
@@ -663,6 +650,8 @@ onBeforeUnmount(() => {
 .document-header h3 {
   margin: 0;
   font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .document-header > span {
@@ -695,12 +684,38 @@ onBeforeUnmount(() => {
   height: 100%;
 }
 
-.document-form-pane,
-.approval-records {
+.document-form-layout {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  padding: 4px 12px 12px 2px;
+  min-height: 0;
+  padding-inline-end: 12px;
+}
+
+.document-form-pane {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 2px 12px;
   overflow: auto;
   overscroll-behavior: contain;
+}
+
+.document-actions {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  padding: 12px 2px 0;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.approval-records,
+.approval-record-list {
+  height: 100%;
+}
+
+.approval-records :deep(.crud-table-bounded) {
+  flex: 1;
+  height: auto;
 }
 
 .document-flow :deep(.workflow-canvas) {
