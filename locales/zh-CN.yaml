@@ -1095,6 +1095,10 @@ memberPicker:
   cancel: "取消"
   confirm: "确定"
 notifications:
+  inbox: 我的消息
+  unread: "{count} 条未读消息"
+  pending: "{count} 条审批待办"
+  viewAll: 查看全部消息
   queued: 已加入同步队列，请在同步记录查看结果
   logs: 同步记录
   open: 查看消息

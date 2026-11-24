@@ -5,6 +5,8 @@ import { menuType } from "@/layout/types";
 import { ReText } from "@/components/ReText";
 import { useNav } from "@/layout/hooks/useNav";
 import { transformI18n } from "@/plugins/i18n";
+import { useI18n } from "vue-i18n";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import SidebarLinkItem from "./SidebarLinkItem.vue";
 import SidebarExtraIcon from "./SidebarExtraIcon.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -23,6 +25,8 @@ import ArrowLeft from "~icons/ep/arrow-left-bold";
 import ArrowRight from "~icons/ep/arrow-right-bold";
 
 const attrs = useAttrs();
+const { t } = useI18n();
+const workflowCounts = useWorkflowCounts();
 const { layout, isCollapse, tooltipEffect, getDivStyle } = useNav();
 
 const props = defineProps({
@@ -165,7 +169,7 @@ function resolvePath(routePath) {
       </el-text>
 
       <template #title>
-        <div :style="getDivStyle">
+        <div :style="getDivStyle" class="sidebar-menu-title">
           <ReText
             :tippyProps="{
               offset: [0, -10],
@@ -175,6 +179,20 @@ function resolvePath(routePath) {
           >
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
+          <el-tag
+            v-if="
+              workflowCounts.pending > 0 &&
+              resolvePath(onlyOneChild.path) === '/workflow/instance'
+            "
+            size="small"
+            class="sidebar-pending-count"
+            :aria-label="
+              t('notifications.pending', { count: workflowCounts.pending })
+            "
+            >{{
+              workflowCounts.pending > 99 ? "99+" : workflowCounts.pending
+            }}</el-tag
+          >
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
         </div>
       </template>
@@ -227,3 +245,10 @@ function resolvePath(routePath) {
     />
   </el-sub-menu>
 </template>
+
+<style scoped>
+.sidebar-menu-title .sidebar-pending-count {
+  flex-shrink: 0;
+  margin-inline-start: 8px;
+}
+</style>

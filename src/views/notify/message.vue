@@ -6,12 +6,14 @@ import { api } from "@/api/client";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import { onSessionReset } from "@/platform/lifecycle";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import type { CrudRecord } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import WorkflowDocument from "../workflow/WorkflowDocument.vue";
 import { useRequestScope } from "../workflow/model";
 const { t } = useI18n();
 const router = useRouter();
+const workflowCounts = useWorkflowCounts();
 const { busy, error, run } = useRequestScope();
 const generated = generatedCrud("notifyMessage");
 const list = ref<InstanceType<typeof CrudPage>>();
@@ -24,6 +26,7 @@ async function open(row: CrudRecord) {
       { signal, headers: { "Idempotency-Key": key(body) } }
     );
     if (signal.aborted) return;
+    void workflowCounts.refreshUnread();
     if (row.event === "mcp.exempt")
       await router.push({
         path: "/automation/confirm",

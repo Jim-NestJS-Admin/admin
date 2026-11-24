@@ -1,98 +1,216 @@
 <script setup lang="ts">
+import {
+  computed,
+  defineAsyncComponent,
+  onBeforeUnmount,
+  ref,
+  watch
+} from "vue";
 import { useI18n } from "vue-i18n";
-import { ref, computed } from "vue";
-import { noticesData } from "./data";
-import NoticeList from "./components/NoticeList.vue";
+import { useRouter } from "vue-router";
+import { api } from "@/api/client";
+import type { components } from "@/api/schema";
+import { onSessionReset } from "@/platform/lifecycle";
+import { permission } from "@/platform/system/resources";
+import { useUserStoreHook } from "@/store/modules/user";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
+import { date, useRequestScope } from "@/views/workflow/model";
 import BellIcon from "~icons/ep/bell";
 
-const { t } = useI18n();
-const noticesNum = ref(0);
-const notices = ref(noticesData);
-const activeKey = ref(noticesData[0]?.key);
-
-notices.value.map(v => (noticesNum.value += v.list.length));
-
-const getLabel = computed(
-  () => item =>
-    t(item.name) + (item.list.length > 0 ? `(${item.list.length})` : "")
+const WorkflowDocument = defineAsyncComponent(
+  () => import("@/views/workflow/WorkflowDocument.vue")
 );
+defineOptions({ inheritAttrs: false });
+type Message = components["schemas"]["NotifyMessageRow"];
+const { t } = useI18n();
+const router = useRouter();
+const user = useUserStoreHook();
+const counts = useWorkflowCounts();
+const canList = computed(() =>
+  user.permissions.includes(permission("notifyMessagePage"))
+);
+const canRead = computed(() =>
+  user.permissions.includes(permission("notifyMessageRead"))
+);
+const visible = ref(false);
+const messages = ref<Message[]>([]);
+const { busy, error, run } = useRequestScope();
+const detail = ref<{ instanceId: string; taskId?: string }>();
+
+async function load() {
+  void counts.refreshUnread();
+  await run(async signal => {
+    const response = await api.notifyMessagePage(
+      { body: { page: 1, size: 10 } },
+      { signal }
+    );
+    if (!signal.aborted) messages.value = response.data.list;
+  });
+}
+
+async function open(message: Message) {
+  const { id, instanceId, taskId, event } = message;
+  if (!canRead.value || !instanceId) return;
+  await run(async (signal, key) => {
+    const body = { id };
+    await api.notifyMessageRead(
+      { body },
+      { signal, headers: { "Idempotency-Key": key(body) } }
+    );
+    if (signal.aborted) return;
+    visible.value = false;
+    void counts.refreshUnread();
+    if (event === "mcp.exempt") {
+      await router.push({
+        path: "/automation/confirm",
+        query: { operation: instanceId }
+      });
+    } else {
+      detail.value = {
+        instanceId,
+        ...(taskId ? { taskId } : {})
+      };
+    }
+  });
+}
+
+function reset() {
+  visible.value = false;
+  messages.value = [];
+  detail.value = undefined;
+}
+watch(canList, value => {
+  if (!value) reset();
+});
+const stop = onSessionReset(reset);
+onBeforeUnmount(stop);
 </script>
 
 <template>
-  <el-dropdown trigger="click" placement="bottom-end">
-    <span
-      :class="[
-        'dropdown-badge',
-        'navbar-bg-hover',
-        'select-none',
-        Number(noticesNum) !== 0 && 'mr-[10px]'
-      ]"
+  <template v-if="canList">
+    <el-popover
+      v-model:visible="visible"
+      trigger="click"
+      placement="bottom-end"
+      :width="320"
+      @show="load"
     >
-      <el-badge :value="Number(noticesNum) === 0 ? '' : noticesNum" :max="99">
-        <span class="header-notice-icon">
-          <IconifyIconOffline :icon="BellIcon" />
-        </span>
-      </el-badge>
-    </span>
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-tabs
-          v-model="activeKey"
-          :stretch="true"
-          class="dropdown-tabs"
-          :style="{ width: notices.length === 0 ? '200px' : '330px' }"
+      <template #reference>
+        <button
+          v-bind="$attrs"
+          type="button"
+          class="notice-trigger navbar-bg-hover"
+          :aria-expanded="visible"
+          :aria-label="
+            counts.unread
+              ? t('notifications.unread', { count: counts.unread })
+              : t('notifications.inbox')
+          "
         >
-          <el-empty
-            v-if="notices.length === 0"
-            :description="t('status.pureNoMessage')"
-            :image-size="60"
-          />
-          <span v-else>
-            <template v-for="item in notices" :key="item.key">
-              <el-tab-pane :label="getLabel(item)" :name="`${item.key}`">
-                <el-scrollbar max-height="330px">
-                  <div class="noticeList-container">
-                    <NoticeList :list="item.list" :emptyText="item.emptyText" />
-                  </div>
-                </el-scrollbar>
-              </el-tab-pane>
-            </template>
-          </span>
-        </el-tabs>
-      </el-dropdown-menu>
-    </template>
-  </el-dropdown>
+          <el-badge :value="counts.unread" :max="99" :hidden="!counts.unread">
+            <BellIcon aria-hidden="true" />
+          </el-badge>
+        </button>
+      </template>
+      <p class="notice-title">{{ t("notifications.inbox") }}</p>
+      <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+      <el-scrollbar v-loading="busy" max-height="320px">
+        <ul v-if="messages.length" class="notice-list">
+          <li v-for="message in messages" :key="message.id">
+            <button
+              class="notice-row"
+              :class="{ 'notice-row-unread': message.readAt === null }"
+              type="button"
+              :disabled="busy || !canRead || !message.instanceId"
+              @click="open(message)"
+            >
+              <span class="notice-message-title">{{
+                message.title || t("notifications.open")
+              }}</span>
+              <span class="notice-time">{{ date(message.createdAt) }}</span>
+            </button>
+          </li>
+        </ul>
+        <el-empty
+          v-else-if="!busy && !error"
+          :image-size="48"
+          :description="t('status.pureNoMessage')"
+        />
+      </el-scrollbar>
+      <router-link
+        to="/notify/message"
+        class="notice-view-all"
+        @click="visible = false"
+      >
+        {{ t("notifications.viewAll") }}
+      </router-link>
+    </el-popover>
+    <WorkflowDocument
+      v-if="detail"
+      :key="
+        detail.taskId
+          ? `${detail.instanceId}:${detail.taskId}`
+          : detail.instanceId
+      "
+      :instance-id="detail.instanceId"
+      :task-id="detail.taskId"
+      @close="detail = undefined"
+    />
+  </template>
 </template>
 
-<style lang="scss" scoped>
-.dropdown-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+<style scoped>
+.notice-trigger {
+  display: grid;
+  place-items: center;
   width: 40px;
   height: 48px;
+  color: inherit;
   cursor: pointer;
-
-  .header-notice-icon {
-    font-size: 18px;
-  }
 }
 
-.dropdown-tabs {
-  .noticeList-container {
-    padding: 15px 24px 0;
-  }
+.notice-trigger svg {
+  display: block;
+  font-size: 18px;
+}
 
-  :deep(.el-tabs__header) {
-    margin: 0;
-  }
+.notice-title {
+  margin-block-end: 8px;
+  font-weight: 600;
+}
 
-  :deep(.el-tabs__nav-wrap)::after {
-    height: 1px;
-  }
+.notice-list {
+  margin: 0;
+  list-style: none;
+}
 
-  :deep(.el-tabs__nav-wrap) {
-    padding: 0 36px;
-  }
+.notice-row {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 8px;
+  text-align: start;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.notice-row:not(:disabled):hover {
+  cursor: pointer;
+  background: var(--el-fill-color-light);
+}
+
+.notice-row-unread .notice-message-title {
+  font-weight: 600;
+}
+
+.notice-time {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.notice-view-all {
+  display: block;
+  margin-block-start: 8px;
+  color: var(--el-color-primary);
+  text-align: center;
 }
 </style>

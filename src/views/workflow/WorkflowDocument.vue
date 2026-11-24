@@ -11,6 +11,7 @@ import { api } from "@/api/client";
 import { permission } from "@/platform/system/resources";
 import { generatedCrud } from "@/platform/generated-crud";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { onSessionReset } from "@/platform/lifecycle";
 import type { CrudPort } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
@@ -30,6 +31,7 @@ const props = defineProps<{ instanceId: string; taskId?: string }>();
 const emit = defineEmits<{ close: []; changed: [] }>();
 const { t } = useI18n();
 const user = useUserStoreHook();
+const workflowCounts = useWorkflowCounts();
 const { busy, error, run } = useRequestScope();
 const document = ref<Document>(),
   task = ref<Task>(),
@@ -340,6 +342,7 @@ async function executeAction(action: Action, targetUserId?: string) {
         await api.workflowInstanceResubmit({ body }, requestConfig(body));
       }
       ElMessage.success(t("workflow.actionDone"));
+      if (action !== "urge") void workflowCounts.refreshPending();
       emit("changed");
       emit("close");
     } catch (e) {

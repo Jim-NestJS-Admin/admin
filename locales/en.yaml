@@ -1095,6 +1095,10 @@ memberPicker:
   cancel: "Cancel"
   confirm: "Confirm"
 notifications:
+  inbox: My messages
+  unread: "{count} unread messages"
+  pending: "{count} pending approval tasks"
+  viewAll: View all messages
   queued: Sync queued. Check sync history for the result.
   logs: Sync history
   open: Open message
