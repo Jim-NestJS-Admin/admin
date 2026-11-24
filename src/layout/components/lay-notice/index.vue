@@ -16,7 +16,14 @@ import { permission } from "@/platform/system/resources";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { date, useRequestScope } from "@/views/workflow/model";
+import {
+  inboxFilter,
+  inboxTabs,
+  messageDestination,
+  type InboxTab
+} from "@/views/notify/inbox";
 import BellIcon from "~icons/ep/bell";
+import ArrowRight from "~icons/ri/arrow-right-s-line";
 
 const WorkflowDocument = defineAsyncComponent(
   () => import("@/views/workflow/WorkflowDocument.vue")
@@ -35,18 +42,34 @@ const canRead = computed(() =>
 );
 const visible = ref(false);
 const dropdown = ref<InstanceType<typeof ElDropdown>>();
-const messages = ref<Message[]>([]);
-const { busy, error, run } = useRequestScope();
+const activeTab = ref<InboxTab>("notice");
+type Preview = { list: Message[]; total: number };
+const previews = ref<Partial<Record<InboxTab, Preview>>>({});
+const { busy, error, run, reset: resetRequest } = useRequestScope();
 const detail = ref<{ instanceId: string; taskId?: string }>();
+
+async function loadPreviews(signal: AbortSignal) {
+  const entries = await Promise.all(
+    inboxTabs.map(async ({ key }) => {
+      const { data } = await api.notifyMessagePage(
+        { body: { page: 1, size: 10, where: inboxFilter(key, true) } },
+        { signal }
+      );
+      return [key, data] as const;
+    })
+  );
+  if (!signal.aborted) previews.value = Object.fromEntries(entries);
+}
 
 async function load() {
   void counts.refreshUnread();
   await run(async signal => {
-    const response = await api.notifyMessagePage(
-      { body: { page: 1, size: 10 } },
-      { signal }
-    );
-    if (!signal.aborted) messages.value = response.data.list;
+    const firstOpen = Object.keys(previews.value).length === 0;
+    await loadPreviews(signal);
+    if (firstOpen && !signal.aborted && !previews.value[activeTab.value]?.total)
+      activeTab.value =
+        inboxTabs.find(({ key }) => previews.value[key]?.total)?.key ??
+        activeTab.value;
   });
 }
 
@@ -57,39 +80,66 @@ function changeVisibility(open: boolean) {
 
 function viewAll() {
   dropdown.value?.handleClose();
-  void router.push("/notify/message");
+  void router.push({
+    path: "/notify/message",
+    query: { tab: activeTab.value }
+  });
 }
 
 async function open(message: Message) {
-  const { id, instanceId, taskId, event } = message;
-  if (!canRead.value || !instanceId) return;
+  if (!canRead.value) return;
   await run(async (signal, key) => {
-    const body = { id };
+    const body = { id: message.id };
     await api.notifyMessageRead(
       { body },
       { signal, headers: { "Idempotency-Key": key(body) } }
     );
     if (signal.aborted) return;
-    dropdown.value?.handleClose();
     void counts.refreshUnread();
-    if (event === "mcp.exempt") {
+    const target = messageDestination(message);
+    if (!target) {
+      await loadPreviews(signal);
+      return;
+    }
+    dropdown.value?.handleClose();
+    if (target.kind === "mcp") {
       await router.push({
         path: "/automation/confirm",
-        query: { operation: instanceId }
+        query: { operation: target.instanceId }
       });
     } else {
-      detail.value = {
-        instanceId,
-        ...(taskId ? { taskId } : {})
-      };
+      detail.value = target;
     }
   });
 }
 
+async function markAsRead() {
+  const messages = previews.value[activeTab.value]?.list ?? [];
+  if (!canRead.value || !messages.length) return;
+  await run(async (signal, key) => {
+    const results = await Promise.allSettled(
+      messages.map(({ id }) => {
+        const body = { id };
+        return api.notifyMessageRead(
+          { body },
+          { signal, headers: { "Idempotency-Key": key(body) } }
+        );
+      })
+    );
+    if (signal.aborted) return;
+    void counts.refreshUnread();
+    await loadPreviews(signal);
+    const failed = results.find(result => result.status === "rejected");
+    if (failed) throw failed.reason;
+  });
+}
+
 function reset() {
+  resetRequest();
   dropdown.value?.handleClose();
   visible.value = false;
-  messages.value = [];
+  previews.value = {};
+  activeTab.value = "notice";
   detail.value = undefined;
 }
 watch(canList, value => {
@@ -134,24 +184,27 @@ onBeforeUnmount(stop);
             type="error"
             :closable="false"
           />
-          <el-tabs
-            stretch
-            class="dropdown-tabs"
-            :style="{
-              width: messages.length
-                ? 'min(330px, calc(100vw - 24px))'
-                : '200px'
-            }"
-          >
-            <el-tab-pane :label="t('notifications.inbox')">
-              <el-scrollbar v-loading="busy" max-height="330px">
-                <div v-if="messages.length" class="notice-list-container">
-                  <el-dropdown-item
-                    v-for="message in messages"
+          <el-tabs v-model="activeTab" stretch class="dropdown-tabs">
+            <el-tab-pane
+              v-for="tab in inboxTabs"
+              :key="tab.key"
+              :name="tab.key"
+              :label="
+                t(tab.label) +
+                (previews[tab.key]?.total ? `(${previews[tab.key].total})` : '')
+              "
+            >
+              <el-scrollbar v-loading="busy" max-height="345px">
+                <div
+                  v-if="previews[tab.key]?.list.length"
+                  class="notice-list-container"
+                >
+                  <button
+                    v-for="message in previews[tab.key]?.list"
                     :key="message.id"
                     class="notice-container"
-                    :class="{ 'notice-unread': message.readAt === null }"
-                    :disabled="busy || !canRead || !message.instanceId"
+                    type="button"
+                    :disabled="busy || !canRead"
                     @click="open(message)"
                   >
                     <div class="notice-container-text">
@@ -162,19 +215,29 @@ onBeforeUnmount(stop);
                         {{ date(message.createdAt) }}
                       </div>
                     </div>
-                  </el-dropdown-item>
+                  </button>
                 </div>
-                <el-empty
-                  v-else
-                  :image-size="60"
-                  :description="t('status.pureNoMessage')"
-                />
+                <el-empty v-else :image-size="60" :description="t(tab.empty)" />
               </el-scrollbar>
             </el-tab-pane>
           </el-tabs>
-          <el-dropdown-item divided class="notice-view-all" @click="viewAll">
-            {{ t("notifications.viewAll") }}
-          </el-dropdown-item>
+          <div class="notice-footer">
+            <el-button type="primary" size="small" text @click="viewAll">
+              {{ t("notifications.viewMore") }}
+              <IconifyIconOffline :icon="ArrowRight" />
+            </el-button>
+            <el-button
+              v-if="canRead"
+              type="primary"
+              size="small"
+              text
+              :disabled="busy || !previews[activeTab]?.list.length"
+              :title="t('notifications.markPreviewRead')"
+              @click="markAsRead"
+            >
+              {{ t("notifications.markRead") }}
+            </el-button>
+          </div>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
@@ -216,6 +279,8 @@ onBeforeUnmount(stop);
 }
 
 .dropdown-tabs {
+  width: min(330px, calc(100vw - 24px));
+
   .notice-list-container {
     padding: 15px 24px 0;
   }
@@ -233,16 +298,22 @@ onBeforeUnmount(stop);
   }
 }
 
-.notice-dropdown :deep(.notice-container) {
+.notice-container {
+  display: block;
+  width: 100%;
   padding: 12px 0;
+  text-align: start;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.notice-dropdown :deep(.notice-container:not(.is-disabled):is(:hover, :focus)) {
-  background: transparent;
+.notice-container:disabled {
+  cursor: default;
 }
 
-.notice-dropdown :deep(.notice-container:focus-visible) {
+.notice-container:focus-visible {
   outline: 2px solid var(--el-color-primary);
   outline-offset: -2px;
 }
@@ -262,8 +333,8 @@ onBeforeUnmount(stop);
   white-space: nowrap;
 }
 
-.notice-unread .notice-text-title {
-  font-weight: 600;
+.notice-container:not(:disabled):hover .notice-text-title {
+  color: var(--el-color-primary);
 }
 
 .notice-text-datetime {
@@ -271,8 +342,10 @@ onBeforeUnmount(stop);
   color: var(--el-text-color-secondary);
 }
 
-.notice-view-all {
-  justify-content: center;
-  color: var(--el-color-primary);
+.notice-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+  border-top: 1px solid var(--el-border-color-light);
 }
 </style>

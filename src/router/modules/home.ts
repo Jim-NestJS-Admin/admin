@@ -23,6 +23,12 @@ export default {
       }
     },
     {
+      path: "/notify/message",
+      name: "NotificationCenter",
+      component: () => import("@/views/notify/message.vue"),
+      meta: { title: $t("notifications.inbox"), showLink: false }
+    },
+    {
       path: "/workflow/definition/new",
       name: "WorkflowCreate",
       component: () => import("@/views/workflow/design.vue"),

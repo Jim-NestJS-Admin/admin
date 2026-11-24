@@ -13,7 +13,11 @@ import { generatedCrud } from "@/platform/generated-crud";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { onSessionReset } from "@/platform/lifecycle";
-import type { CrudPort } from "@/components/Crud/types";
+import type {
+  CrudPort,
+  CrudSavedChoices,
+  CrudSchema
+} from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import MemberPicker from "@/components/MemberPicker/index.vue";
 import { issuesFrom } from "../form/model";
@@ -123,9 +127,27 @@ const recordFields = [
   "nodeId",
   "actorId",
   "comment",
-  "createdAt",
-  "attachmentIds"
+  "attachmentIds",
+  "createdAt"
 ];
+function orderRecordColumns<T extends { field: string }>(columns: T[]) {
+  const byField = new Map(columns.map(column => [column.field, column]));
+  return recordFields.map(field => byField.get(field) ?? { field });
+}
+function orderRecordView(view: CrudSchema["view"]): CrudSchema["view"] {
+  const config = view as
+    | { list?: { columns?: { field: string }[] } }
+    | undefined;
+  if (!config?.list?.columns) return view;
+  return {
+    ...config,
+    list: {
+      ...config.list,
+      columns: orderRecordColumns(config.list.columns)
+    }
+  } as unknown as CrudSchema["view"];
+}
+const recordPreferences = generated.port.preferences;
 const recordPort: CrudPort = {
   describe: async signal => {
     const schema = await generated.port.describe(signal);
@@ -134,6 +156,8 @@ const recordPort: CrudPort = {
     );
     return {
       ...schema,
+      view: orderRecordView(schema.view),
+      moduleView: orderRecordView(schema.moduleView),
       columns: recordFields.flatMap(field => {
         const column = byField.get(field);
         return column ? [column] : [];
@@ -141,7 +165,21 @@ const recordPort: CrudPort = {
     };
   },
   detail: generated.port.detail,
-  preferences: generated.port.preferences,
+  ...(recordPreferences && {
+    preferences: {
+      ...recordPreferences,
+      load: async (page, signal) => {
+        const saved = (await recordPreferences.load(page, signal)) as
+          | Partial<CrudSavedChoices>
+          | undefined;
+        if (!Array.isArray(saved?.columns)) return saved;
+        return {
+          ...saved,
+          columns: orderRecordColumns(saved.columns)
+        };
+      }
+    }
+  }),
   list: (query, signal) =>
     generated.port.list(
       {

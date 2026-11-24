@@ -1095,10 +1095,14 @@ memberPicker:
   cancel: "取消"
   confirm: "确定"
 notifications:
-  inbox: 我的消息
+  inbox: 站内信中心
+  all: 全部
+  unreadStatus: 未读
+  viewMore: 查看更多
+  markRead: 标为已读
+  markPreviewRead: 将当前列表中的消息标为已读
   unread: "{count} 条未读消息"
   pending: "{count} 条审批待办"
-  viewAll: 查看全部消息
   queued: 已加入同步队列，请在同步记录查看结果
   logs: 同步记录
   open: 查看消息
