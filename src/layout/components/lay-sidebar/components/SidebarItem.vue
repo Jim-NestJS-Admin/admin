@@ -266,6 +266,7 @@ const compactBadge = computed(
   <el-sub-menu
     v-else
     ref="subMenu"
+    class="sidebar-menu-group"
     teleported
     :index="resolvePath(item.path)"
     v-bind="expandCloseIcon"
@@ -360,10 +361,8 @@ const compactBadge = computed(
   margin: 0;
 }
 
-:global(.el-sub-menu.is-opened > .el-sub-menu__title) > .sidebar-count-group,
-:global(.el-sub-menu.is-opened > .el-sub-menu__title)
-  > .sidebar-title-row
-  > .sidebar-count-group {
+.sidebar-menu-group.is-opened
+  > :deep(.el-sub-menu__title .sidebar-count-group) {
   display: none;
 }
 </style>
