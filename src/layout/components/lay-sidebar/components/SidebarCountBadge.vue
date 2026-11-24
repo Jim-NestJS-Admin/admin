@@ -27,13 +27,13 @@ const { t } = useI18n();
 
 .sidebar-count :deep(.el-badge__content) {
   position: static;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: 4px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
-  line-height: 18px;
+  line-height: 22px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 50%;
 }
 </style>
