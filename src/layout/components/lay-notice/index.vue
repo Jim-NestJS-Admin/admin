@@ -8,6 +8,7 @@ import {
 } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import type { ElDropdown } from "element-plus";
 import { api } from "@/api/client";
 import type { components } from "@/api/schema";
 import { onSessionReset } from "@/platform/lifecycle";
@@ -33,6 +34,7 @@ const canRead = computed(() =>
   user.permissions.includes(permission("notifyMessageRead"))
 );
 const visible = ref(false);
+const dropdown = ref<InstanceType<typeof ElDropdown>>();
 const messages = ref<Message[]>([]);
 const { busy, error, run } = useRequestScope();
 const detail = ref<{ instanceId: string; taskId?: string }>();
@@ -48,6 +50,16 @@ async function load() {
   });
 }
 
+function changeVisibility(open: boolean) {
+  visible.value = open;
+  if (open) void load();
+}
+
+function viewAll() {
+  dropdown.value?.handleClose();
+  void router.push("/notify/message");
+}
+
 async function open(message: Message) {
   const { id, instanceId, taskId, event } = message;
   if (!canRead.value || !instanceId) return;
@@ -58,7 +70,7 @@ async function open(message: Message) {
       { signal, headers: { "Idempotency-Key": key(body) } }
     );
     if (signal.aborted) return;
-    visible.value = false;
+    dropdown.value?.handleClose();
     void counts.refreshUnread();
     if (event === "mcp.exempt") {
       await router.push({
@@ -75,6 +87,7 @@ async function open(message: Message) {
 }
 
 function reset() {
+  dropdown.value?.handleClose();
   visible.value = false;
   messages.value = [];
   detail.value = undefined;
@@ -88,63 +101,81 @@ onBeforeUnmount(stop);
 
 <template>
   <template v-if="canList">
-    <el-popover
-      v-model:visible="visible"
+    <el-dropdown
+      ref="dropdown"
+      v-bind="$attrs"
       trigger="click"
       placement="bottom-end"
-      :width="320"
-      @show="load"
+      :hide-on-click="false"
+      @visible-change="changeVisibility"
     >
-      <template #reference>
-        <button
-          v-bind="$attrs"
-          type="button"
-          class="notice-trigger navbar-bg-hover"
-          :aria-expanded="visible"
-          :aria-label="
-            counts.unread
-              ? t('notifications.unread', { count: counts.unread })
-              : t('notifications.inbox')
-          "
-        >
-          <el-badge :value="counts.unread" :max="99" :hidden="!counts.unread">
-            <BellIcon aria-hidden="true" />
-          </el-badge>
-        </button>
-      </template>
-      <p class="notice-title">{{ t("notifications.inbox") }}</p>
-      <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
-      <el-scrollbar v-loading="busy" max-height="320px">
-        <ul v-if="messages.length" class="notice-list">
-          <li v-for="message in messages" :key="message.id">
-            <button
-              class="notice-row"
-              :class="{ 'notice-row-unread': message.readAt === null }"
-              type="button"
-              :disabled="busy || !canRead || !message.instanceId"
-              @click="open(message)"
-            >
-              <span class="notice-message-title">{{
-                message.title || t("notifications.open")
-              }}</span>
-              <span class="notice-time">{{ date(message.createdAt) }}</span>
-            </button>
-          </li>
-        </ul>
-        <el-empty
-          v-else-if="!busy && !error"
-          :image-size="48"
-          :description="t('status.pureNoMessage')"
-        />
-      </el-scrollbar>
-      <router-link
-        to="/notify/message"
-        class="notice-view-all"
-        @click="visible = false"
+      <button
+        type="button"
+        class="dropdown-badge navbar-bg-hover select-none"
+        :class="{ 'mr-[10px]': counts.unread > 0 }"
+        :aria-expanded="visible"
+        :aria-label="
+          counts.unread
+            ? t('notifications.unread', { count: counts.unread })
+            : t('notifications.inbox')
+        "
       >
-        {{ t("notifications.viewAll") }}
-      </router-link>
-    </el-popover>
+        <el-badge :value="counts.unread" :max="99" :hidden="!counts.unread">
+          <span class="header-notice-icon" aria-hidden="true">
+            <IconifyIconOffline :icon="BellIcon" />
+          </span>
+        </el-badge>
+      </button>
+      <template #dropdown>
+        <el-dropdown-menu class="notice-dropdown">
+          <el-alert
+            v-if="error"
+            :title="t(error)"
+            type="error"
+            :closable="false"
+          />
+          <el-tabs
+            stretch
+            class="dropdown-tabs"
+            :style="{
+              width: messages.length
+                ? 'min(330px, calc(100vw - 24px))'
+                : '200px'
+            }"
+          >
+            <el-tab-pane :label="t('notifications.inbox')">
+              <el-scrollbar v-loading="busy" max-height="330px">
+                <div v-if="messages.length" class="notice-list-container">
+                  <el-dropdown-item
+                    v-for="message in messages"
+                    :key="message.id"
+                    class="notice-container"
+                    :class="{ 'notice-unread': message.readAt === null }"
+                    :disabled="busy || !canRead || !message.instanceId"
+                    @click="open(message)"
+                  >
+                    <span class="notice-text-title" :title="message.title">{{
+                      message.title || t("notifications.open")
+                    }}</span>
+                    <span class="notice-text-datetime">{{
+                      date(message.createdAt)
+                    }}</span>
+                  </el-dropdown-item>
+                </div>
+                <el-empty
+                  v-else
+                  :image-size="60"
+                  :description="t('status.pureNoMessage')"
+                />
+              </el-scrollbar>
+            </el-tab-pane>
+          </el-tabs>
+          <el-dropdown-item divided class="notice-view-all" @click="viewAll">
+            {{ t("notifications.viewAll") }}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
     <WorkflowDocument
       v-if="detail"
       :key="
@@ -159,58 +190,65 @@ onBeforeUnmount(stop);
   </template>
 </template>
 
-<style scoped>
-.notice-trigger {
-  display: grid;
-  place-items: center;
+<style lang="scss" scoped>
+.dropdown-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 48px;
   color: inherit;
   cursor: pointer;
 }
 
-.notice-trigger svg {
-  display: block;
+.header-notice-icon {
   font-size: 18px;
 }
 
-.notice-title {
-  margin-block-end: 8px;
-  font-weight: 600;
+.dropdown-tabs {
+  .notice-list-container {
+    padding: 15px 24px 0;
+  }
+
+  :deep(.el-tabs__header) {
+    margin: 0;
+  }
+
+  :deep(.el-tabs__nav-wrap)::after {
+    height: 1px;
+  }
+
+  :deep(.el-tabs__nav-wrap) {
+    padding: 0 36px;
+  }
 }
 
-.notice-list {
-  margin: 0;
-  list-style: none;
-}
-
-.notice-row {
-  display: grid;
-  gap: 4px;
-  width: 100%;
-  padding: 8px;
-  text-align: start;
+.notice-container {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 12px 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
-.notice-row:not(:disabled):hover {
-  cursor: pointer;
-  background: var(--el-fill-color-light);
+.notice-text-title {
+  margin-block-end: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
-.notice-row-unread .notice-message-title {
+.notice-unread .notice-text-title {
   font-weight: 600;
 }
 
-.notice-time {
+.notice-text-datetime {
   font-size: 12px;
   color: var(--el-text-color-secondary);
 }
 
 .notice-view-all {
-  display: block;
-  margin-block-start: 8px;
+  justify-content: center;
   color: var(--el-color-primary);
-  text-align: center;
 }
 </style>

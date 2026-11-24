@@ -5,10 +5,10 @@ import { menuType } from "@/layout/types";
 import { ReText } from "@/components/ReText";
 import { useNav } from "@/layout/hooks/useNav";
 import { transformI18n } from "@/plugins/i18n";
-import { useI18n } from "vue-i18n";
 import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import SidebarLinkItem from "./SidebarLinkItem.vue";
 import SidebarExtraIcon from "./SidebarExtraIcon.vue";
+import SidebarCountBadge from "./SidebarCountBadge.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import {
   type PropType,
@@ -25,7 +25,6 @@ import ArrowLeft from "~icons/ep/arrow-left-bold";
 import ArrowRight from "~icons/ep/arrow-right-bold";
 
 const attrs = useAttrs();
-const { t } = useI18n();
 const workflowCounts = useWorkflowCounts();
 const { layout, isCollapse, tooltipEffect, getDivStyle } = useNav();
 
@@ -121,6 +120,28 @@ function resolvePath(routePath) {
     return posix.resolve(props.basePath, routePath);
   }
 }
+
+function containsWorkbench(menu: menuType, path: string): boolean {
+  return (
+    path === "/workflow/instance" ||
+    Boolean(
+      menu.children?.some(child =>
+        containsWorkbench(child, posix.resolve(path, child.path ?? ""))
+      )
+    )
+  );
+}
+
+// 菜单树已按当前会话过滤。同一个工作台计数在每个分组只汇总一次。
+const pendingCount = computed(() =>
+  workflowCounts.pending &&
+  containsWorkbench(props.item, props.basePath || props.item.path || "")
+    ? workflowCounts.pending
+    : 0
+);
+const compactBadge = computed(
+  () => isCollapse.value && !props.isNest && layout.value !== "horizontal"
+);
 </script>
 
 <template>
@@ -168,8 +189,14 @@ function resolvePath(routePath) {
         {{ transformI18n(onlyOneChild.meta.title) }}
       </el-text>
 
+      <SidebarCountBadge
+        v-if="compactBadge"
+        :count="pendingCount"
+        class="sidebar-count-compact"
+      />
+
       <template #title>
-        <div :style="getDivStyle" class="sidebar-menu-title">
+        <div :style="getDivStyle">
           <ReText
             :tippyProps="{
               offset: [0, -10],
@@ -179,21 +206,8 @@ function resolvePath(routePath) {
           >
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
-          <el-tag
-            v-if="
-              workflowCounts.pending > 0 &&
-              resolvePath(onlyOneChild.path) === '/workflow/instance'
-            "
-            size="small"
-            class="sidebar-pending-count"
-            :aria-label="
-              t('notifications.pending', { count: workflowCounts.pending })
-            "
-            >{{
-              workflowCounts.pending > 99 ? "99+" : workflowCounts.pending
-            }}</el-tag
-          >
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
+          <SidebarCountBadge v-if="!compactBadge" :count="pendingCount" />
         </div>
       </template>
     </el-menu-item>
@@ -233,6 +247,10 @@ function resolvePath(routePath) {
         {{ transformI18n(item.meta.title) }}
       </ReText>
       <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
+      <SidebarCountBadge
+        :count="pendingCount"
+        :class="compactBadge ? 'sidebar-count-compact' : 'sidebar-count-group'"
+      />
     </template>
 
     <sidebar-item
@@ -247,8 +265,15 @@ function resolvePath(routePath) {
 </template>
 
 <style scoped>
-.sidebar-menu-title .sidebar-pending-count {
-  flex-shrink: 0;
-  margin-inline-start: 8px;
+.sidebar-count-group {
+  margin-inline-end: 16px;
+}
+
+.sidebar-count-compact {
+  position: absolute;
+  inset-block: 4px auto;
+  inset-inline-end: 4px;
+  height: auto;
+  margin: 0;
 }
 </style>
