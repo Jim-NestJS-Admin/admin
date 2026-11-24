@@ -34,6 +34,12 @@ function changeField(node: ConditionDraft) {
 function typeOf(node: ConditionDraft) {
   return props.fields.find(field => field.field === node.field)?.type;
 }
+function optionsFor(node: ConditionDraft) {
+  return props.fields.find(field => field.field === node.field)?.options;
+}
+function isList(node: ConditionDraft) {
+  return node.operator === "in" || node.operator === "notIn";
+}
 </script>
 <template>
   <!-- 条件组：标题栏（层级、条件关系、添加条件 / 分组）+ 条件行，子分组缩进成卡片 -->
@@ -101,7 +107,15 @@ function typeOf(node: ConditionDraft) {
               :value="field.field"
               :label="field.label"
           /></el-select>
-          <el-select v-model="node.operator" :aria-label="t('query.operator')"
+          <el-select
+            v-model="node.operator"
+            :aria-label="t('query.operator')"
+            @change="
+              () => {
+                if (optionsFor(node) && !isList(node))
+                  node.text = node.text.split(',')[0] ?? '';
+              }
+            "
             ><el-option
               v-for="op in fields.find(field => field.field === node.field)
                 ?.operators ?? []"
@@ -112,7 +126,29 @@ function typeOf(node: ConditionDraft) {
           <div class="query-value">
             <template v-if="!['isNull', 'notNull'].includes(node.operator)">
               <el-select
-                v-if="typeOf(node) === 'boolean'"
+                v-if="optionsFor(node)"
+                :key="node.operator"
+                :model-value="
+                  isList(node)
+                    ? node.text.split(',').filter(Boolean)
+                    : node.text
+                "
+                :multiple="isList(node)"
+                :aria-label="t('query.value')"
+                :placeholder="t('query.value')"
+                @update:model-value="
+                  value =>
+                    (node.text = Array.isArray(value) ? value.join(',') : value)
+                "
+              >
+                <el-option
+                  v-for="option in optionsFor(node)"
+                  :key="option.value"
+                  v-bind="option"
+                />
+              </el-select>
+              <el-select
+                v-else-if="typeOf(node) === 'boolean'"
                 v-model="node.text"
                 :aria-label="t('query.value')"
                 :placeholder="t('query.value')"

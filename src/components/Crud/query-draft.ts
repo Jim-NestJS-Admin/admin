@@ -1,6 +1,7 @@
 import type { components } from "@/api/schema";
+import type { CrudSchema } from "./types";
 export type QueryGroup = components["schemas"]["QueryGroupDto"];
-export type QueryField = components["schemas"]["CrudSchemaQueryItem"];
+export type QueryField = CrudSchema["query"][number];
 type Condition = components["schemas"]["QueryConditionDto"];
 /** 仅供编辑器使用的草稿，文本输入在提交时按后端字段类型转换。 */
 export interface ConditionDraft {

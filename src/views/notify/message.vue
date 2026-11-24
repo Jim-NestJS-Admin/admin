@@ -11,7 +11,13 @@ import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import WorkflowDocument from "../workflow/WorkflowDocument.vue";
 import { useRequestScope } from "../workflow/model";
-import { inboxFilter, inboxTabs, messageDestination } from "./inbox";
+import { defaultCell } from "@/components/Crud/model.mjs";
+import {
+  inboxFilter,
+  inboxTabs,
+  messageDestination,
+  notificationEventLabels
+} from "./inbox";
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -23,6 +29,29 @@ const tab = computed(
 );
 const port: CrudPort = {
   ...generated.port,
+  async describe(signal) {
+    const schema = await generated.port.describe(signal);
+    return {
+      ...schema,
+      query: schema.query.map(field =>
+        field.field === "event"
+          ? {
+              ...field,
+              operators: field.operators.filter(op =>
+                ["eq", "ne", "in", "notIn"].includes(op)
+              ),
+              options: Array.from(
+                notificationEventLabels,
+                ([value, label]) => ({
+                  value,
+                  label: t(label)
+                })
+              )
+            }
+          : field
+      )
+    };
+  },
   list(query, signal) {
     if (tab.value === "all") return generated.port.list(query, signal);
     const filter = inboxFilter(tab.value);
@@ -37,6 +66,22 @@ const port: CrudPort = {
     );
   }
 };
+function messageCell(row: CrudRecord, field: string) {
+  const cell = defaultCell(row, field);
+  if (
+    field !== "event" ||
+    (cell.state !== "visible" && cell.state !== "readonly") ||
+    typeof cell.display !== "string" ||
+    !cell.display
+  )
+    return cell;
+  return {
+    ...cell,
+    display: t(
+      notificationEventLabels.get(cell.display) ?? "notifications.event.other"
+    )
+  };
+}
 const list = ref<InstanceType<typeof CrudPage>>();
 const detail = ref<{ instanceId: string; taskId?: string }>();
 function changeTab(key: string | number) {
@@ -85,7 +130,13 @@ onBeforeUnmount(stop);
       />
     </el-tabs>
     <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
-    <CrudPage :key="tab" ref="list" :port="port" page-key="notify:message">
+    <CrudPage
+      :key="tab"
+      ref="list"
+      :port="port"
+      :cell="messageCell"
+      page-key="notify:message"
+    >
       <template #cell-readAt="{ value, text }">
         <el-tag v-if="value === null" type="primary" size="small">
           {{ t("notifications.unreadStatus") }}

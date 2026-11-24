@@ -11,19 +11,28 @@ export const inboxTabs = [
 ] as const;
 export type InboxTab = (typeof inboxTabs)[number]["key"];
 
-const workflowEvents = [
-  "task.created",
-  "task.reminder",
-  "task.cancelled",
-  "task.copied",
-  "instance.approved",
-  "instance.returned",
-  "instance.withdrawn"
-];
+const securityEvent = "mcp.exempt";
+export const notificationEventLabels = new Map<string, string>([
+  ["task.created", "notifications.event.taskCreated"],
+  ["task.reminder", "notifications.event.taskReminder"],
+  ["task.cancelled", "notifications.event.taskCancelled"],
+  ["task.copied", "notifications.event.taskCopied"],
+  ["instance.approved", "notifications.event.instanceApproved"],
+  ["instance.returned", "notifications.event.instanceReturned"],
+  ["instance.withdrawn", "notifications.event.instanceWithdrawn"],
+  [securityEvent, "notifications.event.mcpExempt"]
+]);
+const workflowEvents = [...notificationEventLabels.keys()].filter(
+  event => event !== securityEvent
+);
+const todoEvents = ["task.created", "task.reminder"];
 const eventFilters = {
   notice: { op: "notIn", events: workflowEvents },
-  message: { op: "in", events: workflowEvents.slice(2) },
-  todo: { op: "in", events: workflowEvents.slice(0, 2) }
+  message: {
+    op: "in",
+    events: workflowEvents.filter(event => !todoEvents.includes(event))
+  },
+  todo: { op: "in", events: todoEvents }
 } as const;
 
 export function inboxFilter(tab: InboxTab, unread = false) {
@@ -51,10 +60,9 @@ export function messageDestination(row: {
     !/^[1-9]\d{0,19}$/.test(row.instanceId)
   )
     return;
-  if (row.event === "mcp.exempt")
+  if (row.event === securityEvent)
     return { kind: "mcp", instanceId: row.instanceId } as const;
-  if (typeof row.event !== "string" || !workflowEvents.includes(row.event))
-    return;
+  if (!workflowEvents.some(event => event === row.event)) return;
   return {
     kind: "workflow",
     instanceId: row.instanceId,

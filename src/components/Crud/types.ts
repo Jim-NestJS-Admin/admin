@@ -1,9 +1,12 @@
 import type { components } from "@/api/schema";
 export type CrudSchema = Omit<
   components["schemas"]["CrudSchema"],
-  "columns"
+  "columns" | "query"
 > & {
   columns: CrudColumn[];
+  query: (components["schemas"]["CrudSchemaQueryItem"] & {
+    options?: { value: string; label: string }[];
+  })[];
 };
 export type CrudTableMode = NonNullable<CrudSchema["defaultTableMode"]>;
 export type CrudColumn = components["schemas"]["CrudSchemaColumn"] & {

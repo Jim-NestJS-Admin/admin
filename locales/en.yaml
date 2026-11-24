@@ -1101,6 +1101,16 @@ notifications:
   viewMore: View more
   markRead: Mark as read
   markPreviewRead: Mark the displayed messages as read
+  event:
+    taskCreated: New approval task
+    taskReminder: Approval reminder
+    taskCancelled: Approval task no longer active
+    taskCopied: Approval copy
+    instanceApproved: Approved
+    instanceReturned: Returned for changes
+    instanceWithdrawn: Request withdrawn
+    mcpExempt: Operation without confirmation
+    other: Other notification
   unread: "{count} unread messages"
   pending: "{count} pending approval tasks"
   queued: Sync queued. Check sync history for the result.

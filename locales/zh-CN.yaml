@@ -1101,6 +1101,16 @@ notifications:
   viewMore: 查看更多
   markRead: 标为已读
   markPreviewRead: 将当前列表中的消息标为已读
+  event:
+    taskCreated: 新审批待办
+    taskReminder: 审批催办
+    taskCancelled: 审批待办已失效
+    taskCopied: 审批抄送
+    instanceApproved: 审批通过
+    instanceReturned: 审批退回
+    instanceWithdrawn: 申请撤回
+    mcpExempt: 免确认操作通知
+    other: 其他通知
   unread: "{count} 条未读消息"
   pending: "{count} 条审批待办"
   queued: 已加入同步队列，请在同步记录查看结果
