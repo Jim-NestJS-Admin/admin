@@ -414,8 +414,9 @@ onBeforeUnmount(() => {
           <el-tag>{{
             t(`workflow.instanceStatus.${document.instance.status}`)
           }}</el-tag>
-          <el-tag effect="plain">v{{ document.instance.revision }}</el-tag>
-          <span>{{ t("workflow.round") }} {{ document.instance.round }}</span>
+          <el-tag type="info" effect="plain">
+            {{ t("workflow.round") }} {{ document.instance.round }}
+          </el-tag>
         </template>
       </div>
     </template>
@@ -613,11 +614,6 @@ onBeforeUnmount(() => {
   font-size: 18px;
   font-weight: 600;
   overflow-wrap: anywhere;
-}
-
-.document-header > span {
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
 }
 
 .document-tabs,
