@@ -26,7 +26,7 @@ import ArrowRight from "~icons/ep/arrow-right-bold";
 
 const attrs = useAttrs();
 const workflowCounts = useWorkflowCounts();
-const { layout, isCollapse, tooltipEffect, getDivStyle } = useNav();
+const { layout, isCollapse, tooltipEffect } = useNav();
 
 const props = defineProps({
   item: {
@@ -196,13 +196,13 @@ const compactBadge = computed(
       />
 
       <template #title>
-        <div :style="getDivStyle">
+        <div class="sidebar-title-row">
           <ReText
             :tippyProps="{
               offset: [0, -10],
               theme: tooltipEffect
             }"
-            class="w-full! text-inherit!"
+            class="sidebar-menu-label text-inherit!"
           >
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
@@ -227,29 +227,39 @@ const compactBadge = computed(
       >
         <component :is="useRenderIcon(item.meta && toRaw(item.meta.icon))" />
       </div>
-      <ReText
-        v-if="
-          layout === 'mix' && toRaw(item.meta.icon)
-            ? !isCollapse || item?.pathList?.length !== 2
-            : !(
-                layout === 'vertical' &&
-                isCollapse &&
-                toRaw(item.meta.icon) &&
-                item.parentId === null
-              )
-        "
-        :tippyProps="{
-          offset: [0, -10],
-          theme: tooltipEffect
+      <div
+        class="sidebar-title-row"
+        :class="{
+          'sidebar-title-row-with-arrow': pendingCount > 0 && !compactBadge
         }"
-        :class="textClass"
       >
-        {{ transformI18n(item.meta.title) }}
-      </ReText>
-      <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
+        <ReText
+          v-if="
+            layout === 'mix' && toRaw(item.meta.icon)
+              ? !isCollapse || item?.pathList?.length !== 2
+              : !(
+                  layout === 'vertical' &&
+                  isCollapse &&
+                  toRaw(item.meta.icon) &&
+                  item.parentId === null
+                )
+          "
+          :tippyProps="{
+            offset: [0, -10],
+            theme: tooltipEffect
+          }"
+          class="sidebar-menu-label"
+          :class="textClass"
+        >
+          {{ transformI18n(item.meta.title) }}
+        </ReText>
+        <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
+        <SidebarCountBadge v-if="!compactBadge" :count="pendingCount" />
+      </div>
       <SidebarCountBadge
+        v-if="compactBadge"
         :count="pendingCount"
-        :class="compactBadge ? 'sidebar-count-compact' : 'sidebar-count-group'"
+        class="sidebar-count-compact"
       />
     </template>
 
@@ -265,7 +275,19 @@ const compactBadge = computed(
 </template>
 
 <style scoped>
-.sidebar-count-group {
+.sidebar-title-row {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.sidebar-menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-title-row-with-arrow {
   margin-inline-end: 16px;
 }
 

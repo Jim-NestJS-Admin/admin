@@ -9,7 +9,7 @@ const { t } = useI18n();
   <el-badge
     v-if="count > 0"
     class="sidebar-count"
-    type="primary"
+    type="danger"
     :value="count"
     :max="99"
     :aria-label="t('notifications.pending', { count })"
@@ -26,11 +26,13 @@ const { t } = useI18n();
 }
 
 .sidebar-count :deep(.el-badge__content) {
+  position: static;
   min-width: 18px;
   height: 18px;
   padding-inline: 4px;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+  line-height: 18px;
   border: 0;
   border-radius: 5px;
 }
