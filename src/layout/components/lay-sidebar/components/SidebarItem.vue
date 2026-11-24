@@ -5,7 +5,7 @@ import { menuType } from "@/layout/types";
 import { ReText } from "@/components/ReText";
 import { useNav } from "@/layout/hooks/useNav";
 import { transformI18n } from "@/plugins/i18n";
-import { useWorkflowCounts } from "@/store/modules/workflow-counts";
+import { useRouter } from "vue-router";
 import SidebarLinkItem from "./SidebarLinkItem.vue";
 import SidebarExtraIcon from "./SidebarExtraIcon.vue";
 import SidebarCountBadge from "./SidebarCountBadge.vue";
@@ -25,7 +25,7 @@ import ArrowLeft from "~icons/ep/arrow-left-bold";
 import ArrowRight from "~icons/ep/arrow-right-bold";
 
 const attrs = useAttrs();
-const workflowCounts = useWorkflowCounts();
+const router = useRouter();
 const { layout, isCollapse, tooltipEffect } = useNav();
 
 const props = defineProps({
@@ -39,7 +39,9 @@ const props = defineProps({
   basePath: {
     type: String,
     default: ""
-  }
+  },
+  pendingByPath: Object as PropType<Record<string, number>>,
+  openGroup: Function as PropType<(path: string) => void>
 });
 
 const getNoDropdownStyle = computed((): CSSProperties => {
@@ -121,24 +123,75 @@ function resolvePath(routePath) {
   }
 }
 
-function containsWorkbench(menu: menuType, path: string): boolean {
-  return (
-    path === "/workflow/instance" ||
-    Boolean(
-      menu.children?.some(child =>
-        containsWorkbench(child, posix.resolve(path, child.path ?? ""))
-      )
-    )
-  );
+type PendingEntry = { path: string; count: number; groups: string[] };
+
+function collectPending(
+  menu: menuType,
+  path: string,
+  groups: string[],
+  entries: Map<string, PendingEntry>
+) {
+  if (menu.children?.length) {
+    const [child] = menu.children;
+    const ancestors =
+      menu.children.length === 1 && !child.meta?.showParent && !child.children
+        ? groups
+        : [...groups, path];
+    for (const child of menu.children)
+      collectPending(
+        child,
+        posix.resolve(path, child.path ?? ""),
+        ancestors,
+        entries
+      );
+    return;
+  }
+  const count = props.pendingByPath?.[path] ?? 0;
+  if (count > 0 && !entries.has(path))
+    entries.set(path, { path, count, groups });
 }
 
-// 菜单树已按当前会话过滤。同一个工作台计数在每个分组只汇总一次。
+const pendingEntries = computed(() => {
+  const entries = new Map<string, PendingEntry>();
+  collectPending(
+    props.item,
+    props.basePath || props.item.path || "",
+    [],
+    entries
+  );
+  return [...entries.values()];
+});
 const pendingCount = computed(() =>
-  workflowCounts.pending &&
-  containsWorkbench(props.item, props.basePath || props.item.path || "")
-    ? workflowCounts.pending
-    : 0
+  pendingEntries.value.reduce((sum, entry) => sum + entry.count, 0)
 );
+const leafLink = computed(() => {
+  const [entry] = pendingEntries.value;
+  return entry
+    ? { ...props.item, ...pendingLocation(entry.path), name: undefined }
+    : props.item;
+});
+
+function pendingLocation(path: string) {
+  return path === "/workflow/instance"
+    ? { path, query: { pending: "1" } }
+    : { path };
+}
+
+function activatePending() {
+  const [first, ...other] = pendingEntries.value;
+  if (!first) return;
+  if (!other.length) {
+    const group = first.groups.at(-1);
+    if (group) props.openGroup?.(group);
+    void router.push(pendingLocation(first.path));
+    return;
+  }
+  // 先打开待办入口共享的最深分组，分叉后让各分组继续显示自己的汇总。
+  const common = [...first.groups]
+    .reverse()
+    .find(path => other.every(entry => entry.groups.includes(path)));
+  if (common) props.openGroup?.(common);
+}
 const compactBadge = computed(
   () => isCollapse.value && !props.isNest && layout.value !== "horizontal"
 );
@@ -150,7 +203,7 @@ const compactBadge = computed(
       hasOneShowingChild(item.children, item) &&
       (!onlyOneChild.children || onlyOneChild.noShowingChildren)
     "
-    :to="item"
+    :to="leafLink"
   >
     <el-menu-item
       :index="resolvePath(onlyOneChild.path)"
@@ -193,6 +246,7 @@ const compactBadge = computed(
         v-if="compactBadge"
         :count="pendingCount"
         class="sidebar-count-compact"
+        @activate="activatePending"
       />
 
       <template #title>
@@ -207,7 +261,11 @@ const compactBadge = computed(
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
-          <SidebarCountBadge v-if="!compactBadge" :count="pendingCount" />
+          <SidebarCountBadge
+            v-if="!compactBadge"
+            :count="pendingCount"
+            @activate="activatePending"
+          />
         </div>
       </template>
     </el-menu-item>
@@ -254,12 +312,20 @@ const compactBadge = computed(
           {{ transformI18n(item.meta.title) }}
         </ReText>
         <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
-        <SidebarCountBadge v-if="!compactBadge" :count="pendingCount" />
+        <SidebarCountBadge
+          v-if="!compactBadge"
+          :count="pendingCount"
+          group
+          class="sidebar-count-group"
+          @activate="activatePending"
+        />
       </div>
       <SidebarCountBadge
         v-if="compactBadge"
         :count="pendingCount"
-        class="sidebar-count-compact"
+        group
+        class="sidebar-count-compact sidebar-count-group"
+        @activate="activatePending"
       />
     </template>
 
@@ -269,6 +335,8 @@ const compactBadge = computed(
       :is-nest="true"
       :item="child"
       :base-path="resolvePath(child.path)"
+      :pending-by-path="pendingByPath"
+      :open-group="openGroup"
       class="nest-menu"
     />
   </el-sub-menu>
@@ -297,5 +365,12 @@ const compactBadge = computed(
   inset-inline-end: 4px;
   height: auto;
   margin: 0;
+}
+
+:global(.el-sub-menu.is-opened > .el-sub-menu__title) > .sidebar-count-group,
+:global(.el-sub-menu.is-opened > .el-sub-menu__title)
+  > .sidebar-title-row
+  > .sidebar-count-group {
+  display: none;
 }
 </style>

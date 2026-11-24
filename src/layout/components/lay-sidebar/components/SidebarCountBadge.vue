@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 
-defineProps<{ count: number }>();
+defineProps<{ count: number; group?: boolean }>();
+defineEmits<{ activate: [] }>();
 const { t } = useI18n();
 </script>
 
 <template>
-  <el-badge
+  <component
+    :is="group ? 'button' : 'span'"
     v-if="count > 0"
     class="sidebar-count"
-    type="danger"
-    :value="count"
-    :max="99"
+    :type="group ? 'button' : undefined"
     :aria-label="t('notifications.pending', { count })"
     :title="t('notifications.pending', { count })"
-  />
+    @click.stop.prevent="$emit('activate')"
+    @keydown.enter.stop
+    @keydown.space.stop
+  >
+    <el-badge type="danger" :value="count" :max="99" />
+  </component>
 </template>
 
 <style scoped>
@@ -23,17 +28,12 @@ const { t } = useI18n();
   flex: none;
   align-items: center;
   margin-inline-start: 8px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
 }
 
 .sidebar-count :deep(.el-badge__content) {
   position: static;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  line-height: 22px;
-  border: 0;
-  border-radius: 50%;
 }
 </style>

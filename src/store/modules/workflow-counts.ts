@@ -1,4 +1,4 @@
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import { api } from "@/api/client";
 import { permission } from "@/platform/system/resources";
@@ -9,6 +9,9 @@ export const useWorkflowCounts = defineStore("workflow-counts", () => {
   const user = useUserStoreHook();
   const unread = ref(0);
   const pending = ref(0);
+  const pendingByPath = computed(() => ({
+    "/workflow/instance": pending.value
+  }));
   const requests = new Map<string, AbortController>();
 
   function reset() {
@@ -86,5 +89,5 @@ export const useWorkflowCounts = defineStore("workflow-counts", () => {
   );
   onSessionReset(reset);
 
-  return { unread, pending, refresh, refreshUnread, refreshPending };
+  return { unread, pendingByPath, refresh, refreshUnread, refreshPending };
 });

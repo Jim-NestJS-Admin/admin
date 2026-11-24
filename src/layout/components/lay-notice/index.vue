@@ -154,12 +154,14 @@ onBeforeUnmount(stop);
                     :disabled="busy || !canRead || !message.instanceId"
                     @click="open(message)"
                   >
-                    <span class="notice-text-title" :title="message.title">{{
-                      message.title || t("notifications.open")
-                    }}</span>
-                    <span class="notice-text-datetime">{{
-                      date(message.createdAt)
-                    }}</span>
+                    <div class="notice-container-text">
+                      <div class="notice-text-title" :title="message.title">
+                        {{ message.title || t("notifications.open") }}
+                      </div>
+                      <div class="notice-text-datetime">
+                        {{ date(message.createdAt) }}
+                      </div>
+                    </div>
                   </el-dropdown-item>
                 </div>
                 <el-empty
@@ -231,11 +233,25 @@ onBeforeUnmount(stop);
   }
 }
 
-.notice-container {
-  flex-direction: column;
-  align-items: stretch;
+.notice-dropdown :deep(.notice-container) {
   padding: 12px 0;
   border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.notice-dropdown :deep(.notice-container:not(.is-disabled):is(:hover, :focus)) {
+  background: transparent;
+}
+
+.notice-dropdown :deep(.notice-container:focus-visible) {
+  outline: 2px solid var(--el-color-primary);
+  outline-offset: -2px;
+}
+
+.notice-container-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.5715;
+  color: var(--el-text-color-primary);
 }
 
 .notice-text-title {

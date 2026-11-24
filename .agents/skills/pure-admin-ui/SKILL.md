@@ -19,10 +19,10 @@ description: 在 jim-nestjs-admin 的 admin 前端实现或评审页面、导航
 **Pure 的扩展点**
 
 - 顶部通知从 `src/layout/components/lay-notice/index.vue` 入手。沿用固定快照的 `el-dropdown`、铃铛及原配徽标位置、列表和空态。把原配示例数组换成真实未读总数与消息数据，保留读取后的跳转或抽屉行为。参照 [固定版通知源码](https://github.com/pure-admin/pure-admin-thin/blob/2395bb11b51b45c3e9ae78ee23f88e3f3510b606/src/layout/components/lay-notice/index.vue)。
-- `src/layout/components/lay-sidebar/components/SidebarItem.vue` 分别渲染菜单叶子和分组标题，并递归渲染子项。在两个标题分支共用紧凑的行内数字徽标，保留 `ReText` 的标题截断、`SidebarExtraIcon` 和展开箭头。分组徽标位于展开箭头内侧，数字垂直居中，使用固定直径的正圆。参照 [固定版菜单源码](https://github.com/pure-admin/pure-admin-thin/blob/2395bb11b51b45c3e9ae78ee23f88e3f3510b606/src/layout/components/lay-sidebar/components/SidebarItem.vue)、[Element Plus Menu](https://element-plus.org/en-US/component/menu.html) 和 [Badge](https://element-plus.org/en-US/component/badge)。
+- `src/layout/components/lay-sidebar/components/SidebarItem.vue` 分别渲染菜单叶子和分组标题，并递归渲染子项。两种标题共用原生行内 `el-badge`，沿用组件的尺寸、内边距和背景。菜单名在左，徽标在右，分组徽标位于箭头内侧。保留 `ReText` 的标题截断和 `SidebarExtraIcon`。参照 [固定版菜单源码](https://github.com/pure-admin/pure-admin-thin/blob/2395bb11b51b45c3e9ae78ee23f88e3f3510b606/src/layout/components/lay-sidebar/components/SidebarItem.vue)、[Element Plus Menu](https://element-plus.org/en-US/component/menu.html) 和 [Badge](https://element-plus.org/en-US/component/badge)。
 
 **本项目的计数规则**
 
 - 铃铛显示当前用户未读站内信总数，工作台显示当前用户待处理的审批数。复用 `src/store/modules/workflow-counts.ts` 和原有接口，读消息只刷新未读数，审批处理成功后刷新待办数。菜单组件只消费共享状态。
-- 叶子显示所属计数，父级汇总其可见子树内的计数。用稳定路由标识或计数来源键归集，每个来源在同一父级只计一次。三层或更多层按同一规则处理，单子项折叠成一行时显示对应计数。父级汇总在分组展开与收起时一致。
-- 按原始数值汇总，展示时隐藏 `0`，超过 `99` 显示 `99+`。菜单标题和徽标各自占同一行的一侧，文字在左、红色徽标在右，徽标使用 `danger` 主题色，`99+` 也保持正圆。保证明暗主题、激活项和长标题下仍垂直对齐。给可访问名称保留真实计数。验收有 `1` 条待办时三个可见层级各显示 `1`，无关分组没有徽标，再验证 `0`、`99`、`100` 和无权限场景。
+- 叶子显示所属计数，收起的父级显示其可见子树的合计，展开后由下一层显示。按稳定路由标识去重。单入口徽标直达待办，多入口徽标展开共同分组，继续在分叉处提示各分支的待办。
+- 按原始数值汇总，展示时隐藏 `0`，超过 `99` 显示 `99+`。给可访问名称保留真实计数。三级验收用 A=5、B=3，父级收起显示 `8`，逐级展开后最终显示 `5` 和 `3`，无关分组没有徽标。

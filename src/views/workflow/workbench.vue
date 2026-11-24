@@ -36,9 +36,10 @@ watch(
     route.query.taskId,
     route.query.mine,
     route.query.drafts,
-    route.query.apply
+    route.query.apply,
+    route.query.pending
   ],
-  ([value, taskId, mine, drafts, apply]) => {
+  ([value, taskId, mine, drafts, apply, pending]) => {
     if (typeof value === "string" && /^[1-9]\d{0,19}$/.test(value))
       detail.value = {
         instanceId: value,
@@ -53,6 +54,15 @@ watch(
       tab.value = "mine";
     if (drafts === "1" && canApply.value) tab.value = "drafts";
     if (apply === "1" && canApply.value) catalogOpen.value = true;
+    if (
+      pending === "1" &&
+      user.permissions.includes(permission("workflowTaskPage"))
+    ) {
+      tab.value = "pending";
+      const query = { ...route.query };
+      delete query.pending;
+      void router.replace({ query });
+    }
   },
   { immediate: true }
 );
