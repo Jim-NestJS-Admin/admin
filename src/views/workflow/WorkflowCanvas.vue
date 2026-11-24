@@ -1,7 +1,17 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch, watchEffect } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  ref,
+  watch,
+  watchEffect,
+  type Component
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { ElMessageBox } from "element-plus";
+import CircleCheckFilled from "~icons/ep/circle-check-filled";
+import CircleCloseFilled from "~icons/ep/circle-close-filled";
+import Clock from "~icons/ep/clock";
 import NodeChain from "mldong-flow-designer-dingtalk/packages/flow-designer/src/dingtalk/components/NodeChain.vue";
 import { setLocale } from "mldong-flow-designer-dingtalk/packages/flow-designer/src/locales/index";
 import "mldong-flow-designer-dingtalk/lib/style.css";
@@ -19,6 +29,17 @@ import {
 import { workflowMemberDirectory } from "./member-directory";
 
 type ProgressNode = Document["progress"][number];
+const progressAppearance: Partial<
+  Record<
+    ProgressNode["status"],
+    { icon: Component; tone: "success" | "danger" | "warning" }
+  >
+> = {
+  approved: { icon: CircleCheckFilled, tone: "success" },
+  returned: { icon: CircleCloseFilled, tone: "danger" },
+  pending: { icon: Clock, tone: "warning" }
+};
+const progressTheme = { historyColor: "var(--el-color-success)" };
 const props = withDefaults(
   defineProps<{
     nodes?: Node[];
@@ -133,6 +154,10 @@ function toChain(
 ): Card | undefined {
   return nodes.reduceRight<Card | undefined>((next, node) => {
     const progress = "status" in node ? node : undefined;
+    const appearance =
+      props.showStatus && progress?.type === "approve"
+        ? progressAppearance[progress.status]
+        : undefined;
     const actor = "actor" in node ? node.actor : undefined;
     const actorType = progress?.actorType ?? actor?.type;
     const level = progress?.actorLevel ?? actor?.level ?? 1;
@@ -184,7 +209,8 @@ function toChain(
           statusLabel: props.showStatus
             ? t(`workflow.progress.${progress.status}`)
             : "",
-          pending: props.showStatus && progress.status === "pending",
+          statusIcon: appearance?.icon,
+          statusTone: appearance?.tone,
           actorHint:
             !props.showStatus &&
             actorType &&
@@ -334,6 +360,7 @@ function addBranch(id: string) {
         :viewer="readonly"
         :type-prefix="prefix"
         :depth="0"
+        :theme="showStatus ? progressTheme : undefined"
         :dnd-panel="palette"
         :high-light="{
           activeNodeNames:
@@ -394,26 +421,22 @@ function addBranch(id: string) {
   color: var(--el-text-color-secondary);
 }
 
-.workflow-canvas :deep(.ding-node-card__status.is-pending) {
-  font-weight: 600;
-  color: var(--el-color-primary);
+.workflow-canvas :deep(.ding-node-card__status .el-tag) {
+  border-style: dashed;
+}
+
+.workflow-canvas :deep(.ding-node-card__status .el-tag__content) {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .workflow-canvas--progress :deep(.ding-node-card__icon) {
   display: none;
 }
 
-.workflow-canvas--progress
-  :deep(.ding-node-card--history .ding-node-card__icon) {
-  display: inline;
-}
-
-.workflow-canvas--progress
-  :deep(.ding-node-card--history .ding-node-card__icon),
-.workflow-canvas--progress
-  :deep(.ding-node-card--history .ding-node-card__status) {
-  font-weight: 600;
-  color: var(--el-color-success);
+.workflow-canvas--progress :deep(.ding-node-card--history) {
+  background-color: var(--el-color-success-light-9);
 }
 
 .workflow-canvas :deep(.ding-node-card__configured-members) {
