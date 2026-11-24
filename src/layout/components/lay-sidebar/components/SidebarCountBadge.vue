@@ -18,7 +18,12 @@ const { t } = useI18n();
     @keydown.enter.stop
     @keydown.space.stop
   >
-    <el-badge type="danger" :value="count" :max="99" />
+    <el-badge
+      class="sidebar-count-value"
+      type="danger"
+      :value="count"
+      :max="99"
+    />
   </component>
 </template>
 
@@ -31,6 +36,11 @@ const { t } = useI18n();
   cursor: pointer;
   background: transparent;
   border: 0;
+}
+
+.sidebar-count-value {
+  display: flex;
+  align-items: center;
 }
 
 .sidebar-count :deep(.el-badge__content) {

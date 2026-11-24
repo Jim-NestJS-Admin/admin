@@ -164,13 +164,6 @@ const pendingEntries = computed(() => {
 const pendingCount = computed(() =>
   pendingEntries.value.reduce((sum, entry) => sum + entry.count, 0)
 );
-const leafLink = computed(() => {
-  const [entry] = pendingEntries.value;
-  return entry
-    ? { ...props.item, ...pendingLocation(entry.path), name: undefined }
-    : props.item;
-});
-
 function pendingLocation(path: string) {
   return path === "/workflow/instance"
     ? { path, query: { pending: "1" } }
@@ -203,7 +196,7 @@ const compactBadge = computed(
       hasOneShowingChild(item.children, item) &&
       (!onlyOneChild.children || onlyOneChild.noShowingChildren)
     "
-    :to="leafLink"
+    :to="item"
   >
     <el-menu-item
       :index="resolvePath(onlyOneChild.path)"
