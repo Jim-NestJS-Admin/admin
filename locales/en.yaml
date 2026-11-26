@@ -648,6 +648,7 @@ forms:
   saved: Form version saved
   immutableHint: Saving a new version preserves historical versions and submitted data.
   versionHistory: Version history
+  archiveStatus: Archive status
   retainedVersions: Unarchived
   archivedVersions: Archived
   viewArchived: View

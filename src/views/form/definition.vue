@@ -27,7 +27,7 @@ const { t } = useI18n();
 const generated = generatedCrud("formDefinition");
 const current = generatedCrud("formDefinitionCurrent");
 const history = ref<{ code: string; revision: number; name: string }>();
-const historyTab = ref<"previous" | "archived">("previous");
+const historyArchived = ref(false);
 const historyList = ref<InstanceType<typeof CrudPage>>();
 const archiveBusy = ref(false);
 // 版本快照只开放列表读取；创建和修订由设计工作区办理。
@@ -42,11 +42,14 @@ const historyPort: CrudPort = {
   list(query, signal) {
     const form = history.value;
     if (!form) return Promise.resolve({ rows: [], totalRows: 0 });
-    const archived = historyTab.value === "archived";
     return generated.port.list(
       {
         ...query,
-        equality: { ...query.equality, code: form.code, archived }
+        equality: {
+          ...query.equality,
+          code: form.code,
+          archived: historyArchived.value
+        }
       },
       signal
     );
@@ -54,7 +57,7 @@ const historyPort: CrudPort = {
 };
 function openHistory(row: CrudRecord) {
   if (typeof row.code !== "string" || typeof row.revision !== "number") return;
-  historyTab.value = "previous";
+  historyArchived.value = false;
   history.value = {
     code: row.code,
     revision: row.revision,
@@ -262,28 +265,41 @@ onBeforeUnmount(workspace.dispose);
       :model-value="Boolean(history)"
       :title="history ? `${history.name} · ${t('forms.versionHistory')}` : ''"
       size="min(860px, 100vw)"
+      body-class="form-history-drawer-body"
       append-to-body
       destroy-on-close
       @update:model-value="history = undefined"
     >
       <el-alert
         v-if="actionError"
+        class="form-history-alert"
         :title="t(actionError)"
         type="error"
         :closable="false"
       />
-      <el-tabs v-model="historyTab">
-        <el-tab-pane name="previous" :label="t('forms.retainedVersions')" />
-        <el-tab-pane name="archived" :label="t('forms.archivedVersions')" />
-      </el-tabs>
       <CrudPage
         v-if="history"
-        :key="historyTab"
         ref="historyList"
+        class="form-history-list"
         :port="historyPort"
         page-key="form:definition"
         :fill="false"
       >
+        <template #toolbar="{ query, reload }">
+          <el-select
+            v-model="historyArchived"
+            class="form-history-filter"
+            :aria-label="t('forms.archiveStatus')"
+            :disabled="archiveBusy"
+            @change="
+              query.pageNumber = 1;
+              reload();
+            "
+          >
+            <el-option :value="false" :label="t('forms.retainedVersions')" />
+            <el-option :value="true" :label="t('forms.archivedVersions')" />
+          </el-select>
+        </template>
         <template #cell-revision="{ value }">
           <el-tag size="small" effect="plain">v{{ value }}</el-tag>
         </template>
@@ -298,21 +314,19 @@ onBeforeUnmount(workspace.dispose);
               open(row, 'view');
             "
             >{{
-              t(historyTab === "archived" ? "forms.viewArchived" : "forms.view")
+              t(historyArchived ? "forms.viewArchived" : "forms.view")
             }}</el-button
           >
           <el-button
-            v-if="
-              historyTab === 'archived' || row.revision !== history.revision
-            "
+            v-if="historyArchived || row.revision !== history.revision"
             v-perm="permission('formDefinitionSetArchived')"
             link
             type="primary"
             :disabled="disabled || archiveBusy"
-            @click="setArchived(row, historyTab === 'previous')"
+            @click="setArchived(row, !historyArchived)"
             >{{
               t(
-                historyTab === "archived"
+                historyArchived
                   ? "forms.restoreVersion"
                   : "forms.archiveVersion"
               )
@@ -355,6 +369,30 @@ onBeforeUnmount(workspace.dispose);
   </div>
 </template>
 <style scoped>
+:global(.form-history-drawer-body.el-drawer__body) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.form-history-list {
+  flex: 1;
+}
+
+.form-history-list :deep(.crud-table-bounded) {
+  flex: 1;
+  height: auto;
+}
+
+.form-history-alert {
+  flex-shrink: 0;
+}
+
+.form-history-filter {
+  width: 120px;
+}
+
 .form-more {
   margin-left: 12px;
   vertical-align: middle;

@@ -648,6 +648,7 @@ forms:
   saved: 表单版本已保存
   immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
   versionHistory: 版本历史
+  archiveStatus: 归档状态
   retainedVersions: 未归档
   archivedVersions: 已归档
   viewArchived: 查看
