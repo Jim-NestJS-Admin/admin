@@ -188,6 +188,7 @@ crud:
   editOf: "编辑{name}"
 
 system:
+  usernameFormat: 账号须以小写字母开头，长度为 3–64 位，仅可使用小写字母、数字、下划线、点和连字符。
   roleAssignments: 角色分配
   supervisors: 上级关系
   dictionaryItems: 字典项

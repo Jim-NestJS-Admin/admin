@@ -33,6 +33,7 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
+import { issuesFrom } from "@/views/form/model";
 
 const props = withDefaults(
   defineProps<{
@@ -107,7 +108,9 @@ const treeNodes = computed(() => {
 watch(treeSearch, value => treeRef.value?.filter(value));
 const dialog = ref<"create" | "reset" | "">("");
 const busy = ref(false),
-  error = ref("");
+  error = ref(""),
+  usernameError = ref("");
+const usernamePattern = /^[a-z][a-z0-9_.-]{2,63}$/;
 const form = reactive<OperationBody<"systemUserCreate">>({
   username: "",
   nickname: "",
@@ -246,6 +249,7 @@ onMounted(loadOptions);
 function openDialog(mode: "create" | "reset", reload: () => Promise<void>) {
   reloadList = reload;
   error.value = "";
+  usernameError.value = "";
   dialog.value = mode;
   Object.assign(form, {
     username: "",
@@ -259,11 +263,16 @@ function openDialog(mode: "create" | "reset", reload: () => Promise<void>) {
 }
 async function submit() {
   if (busy.value) return;
+  error.value = "";
+  usernameError.value = "";
+  if (dialog.value === "create" && !usernamePattern.test(form.username)) {
+    usernameError.value = t("system.usernameFormat");
+    return;
+  }
   const controller = new AbortController();
   requests.add(controller);
   const epoch = user.epoch;
   busy.value = true;
-  error.value = "";
   try {
     if (dialog.value === "create")
       await api.systemUserCreate(
@@ -302,6 +311,21 @@ async function submit() {
     await loadOptions();
   } catch (reason) {
     if (!controller.signal.aborted && epoch === user.epoch) {
+      const account =
+        dialog.value === "create"
+          ? issuesFrom(reason).find(
+              issue =>
+                issue.field === "username" || issue.field === "data.username"
+            )
+          : undefined;
+      if (account?.messages.length) {
+        usernameError.value = account.messages.some(message =>
+          message.includes("must match")
+        )
+          ? t("system.usernameFormat")
+          : account.messages.join("；");
+        return;
+      }
       const view = failureView(
         reason instanceof RequestFailure ? reason.failure : null
       );
@@ -650,12 +674,16 @@ function cell(row: CrudRecord, field: string): CrudCell {
         @submit.prevent="submit"
       >
         <template v-if="dialog === 'create'">
-          <el-form-item :label="t('admin.account')" required
+          <el-form-item
+            :label="t('admin.account')"
+            :error="usernameError"
+            required
             ><el-input
               v-model="form.username"
               maxlength="64"
               autocomplete="off"
               :disabled="busy"
+              @update:model-value="usernameError = ''"
           /></el-form-item>
           <el-form-item :label="t('system.name')" required
             ><el-input v-model="form.nickname" maxlength="100" :disabled="busy"

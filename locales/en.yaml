@@ -188,6 +188,7 @@ crud:
   editOf: "Edit {name}"
 
 system:
+  usernameFormat: Use 3–64 characters starting with a lowercase letter. Only lowercase letters, digits, underscores, dots and hyphens are allowed.
   roleAssignments: Role assignments
   supervisors: Supervisors
   dictionaryItems: Dictionary items

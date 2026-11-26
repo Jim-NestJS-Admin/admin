@@ -38,6 +38,10 @@ function text(value: unknown) {
   const serialized = JSON.stringify(value);
   return serialized === "{}" ? "—" : serialized;
 }
+function displayValue(record: CrudRecord, field: string, value: unknown) {
+  const labels = record._display as Record<string, string> | undefined;
+  return labels?.[`values.${field}`] ?? text(value);
+}
 </script>
 <template>
   <CrudPage
@@ -99,7 +103,7 @@ function text(value: unknown) {
         <dl v-if="pairs(record.values).length" class="submission-values">
           <template v-for="[key, value] in pairs(record.values)" :key="key">
             <dt>{{ title(record, key) }}</dt>
-            <dd>{{ text(value) }}</dd>
+            <dd>{{ displayValue(record, key, value) }}</dd>
           </template>
         </dl>
         <p v-else class="submission-value-empty">

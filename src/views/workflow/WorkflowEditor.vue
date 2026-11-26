@@ -22,6 +22,7 @@ import {
 import WorkflowCanvas from "./WorkflowCanvas.vue";
 import NodeSettings from "./NodeSettings.vue";
 import ResourceSelect from "./ResourceSelect.vue";
+import { useWorkflowPublish } from "./useWorkflowPublish";
 const props = defineProps<{
   record: Definition | null;
   mode: "create" | "revise" | "view";
@@ -29,6 +30,7 @@ const props = defineProps<{
 const emit = defineEmits<{ saved: []; close: [] }>();
 const { t } = useI18n();
 const { busy, error, run } = useRequestScope();
+const publishVersion = useWorkflowPublish(run);
 const form = ref({
   name: props.record?.name ?? "",
   description: props.record?.description ?? "",
@@ -242,24 +244,8 @@ async function save() {
 }
 async function publish() {
   if (!props.record) return;
-  try {
-    await ElMessageBox.confirm(
-      t("workflow.publishConfirm"),
-      t("workflow.publish"),
-      { type: "warning" }
-    );
-  } catch {
-    return;
-  }
-  await run(async (signal, key) => {
-    const body = { id: props.record!.id, version: props.record!.version };
-    await api.workflowDefinitionPublish(
-      { body },
-      { signal, headers: { "Idempotency-Key": key(body) } }
-    );
-    ElMessage.success(t("workflow.published"));
-    emit("saved");
-  });
+  const { id, version } = props.record;
+  if (await publishVersion({ id, version })) emit("saved");
 }
 async function confirmLeave() {
   if (canLeave || readonly.value) return true;
