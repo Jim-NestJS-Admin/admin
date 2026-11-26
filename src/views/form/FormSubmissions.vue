@@ -63,7 +63,6 @@ function text(value: unknown) {
     </template>
     <template #detail-content="{ record, items, display }">
       <section class="submission-section">
-        <h3>{{ t("autoCodes.submissions") }}</h3>
         <el-descriptions :column="compact ? 1 : 2" border>
           <el-descriptions-item
             v-for="item in items.filter(item => item.field !== 'values')"
