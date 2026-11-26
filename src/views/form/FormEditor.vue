@@ -14,9 +14,9 @@ import {
   type FieldIssue
 } from "./model";
 import FormFields from "./FormFields.vue";
+import FormPreview from "./FormPreview.vue";
 import LinkageEditor from "./LinkageEditor.vue";
 const SafeDesigner = defineAsyncComponent(() => import("./SafeDesigner.vue"));
-const FormPreview = defineAsyncComponent(() => import("./FormPreview.vue"));
 const props = defineProps<{ workspace: ReturnType<typeof useFormWorkspace> }>();
 const emit = defineEmits<{ back: []; reopen: [] }>();
 const { t } = useI18n();

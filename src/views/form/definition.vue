@@ -6,7 +6,7 @@ import type { FormRecord } from "./model";
 
 import FormSubmissions from "./FormSubmissions.vue";
 import { requestText } from "./useFormWorkspace";
-import { defineAsyncComponent, nextTick, onBeforeUnmount, ref } from "vue";
+import { nextTick, onBeforeUnmount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
@@ -19,10 +19,10 @@ import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import { Perms } from "@/components/RePerms";
 import FormEditor from "./FormEditor.vue";
+import FormPreview from "./FormPreview.vue";
 import { useFormWorkspace } from "./useFormWorkspace";
 
 defineOptions({ name: "FormDefinitionPage" });
-const FormPreview = defineAsyncComponent(() => import("./FormPreview.vue"));
 const { t } = useI18n();
 const generated = generatedCrud("formDefinition");
 const current = generatedCrud("formDefinitionCurrent");
