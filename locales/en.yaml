@@ -1001,6 +1001,8 @@ workflow:
   uploadAttachment: "Upload attachment"
   attachmentHint: "Up to 10 files, subject to file module limits. Canceling does not delete uploaded files."
   transferTarget: "Transfer to"
+  transferRecord: "{from} transferred this task to {to}"
+  systemActor: "System"
   needTarget: "Choose a transfer recipient"
   actionConfirm: "Confirm {action}?"
   actionDone: "Action completed"

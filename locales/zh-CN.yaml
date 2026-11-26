@@ -1001,6 +1001,8 @@ workflow:
   uploadAttachment: "上传附件"
   attachmentHint: "最多10个，沿用文件模块的类型与大小限制；取消办理不会自动删除已上传文件。"
   transferTarget: "转交给"
+  transferRecord: "{from} 转交给了 {to}"
+  systemActor: "系统"
   needTarget: "请选择转交接收人"
   actionConfirm: "确认执行“{action}”？"
   actionDone: "操作已完成"
@@ -1058,14 +1060,14 @@ workflow:
   instanceStatus:
     running: "审批中"
     approved: "已通过"
-    returned: "已退回"
+    returned: "已驳回"
     withdrawn: "已撤回"
   progress:
     waiting: "未进入"
     pending: "待审批"
     approved: "已通过"
     cancelled: "已取消"
-    returned: "已退回"
+    returned: "已驳回"
     copied: "已抄送"
     taken: "已选路"
 

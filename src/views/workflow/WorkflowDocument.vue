@@ -15,9 +15,11 @@ import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { onSessionReset } from "@/platform/lifecycle";
 import type {
   CrudPort,
+  CrudRecord,
   CrudSavedChoices,
   CrudSchema
 } from "@/components/Crud/types";
+import { defaultCell } from "@/components/Crud/model.mjs";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import MemberPicker from "@/components/MemberPicker/index.vue";
 import { issuesFrom } from "../form/model";
@@ -130,6 +132,20 @@ const recordFields = [
   "attachmentIds",
   "createdAt"
 ];
+function recordPerson(row: CrudRecord, field: "actorId" | "targetUserId") {
+  const cell = defaultCell(row, field);
+  if (cell.state !== "visible" && cell.state !== "readonly") return;
+  if (row[field] === null && field === "actorId")
+    return t("workflow.systemActor");
+  const display = row._display as Record<string, unknown> | undefined;
+  const name = display?.[field];
+  return typeof name === "string" && name ? name : undefined;
+}
+function transferDescription(row: CrudRecord) {
+  const from = recordPerson(row, "actorId");
+  const to = recordPerson(row, "targetUserId");
+  return from && to ? t("workflow.transferRecord", { from, to }) : undefined;
+}
 function orderRecordColumns<T extends { field: string }>(columns: T[]) {
   const byField = new Map(columns.map(column => [column.field, column]));
   return recordFields.map(field => byField.get(field) ?? { field });
@@ -452,9 +468,14 @@ onBeforeUnmount(() => {
           }}
         </h3>
         <template v-if="document">
-          <el-tag>{{
-            t(`workflow.instanceStatus.${document.instance.status}`)
-          }}</el-tag>
+          <el-tag
+            :type="
+              document.instance.status === 'returned' ? 'danger' : 'primary'
+            "
+            >{{
+              t(`workflow.instanceStatus.${document.instance.status}`)
+            }}</el-tag
+          >
           <el-tag type="info" effect="plain">
             {{ t("workflow.round") }} {{ document.instance.round }}
           </el-tag>
@@ -561,11 +582,18 @@ onBeforeUnmount(() => {
             page-key="workflow:record"
             :fill="false"
           >
+            <template #cell-action="{ row, value, text }">
+              <span class="record-detail-text">{{
+                (value === "transfer" && transferDescription(row)) || text
+              }}</span>
+            </template>
             <template #cell-nodeId="{ value }">{{
               nodeNames.get(String(value)) ?? value ?? "—"
             }}</template>
             <template #cell-comment="{ value }"
-              ><span class="record-comment">{{ value || "—" }}</span></template
+              ><span class="record-detail-text">{{
+                value || "—"
+              }}</span></template
             >
             <template #cell-attachmentIds="{ row, value }">
               <el-space wrap>
@@ -723,7 +751,7 @@ onBeforeUnmount(() => {
   margin-block-end: 12px;
 }
 
-.record-comment {
+.record-detail-text {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }

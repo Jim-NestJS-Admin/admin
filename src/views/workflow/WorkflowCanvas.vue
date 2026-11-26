@@ -439,6 +439,19 @@ function addBranch(id: string) {
   background-color: var(--el-color-success-light-9);
 }
 
+.workflow-canvas--progress
+  :deep(.ding-node-card:has(> .ding-node-card__status .el-tag--danger)) {
+  background-color: var(--el-color-danger-light-9);
+  box-shadow:
+    0 0 0 2px var(--el-color-danger),
+    var(--ding-shadow);
+
+  .ding-node-card__bar {
+    /* 会签节点的插件内联颜色需要让位于驳回状态。 */
+    background-color: var(--el-color-danger) !important;
+  }
+}
+
 .workflow-canvas :deep(.ding-node-card__configured-members) {
   display: grid;
   gap: 6px;
