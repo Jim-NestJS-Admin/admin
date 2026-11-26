@@ -666,6 +666,19 @@ export function createApiClient(
         config
       );
     },
+    formDefinitionCurrentPage(
+      input: OperationInput<"formDefinitionCurrentPage"> & {
+        body: OperationBody<"formDefinitionCurrentPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionCurrentPage">>(
+        "post",
+        interpolate("/admin/form/definition/current-page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     formDefinitionInfo(
       input: OperationInput<"formDefinitionInfo"> & {
         body: OperationBody<"formDefinitionInfo">;

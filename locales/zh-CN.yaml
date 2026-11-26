@@ -647,8 +647,9 @@ forms:
   saveRevision: 保存新版本
   saved: 表单版本已保存
   immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
-  versionListHint: 每条记录都是一个保留的表单版本
-  archivedVersions: 查看已归档
+  versionHistory: 版本历史
+  retainedVersions: 未归档
+  archivedVersions: 已归档
   viewArchived: 查看
   archiveVersion: 归档版本
   restoreVersion: 恢复版本

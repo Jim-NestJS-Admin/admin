@@ -231,6 +231,7 @@ export const OPERATION_PERMISSIONS = {
   fileAssetSchema: ["file:asset:page"],
   fileAssetUpload: ["file:asset:upload"],
   formDefinitionAdd: ["form:definition:add"],
+  formDefinitionCurrentPage: ["form:definition:page"],
   formDefinitionInfo: ["form:definition:info"],
   formDefinitionInspect: ["form:definition:info"],
   formDefinitionPage: ["form:definition:page"],
@@ -740,6 +741,19 @@ export const ENUMS = {
   ],
   "components.schemas.FileAssetPageSort.properties.order": ["asc", "desc"],
   "components.schemas.FileAssetRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.FormDefinitionCurrentPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "code",
+    "revision"
+  ],
+  "components.schemas.FormDefinitionCurrentPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.FormDefinitionCurrentRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
   "components.schemas.FormDefinitionPageSort.properties.field": [
     "id",

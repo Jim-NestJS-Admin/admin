@@ -647,8 +647,9 @@ forms:
   saveRevision: Save new version
   saved: Form version saved
   immutableHint: Saving a new version preserves historical versions and submitted data.
-  versionListHint: Each record is a preserved form version
-  archivedVersions: Show archived
+  versionHistory: Version history
+  retainedVersions: Unarchived
+  archivedVersions: Archived
   viewArchived: View
   archiveVersion: Archive version
   restoreVersion: Restore version

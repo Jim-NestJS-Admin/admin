@@ -828,6 +828,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/form/definition/current-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** 每个表单编码最新有效版本的分页列表 */
+    post: operations["formDefinitionCurrentPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/form/definition/info": {
     parameters: {
       query?: never;
@@ -5639,6 +5656,19 @@ export type components = {
     CrudSchemaWriteAction: {
       writable: string[];
     };
+    CurrentFormPageBody: {
+      /** @description 按等于筛选 */
+      eq?: components["schemas"]["FormDefinitionCurrentPageEq"];
+      /** @description 搜索框，模糊匹配：code、name */
+      keyword?: string;
+      /** @default 1 */
+      page: number;
+      /** @default 20 */
+      size: number;
+      sort?: components["schemas"]["FormDefinitionCurrentPageSort"][];
+      /** @description 高级查询：最多 3 层、20 个条件（契约 query.md） */
+      where?: components["schemas"]["QueryGroupDto"];
+    };
     DictionaryOption: {
       label: string;
       /** @enum {string} */
@@ -5815,6 +5845,74 @@ export type components = {
       name: string;
     };
     FormDefinition: {
+      /** @description 已归档 */
+      archived?: boolean;
+      /** @description 表单编码 */
+      code?: string;
+      /**
+       * Format: date-time
+       * @description 创建时间
+       */
+      createdAt: string;
+      /** @description 创建人 */
+      createdBy: string | null;
+      /** @description 表单设计 */
+      designer?: components["schemas"]["FormDesignerDto"];
+      /** @description 字段清单 */
+      fields?: components["schemas"]["FormFieldDto"][];
+      /**
+       * @description 编号
+       * @example 1
+       */
+      id: string;
+      /** @description 表单名称 */
+      name?: string;
+      /** @description 所属组织（新增时取当前组织，数据权限按它过滤） */
+      orgId: string | null;
+      /** @description 表单版本 */
+      revision?: number;
+      /**
+       * Format: date-time
+       * @description 修改时间
+       */
+      updatedAt: string;
+      /** @description 修改人 */
+      updatedBy: string | null;
+      /** @description 版本号，修改时原样带回 */
+      version: number;
+    };
+    FormDefinitionCurrentPageEq: {
+      /** @description 已归档 */
+      archived?: boolean;
+      /** @description 表单编码 */
+      code?: string;
+      /** @description 表单版本 */
+      revision?: number;
+    };
+    FormDefinitionCurrentPageResult: {
+      list: components["schemas"]["FormDefinitionCurrentRow"][];
+      page: number;
+      size: number;
+      total: number;
+    };
+    FormDefinitionCurrentPageSort: {
+      /**
+       * @description 排序字段
+       * @enum {string}
+       */
+      field: "id" | "createdAt" | "updatedAt" | "code" | "revision";
+      /** @enum {string} */
+      order: "asc" | "desc";
+    };
+    FormDefinitionCurrentRow: {
+      /** @description 编号字段的显示名：createdBy / updatedBy 是用户名称，orgId 是组织名称；查不到的不返回 */
+      _display?: {
+        [key: string]: string;
+      };
+      /** @description 这一行上不是「可编辑」的字段：readonly 只读、masked 值已打码、hidden 不返回（契约 field-perm.md 3.1） */
+      _fieldState?: {
+        [key: string]: "readonly" | "masked" | "hidden";
+      };
       /** @description 已归档 */
       archived?: boolean;
       /** @description 表单编码 */
@@ -12988,6 +13086,53 @@ export interface operations {
             /** @enum {integer} */
             code: 1000;
             data: components["schemas"]["FormDefinition"];
+            /** @example ok */
+            message: string;
+          };
+        };
+      };
+      /** @description 4000：参数有误、唯一冲突等，字段错误在 data.errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+      /** @description 4003：没有权限 */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  formDefinitionCurrentPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CurrentFormPageBody"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["FormDefinitionCurrentPageResult"];
             /** @example ok */
             message: string;
           };
