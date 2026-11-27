@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { api } from "@/api/client";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
-import { onSessionReset } from "@/platform/lifecycle";
-import type { CrudRecord, CrudPort } from "@/components/Crud/types";
-import { useRequestScope, type Definition } from "./model";
-import WorkflowEditor from "./WorkflowEditor.vue";
+import { ref } from "vue";
+import type { CrudPort, CrudRecord } from "@/components/Crud/types";
+import { useRequestScope } from "./model";
+import { useWorkflowPublish } from "./useWorkflowPublish";
 defineOptions({ name: "WorkflowDefinitionPage" });
 const { t } = useI18n();
 const generated = generatedCrud("workflowDefinition");
@@ -18,37 +17,16 @@ const port: CrudPort = {
   detail: generated.port.detail,
   preferences: generated.port.preferences
 };
-const list = ref<InstanceType<typeof CrudPage>>(),
-  editor = ref<{
-    record: Definition | null;
-    mode: "create" | "revise" | "view";
-  }>();
+const router = useRouter();
+const list = ref<InstanceType<typeof CrudPage>>();
 const { busy, error, run } = useRequestScope();
-async function open(
-  row: CrudRecord | null,
-  mode: "create" | "revise" | "view"
-) {
-  if (!row) {
-    editor.value = { record: null, mode };
-    return;
+const publishVersion = useWorkflowPublish(run);
+async function publish(row: CrudRecord) {
+  if (typeof row.id !== "string" || typeof row.version !== "number") return;
+  if (await publishVersion({ id: row.id, version: row.version })) {
+    await list.value?.refresh();
   }
-  await run(async signal => {
-    const record = (
-      await api.workflowDefinitionInfo(
-        { body: { id: String(row.id) } },
-        { signal }
-      )
-    ).data;
-    if (!record.designer) throw Error(t("workflow.designHidden"));
-    editor.value = { record, mode };
-  });
 }
-function saved() {
-  editor.value = undefined;
-  void list.value?.refresh();
-}
-const stop = onSessionReset(() => (editor.value = undefined));
-onBeforeUnmount(stop);
 </script>
 <template>
   <div class="workflow-page">
@@ -56,8 +34,10 @@ onBeforeUnmount(stop);
       v-if="error"
       :title="t(error)"
       type="error"
+      role="alert"
       :closable="false"
-    /><CrudPage
+    />
+    <CrudPage
       ref="list"
       :port="port"
       page-key="workflow:definition"
@@ -66,8 +46,7 @@ onBeforeUnmount(stop);
         ><el-button
           v-perm="permission('workflowDefinitionAdd')"
           type="primary"
-          :disabled="busy"
-          @click="open(null, 'create')"
+          @click="router.push({ name: 'WorkflowCreate' })"
           >+ {{ t("workflow.create") }}</el-button
         ></template
       ><template #cell-revision="{ value }"
@@ -77,15 +56,25 @@ onBeforeUnmount(stop);
           v-perm="permission('workflowDefinitionInfo')"
           link
           type="primary"
-          :disabled="disabled || busy"
-          @click="open(row, 'view')"
+          :disabled="disabled"
+          @click="
+            router.push({
+              name: 'WorkflowView',
+              params: { id: String(row.id) }
+            })
+          "
           >{{ t("workflow.viewDesign") }}</el-button
         ><el-button
           v-perm="permission('workflowDefinitionRevise')"
           link
           type="primary"
-          :disabled="disabled || busy"
-          @click="open(row, 'revise')"
+          :disabled="disabled"
+          @click="
+            router.push({
+              name: 'WorkflowRevise',
+              params: { id: String(row.id) }
+            })
+          "
           >{{ t("workflow.revise") }}</el-button
         ><el-button
           v-if="row.status === 'draft'"
@@ -93,26 +82,16 @@ onBeforeUnmount(stop);
           link
           type="primary"
           :disabled="disabled || busy"
-          @click="open(row, 'view')"
+          @click="publish(row)"
           >{{ t("workflow.publish") }}</el-button
         ></template
       ></CrudPage
-    ><WorkflowEditor
-      v-if="editor"
-      :record="editor.record"
-      :mode="editor.mode"
-      @close="editor = undefined"
-      @saved="saved"
-    />
+    >
   </div>
 </template>
 <style scoped>
 .workflow-page {
   min-width: 0;
   min-height: 0;
-}
-
-.workflow-page > .el-alert {
-  margin-bottom: 12px;
 }
 </style>

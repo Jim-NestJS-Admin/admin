@@ -1,0 +1,112 @@
+diff --git a/packages/flow-designer/src/dingtalk/components/BranchColumn.vue b/packages/flow-designer/src/dingtalk/components/BranchColumn.vue
+index aa6137048cee85c8d128ca9e0cf0fed78c8e3fa8..ca3934b0764c3b229fd7d5b79246ebb973a553c9 100644
+--- a/packages/flow-designer/src/dingtalk/components/BranchColumn.vue
++++ b/packages/flow-designer/src/dingtalk/components/BranchColumn.vue
+@@ -26,6 +26,7 @@
+           @add="(nodeType, parentNode) => $emit('add', nodeType, parentNode)"
+           @add-branch="(n) => $emit('add-branch', n)"
+           @edit-branch="(b) => $emit('edit-branch', b)"
++          @add-to-branch="(nodeType, b) => $emit('add-to-branch', nodeType, b)"
+         />
+       </template>
+       <template v-else>
+diff --git a/packages/flow-designer/src/dingtalk/components/NodeCard.vue b/packages/flow-designer/src/dingtalk/components/NodeCard.vue
+--- a/packages/flow-designer/src/dingtalk/components/NodeCard.vue
++++ b/packages/flow-designer/src/dingtalk/components/NodeCard.vue
+@@ -28,6 +28,6 @@
+     </div>
+     <div class="ding-join-marker__inner">
+       <span class="ding-join-marker__dot"></span>
+-      <span class="ding-join-marker__name">{{ node.name || t('fd.ding.node.mergePoint') }}</span>
++      <span v-if="node.name !== ''" class="ding-join-marker__name">{{ node.name || t('fd.ding.node.mergePoint') }}</span>
+     </div>
+   </div>
+@@ -64,6 +64,21 @@
+         {{ node.name || t('fd.ding.node.unnamed') }}
+       </div>
+     </FDTooltip>
++    <div v-if="node.properties?.actorLabel" class="ding-node-card__actor-label">{{ node.properties.actorLabel }}</div>
++    <div v-if="node.properties?.statusLabel" class="ding-node-card__status">
++      <el-tag v-if="node.properties.statusTone" :type="node.properties.statusTone" size="small">
++        <component :is="node.properties.statusIcon" aria-hidden="true" />
++        <span>{{ node.properties.statusLabel }}</span>
++      </el-tag>
++      <template v-else>{{ node.properties.statusLabel }}</template>
++    </div>
++    <div v-if="node.properties?.actorHint" class="ding-node-card__actor-hint">{{ node.properties.actorHint }}</div>
++    <div v-if="configuredMembers.length" class="ding-node-card__configured-members">
++      <div v-for="member in configuredMembers" :key="member.id" class="ding-node-card__configured-member">
++        <el-avatar :size="20" :src="member.avatar">{{ member.initial }}</el-avatar>
++        <span class="ding-node-card__configured-member-name" :title="member.name">{{ member.name }}</span>
++      </div>
++    </div>
+     <!-- 成员列表：highLight.nodeProgress 存在时回显（已处理打勾 / 当前轮到高亮 / 未到灰色） -->
+     <div v-if="nodeProgressMembers.length" class="ding-node-card__members">
+       <div
+@@ -170,2 +185,6 @@
+   return ''
+ })
++type ConfiguredMember = { id: string; name: string; avatar?: string; initial?: string }
++const configuredMembers = computed(() =>
++  (props.node.properties?.configuredMembers as ConfiguredMember[] | undefined) ?? []
++)
+diff --git a/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue b/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue
+index 3a922d56bfc5292c1feaebb1149b7308b56175e6..519cb8e23e476828a7ee1ca2e3ebf7fe3cec69cf 100644
+--- a/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue
++++ b/packages/flow-designer/src/dingtalk/components/ParallelGroup.vue
+@@ -29,7 +29,14 @@
+         <div class="ding-branch-col__line-top"></div>
+         <!-- 分支编号（并行分支无需命名，仅做位置标识，避免与条件分支的'未命名'混淆） -->
+         <div class="ding-branch-col__head ding-branch-col__head--static" v-if="!viewer">
+-          <span class="ding-branch-col__head-text">{{ t('fd.ding.branch.item', { index: index + 1 }) }}</span>
++          <span class="ding-branch-col__head-text">{{ branch.name || t('fd.ding.branch.item', { index: index + 1 }) }}</span>
++          <button
++            v-if="node.branches.length > 2 && (canDeleteChecker?.({ ...node, id: branch.id }) ?? true)"
++            type="button"
++            class="ding-branch-col__remove"
++            :aria-label="t('fd.ding.branch.deleteBranch', { name: branch.name || index + 1 })"
++            @click="$emit('delete', { ...node, id: branch.id })"
++          >&times;</button>
+         </div>
+         <!-- 分支内容区（节点链 / 空分支占位） -->
+         <div class="ding-branch-col__content">
+@@ -48,6 +55,7 @@
+               @add="(nodeType, parentNode) => $emit('add', nodeType, parentNode)"
+               @add-branch="(n) => $emit('add-branch', n)"
+               @edit-branch="(b) => $emit('edit-branch', b)"
++              @add-to-branch="(nodeType, b) => $emit('add-to-branch', nodeType, b)"
+             />
+           </template>
+           <template v-else>
+@@ -176,3 +184,7 @@ watch(() => props.node.branches.length, () => {
+   }
+ }
+ </style>
++
++<style scoped>
++.ding-branch-col__remove { border: 0; background: transparent; cursor: pointer; color: inherit; }
++</style>
+diff --git a/packages/flow-designer/src/locales/messages/en-US.ts b/packages/flow-designer/src/locales/messages/en-US.ts
+index 6c1a91bd1a7171f7373ec45890663aa911b36623..0095ea5ad50a06b5ab9cdc9f30b9ae1023563e79 100644
+--- a/packages/flow-designer/src/locales/messages/en-US.ts
++++ b/packages/flow-designer/src/locales/messages/en-US.ts
+@@ -197,6 +197,7 @@ const enUS: FDMessages = {
+   'fd.ding.branch.edit': 'Click to edit',
+   'fd.ding.branch.editAction': 'Edit branch',
+   'fd.ding.branch.deleteGroup': 'Delete the whole condition group',
++  'fd.ding.branch.deleteBranch': 'Delete branch {name}',
+   'fd.ding.branch.deleteParallelGroup': 'Delete the whole parallel group',
+   'fd.ding.condition.editHint': 'Click to edit decision config',
+   'fd.field.branchName': 'Branch name',
+diff --git a/packages/flow-designer/src/locales/messages/zh-CN.ts b/packages/flow-designer/src/locales/messages/zh-CN.ts
+index 6b1f191b67f43abe016d211a20a1396b0f93095f..69bf7cbf649424fc8ba223f2fb9960c35e40930e 100644
+--- a/packages/flow-designer/src/locales/messages/zh-CN.ts
++++ b/packages/flow-designer/src/locales/messages/zh-CN.ts
+@@ -208,6 +208,7 @@ const zhCN: FDMessages = {
+   'fd.ding.branch.edit': '点击编辑',
+   'fd.ding.branch.editAction': '编辑分支',
+   'fd.ding.branch.deleteGroup': '删除整个条件分支组',
++  'fd.ding.branch.deleteBranch': '删除分支 {name}',
+   'fd.ding.branch.deleteParallelGroup': '删除整个并行分支组',
+   'fd.ding.condition.editHint': '点击编辑决策配置',
+   'fd.field.branchName': '分支名称',

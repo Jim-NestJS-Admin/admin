@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { api } from "@/api/client";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { onSessionReset } from "@/platform/lifecycle";
 import type { FormRecord } from "./model";
 
 import FormSubmissions from "./FormSubmissions.vue";
 import { requestText } from "./useFormWorkspace";
-import { defineAsyncComponent, nextTick, onBeforeUnmount, ref } from "vue";
+import { nextTick, onBeforeUnmount, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import CrudPage from "@/components/Crud/CrudPage.vue";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
@@ -19,19 +19,52 @@ import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
 import { Perms } from "@/components/RePerms";
 import FormEditor from "./FormEditor.vue";
+import FormPreview from "./FormPreview.vue";
 import { useFormWorkspace } from "./useFormWorkspace";
 
 defineOptions({ name: "FormDefinitionPage" });
-const FormPreview = defineAsyncComponent(() => import("./FormPreview.vue"));
 const { t } = useI18n();
 const generated = generatedCrud("formDefinition");
+const current = generatedCrud("formDefinitionCurrent");
+const history = ref<{ code: string; revision: number; name: string }>();
+const historyArchived = ref(false);
+const historyList = ref<InstanceType<typeof CrudPage>>();
+const archiveBusy = ref(false);
 // 版本快照只开放列表读取；创建和修订由设计工作区办理。
 const port: CrudPort = {
   describe: generated.port.describe,
-  list: generated.port.list,
+  list: current.port.list,
   detail: generated.port.detail,
   preferences: generated.port.preferences
 };
+const historyPort: CrudPort = {
+  ...port,
+  list(query, signal) {
+    const form = history.value;
+    if (!form) return Promise.resolve({ rows: [], totalRows: 0 });
+    return generated.port.list(
+      {
+        ...query,
+        equality: {
+          ...query.equality,
+          code: form.code,
+          archived: historyArchived.value
+        }
+      },
+      signal
+    );
+  }
+};
+function openHistory(row: CrudRecord) {
+  if (typeof row.code !== "string" || typeof row.revision !== "number") return;
+  historyArchived.value = false;
+  history.value = {
+    code: row.code,
+    revision: row.revision,
+    name: String(row.name ?? row.code)
+  };
+  actionError.value = "";
+}
 const workspace = useFormWorkspace();
 const { busy, listError, editor } = workspace;
 const list = ref<InstanceType<typeof CrudPage>>();
@@ -40,6 +73,48 @@ const targetForm = ref<FormRecord>();
 const action = ref<"" | "fill" | "records">("");
 const actionError = ref("");
 let actionRequest: AbortController | undefined;
+let archiveRequest: AbortController | undefined;
+async function setArchived(row: CrudRecord, archived: boolean) {
+  if (
+    archiveBusy.value ||
+    typeof row.id !== "string" ||
+    typeof row.version !== "number"
+  )
+    return;
+  const { id, version } = row;
+  archiveBusy.value = true;
+  actionError.value = "";
+  const request = (archiveRequest = new AbortController());
+  try {
+    if (archived) {
+      const confirmed = await ElMessageBox.confirm(
+        t("forms.archiveConfirm", { name: row.name, revision: row.revision }),
+        t("forms.archiveVersion"),
+        { type: "warning" }
+      ).then(
+        () => true,
+        () => false
+      );
+      if (!confirmed || request.signal.aborted) return;
+    }
+    await api.formDefinitionSetArchived(
+      { body: { id, version, archived } },
+      {
+        signal: request.signal,
+        headers: { "Idempotency-Key": crypto.randomUUID() }
+      }
+    );
+    if (request.signal.aborted) return;
+    ElMessage.success(
+      t(archived ? "forms.archivedSuccess" : "forms.restoredSuccess")
+    );
+    await historyList.value?.refresh();
+  } catch (reason) {
+    if (!request.signal.aborted) actionError.value = requestText(reason);
+  } finally {
+    if (archiveRequest === request) archiveBusy.value = false;
+  }
+}
 async function openAction(row: CrudRecord, mode: "fill" | "records") {
   if (typeof row.id !== "string") return;
   actionRequest?.abort();
@@ -59,6 +134,8 @@ async function openAction(row: CrudRecord, mode: "fill" | "records") {
 }
 const stopSession = onSessionReset(() => {
   actionRequest?.abort();
+  archiveRequest?.abort();
+  history.value = undefined;
   action.value = "";
   targetForm.value = undefined;
   actionError.value = "";
@@ -66,6 +143,7 @@ const stopSession = onSessionReset(() => {
 onBeforeUnmount(() => {
   stopSession();
   actionRequest?.abort();
+  archiveRequest?.abort();
 });
 function submitted() {
   action.value = "";
@@ -129,7 +207,6 @@ onBeforeUnmount(workspace.dispose);
             @click="open(null, 'create')"
             >{{ t("forms.newForm") }}</el-button
           >
-          <span class="list-hint">{{ t("forms.versionListHint") }}</span>
         </template>
         <template #cell-revision="{ value }">
           <el-tag size="small" effect="plain">v{{ value }}</el-tag>
@@ -155,9 +232,12 @@ onBeforeUnmount(workspace.dispose);
           <el-dropdown
             class="form-more"
             trigger="click"
-            :disabled="disabled || busy"
+            :disabled="disabled || busy || archiveBusy"
           >
-            <el-button link type="primary" :disabled="disabled || busy"
+            <el-button
+              link
+              type="primary"
+              :disabled="disabled || busy || archiveBusy"
               >{{ t("codeRules.more") }}<ArrowDownIcon class="more-arrow"
             /></el-button>
             <template #dropdown
@@ -172,12 +252,89 @@ onBeforeUnmount(workspace.dispose);
                     t("autoCodes.submissions")
                   }}</el-dropdown-item>
                 </Perms>
+                <el-dropdown-item divided @click="openHistory(row)">{{
+                  t("forms.versionHistory")
+                }}</el-dropdown-item>
               </el-dropdown-menu></template
             >
           </el-dropdown>
         </template>
       </CrudPage>
     </div>
+    <el-drawer
+      :model-value="Boolean(history)"
+      :title="history ? `${history.name} · ${t('forms.versionHistory')}` : ''"
+      size="min(860px, 100vw)"
+      body-class="form-history-drawer-body"
+      append-to-body
+      destroy-on-close
+      @update:model-value="history = undefined"
+    >
+      <el-alert
+        v-if="actionError"
+        class="form-history-alert"
+        :title="t(actionError)"
+        type="error"
+        :closable="false"
+      />
+      <CrudPage
+        v-if="history"
+        ref="historyList"
+        class="form-history-list"
+        :port="historyPort"
+        page-key="form:definition"
+        :fill="false"
+      >
+        <template #toolbar="{ query, reload }">
+          <el-select
+            v-model="historyArchived"
+            class="form-history-filter"
+            :aria-label="t('forms.archiveStatus')"
+            :disabled="archiveBusy"
+            @change="
+              query.pageNumber = 1;
+              reload();
+            "
+          >
+            <el-option :value="false" :label="t('forms.retainedVersions')" />
+            <el-option :value="true" :label="t('forms.archivedVersions')" />
+          </el-select>
+        </template>
+        <template #cell-revision="{ value }">
+          <el-tag size="small" effect="plain">v{{ value }}</el-tag>
+        </template>
+        <template #row-actions="{ row, disabled }">
+          <el-button
+            v-perm="permission('formDefinitionInfo')"
+            link
+            type="primary"
+            :disabled="disabled || busy"
+            @click="
+              history = undefined;
+              open(row, 'view');
+            "
+            >{{
+              t(historyArchived ? "forms.viewArchived" : "forms.view")
+            }}</el-button
+          >
+          <el-button
+            v-if="historyArchived || row.revision !== history.revision"
+            v-perm="permission('formDefinitionSetArchived')"
+            link
+            type="primary"
+            :disabled="disabled || archiveBusy"
+            @click="setArchived(row, !historyArchived)"
+            >{{
+              t(
+                historyArchived
+                  ? "forms.restoreVersion"
+                  : "forms.archiveVersion"
+              )
+            }}</el-button
+          >
+        </template>
+      </CrudPage>
+    </el-drawer>
     <el-dialog
       :model-value="Boolean(action)"
       width="min(1080px, 96vw)"
@@ -212,6 +369,30 @@ onBeforeUnmount(workspace.dispose);
   </div>
 </template>
 <style scoped>
+:global(.form-history-drawer-body.el-drawer__body) {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.form-history-list {
+  flex: 1;
+}
+
+.form-history-list :deep(.crud-table-bounded) {
+  flex: 1;
+  height: auto;
+}
+
+.form-history-alert {
+  flex-shrink: 0;
+}
+
+.form-history-filter {
+  width: 120px;
+}
+
 .form-more {
   margin-left: 12px;
   vertical-align: middle;
@@ -223,18 +404,7 @@ onBeforeUnmount(workspace.dispose);
   margin-left: 4px;
 }
 
-.list-hint {
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
-}
-
 .list-error {
   margin-bottom: 12px;
-}
-
-@media (width <= 760px) {
-  .list-hint {
-    display: none;
-  }
 }
 </style>

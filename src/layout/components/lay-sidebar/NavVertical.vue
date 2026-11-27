@@ -6,6 +6,7 @@ import { responsiveStorageNameSpace } from "@/config";
 import { storageLocal, isAllEmpty } from "@pureadmin/utils";
 import { findRouteByPath, getParentPaths } from "@/router/utils";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import LaySidebarLogo from "../lay-sidebar/components/SidebarLogo.vue";
 import LaySidebarItem from "../lay-sidebar/components/SidebarItem.vue";
@@ -13,6 +14,11 @@ import LaySidebarLeftCollapse from "../lay-sidebar/components/SidebarLeftCollaps
 import LaySidebarCenterCollapse from "../lay-sidebar/components/SidebarCenterCollapse.vue";
 
 const route = useRoute();
+const menu = ref<{ open(index: string): void }>();
+const counts = useWorkflowCounts();
+function openGroup(path: string) {
+  menu.value?.open(path);
+}
 const isShow = ref(false);
 const showLogo = ref(
   storageLocal().getItem<StorageConfigs>(
@@ -99,6 +105,7 @@ onBeforeUnmount(() => {
       :class="[device === 'mobile' ? 'mobile' : 'pc']"
     >
       <el-menu
+        ref="menu"
         unique-opened
         mode="vertical"
         popper-class="pure-scrollbar"
@@ -113,6 +120,8 @@ onBeforeUnmount(() => {
           :key="routes.path"
           :item="routes"
           :base-path="routes.path"
+          :pending-by-path="counts.pendingByPath"
+          :open-group="openGroup"
           class="outer-most select-none"
         />
       </el-menu>

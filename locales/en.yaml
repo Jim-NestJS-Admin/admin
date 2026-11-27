@@ -188,6 +188,7 @@ crud:
   editOf: "Edit {name}"
 
 system:
+  usernameFormat: Use 3–64 characters starting with a lowercase letter. Only lowercase letters, digits, underscores, dots and hyphens are allowed.
   roleAssignments: Role assignments
   supervisors: Supervisors
   dictionaryItems: Dictionary items
@@ -214,6 +215,9 @@ system:
   saved: Saved
   lookupFailed: Could not load related options. Check your permissions and retry.
   permissions: Permissions
+  permissionTreeLoading: Loading grantable permissions
+  permissionTreePlaceholder: Search by name or permission code
+  permissionTreeUnavailable: This role contains permissions you cannot grant. Remove them from the selection before saving.
   organizations: Organizations
   globalScope: Global scope
   dataScope: Data scope
@@ -647,7 +651,16 @@ forms:
   saveRevision: Save new version
   saved: Form version saved
   immutableHint: Saving a new version preserves historical versions and submitted data.
-  versionListHint: Each record is a preserved form version
+  versionHistory: Version history
+  archiveStatus: Archive status
+  retainedVersions: Unarchived
+  archivedVersions: Archived
+  viewArchived: View
+  archiveVersion: Archive version
+  restoreVersion: Restore version
+  archiveConfirm: Archive “{name}” v{revision}? You can restore it later.
+  archivedSuccess: Version archived
+  restoredSuccess: Version restored
   searchHint: Search name or code
   empty: No forms yet. Create a form to get started.
   revision: Version
@@ -876,6 +889,27 @@ autoCodes:
     digits: Digits only
 
 workflow:
+  approvalFlow: Approval flow
+  currentNodes: Current approval steps
+  cardDepartmentLeader: Department lead
+  cardDepartmentLeaderLevel: Level {level} department lead
+  cardSupervisor: Direct supervisor
+  cardSupervisorLevel: Level {level} supervisor
+  noResolvedMembers: No eligible members found
+  applicationItems: Approval items
+  applicationCategory: Item group
+  applicationDraft: Application draft
+  applicationDrafts: My drafts
+  applicationDraftSaved: Draft saved
+  saveApplicationDraft: Save draft
+  continueApplication: Continue editing
+  draftUpdated: Last saved
+  searchApplication: Search items
+  uncategorized: Ungrouped
+  memberInBranch: Already assigned to branch “{name}”
+  removeBranchConfirm: Delete branch “{name}” and its nodes?
+  definitionDetails: "Workflow settings"
+  submitApplication: "Submit application"
   create: "New workflow"
   viewDefinition: "Workflow definition"
   viewDesign: "View design"
@@ -890,6 +924,14 @@ workflow:
   formVersion: "Form revision"
   immutableHint: "Saving creates a revision. Published revisions and running instances are unchanged. Bind a workflow definition code rule before creating the first workflow."
   nodeSettings: "Node settings"
+  approvalSettings: "Approval settings"
+  formFieldPermissions: "Form field permissions"
+  advancedSettings: "Advanced settings"
+  boundForm: "Linked main form: {form}"
+  noBoundForm: "Link a main form in workflow settings before configuring field permissions."
+  boundFormUnavailable: "Your account cannot view the fields of the linked form."
+  boundFormLoadError: "Could not load the linked form. Try again."
+  returnToFieldPermissions: "Back to node field permissions"
   selectNode: "Select a node to configure participants, conditions and permissions"
   startApplicant: "Applicant"
   end: "End"
@@ -898,11 +940,14 @@ workflow:
   people: "Choose members or roles"
   level: "Level"
   emptyPolicy: "When no approver is available"
+  emptyPolicyHint: "This rule applies when the workflow reaches this node and finds no eligible approvers."
   approvalMode: "Approval mode"
   skipRepeated: "Skip consecutive approvals by the same member"
+  skipRepeatedHint: "The task is completed automatically if this person approved at every directly preceding approval node on the path taken."
   timeout: "Enable timeout handling"
   timeoutMinutes: "Timeout in minutes"
   timeoutAction: "Timeout action"
+  timeoutHint: "Time starts when the task is created. The selected action runs if the task is still pending at the deadline."
   remind: "Remind the current approver"
   transferSupervisor: "Transfer to supervisor, or remind if unavailable"
   fieldPermissions: "Node field permissions"
@@ -962,6 +1007,8 @@ workflow:
   uploadAttachment: "Upload attachment"
   attachmentHint: "Up to 10 files, subject to file module limits. Canceling does not delete uploaded files."
   transferTarget: "Transfer to"
+  transferRecord: "{from} transferred this task to {to}"
+  systemActor: "System"
   needTarget: "Choose a transfer recipient"
   actionConfirm: "Confirm {action}?"
   actionDone: "Action completed"
@@ -1056,6 +1103,24 @@ memberPicker:
   cancel: "Cancel"
   confirm: "Confirm"
 notifications:
+  inbox: Message center
+  all: All
+  unreadStatus: Unread
+  viewMore: View more
+  markRead: Mark as read
+  markPreviewRead: Mark the displayed messages as read
+  event:
+    taskCreated: New approval task
+    taskReminder: Approval reminder
+    taskCancelled: Approval task no longer active
+    taskCopied: Approval copy
+    instanceApproved: Approved
+    instanceReturned: Returned for changes
+    instanceWithdrawn: Request withdrawn
+    mcpExempt: Operation without confirmation
+    other: Other notification
+  unread: "{count} unread messages"
+  pending: "{count} pending approval tasks"
   queued: Sync queued. Check sync history for the result.
   logs: Sync history
   open: Open message

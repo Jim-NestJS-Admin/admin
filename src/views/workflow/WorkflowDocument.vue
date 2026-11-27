@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onBeforeUnmount, watch } from "vue";
+import { computed, ref, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
 import {
   ElMessage,
@@ -11,29 +11,72 @@ import { api } from "@/api/client";
 import { permission } from "@/platform/system/resources";
 import { generatedCrud } from "@/platform/generated-crud";
 import { useUserStoreHook } from "@/store/modules/user";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import { onSessionReset } from "@/platform/lifecycle";
-import type { CrudPort } from "@/components/Crud/types";
+import type {
+  CrudPort,
+  CrudRecord,
+  CrudSavedChoices,
+  CrudSchema
+} from "@/components/Crud/types";
+import { defaultCell } from "@/components/Crud/model.mjs";
 import CrudPage from "@/components/Crud/CrudPage.vue";
+import MemberPicker from "@/components/MemberPicker/index.vue";
 import { issuesFrom } from "../form/model";
-import { useRequestScope, copy, type Document, type Task } from "./model";
+import {
+  useRequestScope,
+  copy,
+  pendingNodes,
+  type Document,
+  type Task
+} from "./model";
 import DocumentFields from "./DocumentFields.vue";
-import ProgressTree from "./ProgressTree.vue";
-import ResourceSelect from "./ResourceSelect.vue";
+import WorkflowCanvas from "./WorkflowCanvas.vue";
+import { workflowMemberDirectory } from "./member-directory";
 const props = defineProps<{ instanceId: string; taskId?: string }>();
 const emit = defineEmits<{ close: []; changed: [] }>();
 const { t } = useI18n();
 const user = useUserStoreHook();
+const workflowCounts = useWorkflowCounts();
 const { busy, error, run } = useRequestScope();
 const document = ref<Document>(),
   task = ref<Task>(),
   values = ref<Record<string, unknown>>({}),
   original = ref<Record<string, unknown>>({}),
   patch = ref<Record<string, unknown>>({});
+const currentNodes = computed(() =>
+  pendingNodes(document.value?.progress ?? [])
+);
+const detailTab = ref("form");
+const nodeNames = computed(() => {
+  const names = new Map<string, string>();
+  function visit(nodes: Document["progress"]) {
+    for (const node of nodes) {
+      names.set(node.id, node.name);
+      for (const branch of node.branches ?? []) visit(branch.nodes);
+    }
+  }
+  visit(document.value?.progress ?? []);
+  return names;
+});
+const operations = {
+  approve: "workflowTaskApprove",
+  reject: "workflowTaskReject",
+  transfer: "workflowTaskTransfer",
+  resubmit: "workflowInstanceResubmit",
+  withdraw: "workflowInstanceWithdraw",
+  urge: "workflowInstanceUrge"
+} as const;
+type Action = keyof typeof operations;
+const actionStyles = {
+  approve: "success",
+  reject: "danger",
+  resubmit: "primary",
+  withdraw: "danger",
+  urge: "primary"
+} as const;
 const comment = ref(""),
-  target = ref(""),
-  action = ref<
-    "approve" | "reject" | "transfer" | "withdraw" | "resubmit" | "urge"
-  >("approve");
+  activeAction = ref<Action>();
 const attachments = ref<{ id: string; name: string; uid: number }[]>([]),
   uploads = ref<UploadUserFile[]>([]),
   uploading = ref(0),
@@ -59,7 +102,7 @@ const canResubmit = computed(
   () => own.value && document.value?.instance.status === "returned"
 );
 const permittedActions = computed(() => {
-  const available: (typeof action.value)[] = [];
+  const available: Action[] = [];
   if (canAct.value) available.push("approve", "reject", "transfer");
   if (canResubmit.value) available.push("resubmit");
   if (
@@ -69,26 +112,90 @@ const permittedActions = computed(() => {
     available.push("withdraw");
   if (own.value && document.value?.instance.status === "running")
     available.push("urge");
-  const operations = {
-    approve: "workflowTaskApprove",
-    reject: "workflowTaskReject",
-    transfer: "workflowTaskTransfer",
-    resubmit: "workflowInstanceResubmit",
-    withdraw: "workflowInstanceWithdraw",
-    urge: "workflowInstanceUrge"
-  } as const;
   return available.filter(a =>
     user.permissions.includes(permission(operations[a]))
   );
 });
-watch(permittedActions, list => {
-  if (!list.includes(action.value) && list.length) action.value = list[0];
-});
+const actionsDisabled = computed(
+  () =>
+    busy.value ||
+    uploading.value > 0 ||
+    previewing.value ||
+    Boolean(previewError.value)
+);
 const generated = generatedCrud("workflowRecord");
+const recordFields = [
+  "action",
+  "nodeId",
+  "actorId",
+  "comment",
+  "attachmentIds",
+  "createdAt"
+];
+function recordPerson(row: CrudRecord, field: "actorId" | "targetUserId") {
+  const cell = defaultCell(row, field);
+  if (cell.state !== "visible" && cell.state !== "readonly") return;
+  if (row[field] === null && field === "actorId")
+    return t("workflow.systemActor");
+  const display = row._display as Record<string, unknown> | undefined;
+  const name = display?.[field];
+  return typeof name === "string" && name ? name : undefined;
+}
+function transferDescription(row: CrudRecord) {
+  const from = recordPerson(row, "actorId");
+  const to = recordPerson(row, "targetUserId");
+  return from && to ? t("workflow.transferRecord", { from, to }) : undefined;
+}
+function orderRecordColumns<T extends { field: string }>(columns: T[]) {
+  const byField = new Map(columns.map(column => [column.field, column]));
+  return recordFields.map(field => byField.get(field) ?? { field });
+}
+function orderRecordView(view: CrudSchema["view"]): CrudSchema["view"] {
+  const config = view as
+    | { list?: { columns?: { field: string }[] } }
+    | undefined;
+  if (!config?.list?.columns) return view;
+  return {
+    ...config,
+    list: {
+      ...config.list,
+      columns: orderRecordColumns(config.list.columns)
+    }
+  } as unknown as CrudSchema["view"];
+}
+const recordPreferences = generated.port.preferences;
 const recordPort: CrudPort = {
-  describe: generated.port.describe,
+  describe: async signal => {
+    const schema = await generated.port.describe(signal);
+    const byField = new Map(
+      schema.columns.map(column => [column.field, column])
+    );
+    return {
+      ...schema,
+      view: orderRecordView(schema.view),
+      moduleView: orderRecordView(schema.moduleView),
+      columns: recordFields.flatMap(field => {
+        const column = byField.get(field);
+        return column ? [column] : [];
+      })
+    };
+  },
   detail: generated.port.detail,
-  preferences: generated.port.preferences,
+  ...(recordPreferences && {
+    preferences: {
+      ...recordPreferences,
+      load: async (page, signal) => {
+        const saved = (await recordPreferences.load(page, signal)) as
+          | Partial<CrudSavedChoices>
+          | undefined;
+        if (!Array.isArray(saved?.columns)) return saved;
+        return {
+          ...saved,
+          columns: orderRecordColumns(saved.columns)
+        };
+      }
+    }
+  }),
   list: (query, signal) =>
     generated.port.list(
       {
@@ -117,7 +224,6 @@ async function load() {
       task.value = (
         await api.workflowTaskInfo({ body: { id: props.taskId } }, { signal })
       ).data;
-    if (permittedActions.value.length) action.value = permittedActions.value[0];
   });
 }
 void load();
@@ -212,35 +318,46 @@ async function download(recordId: string, fileId: string, index: number) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 }
-async function submit() {
-  if (!permittedActions.value.includes(action.value)) return;
+function transfer(value: string | string[]) {
+  if (typeof value === "string" && value) void submit("transfer", value);
+}
+async function submit(action: Action, targetUserId?: string) {
   if (
     !document.value ||
-    uploading.value ||
-    previewing.value ||
-    previewError.value
+    actionsDisabled.value ||
+    activeAction.value ||
+    !permittedActions.value.includes(action) ||
+    (action === "transfer" && !targetUserId)
   )
     return;
-  if (
-    (action.value === "approve" || action.value === "resubmit") &&
-    !(await fieldForm.value?.validate())
-  )
-    return;
-  if (action.value === "transfer" && !target.value) {
-    error.value = t("workflow.needTarget");
-    return;
-  }
+  activeAction.value = action;
   try {
-    await ElMessageBox.confirm(
-      t("workflow.actionConfirm", {
-        action: t(`workflow.actions.${action.value}`)
-      }),
-      t(`workflow.actions.${action.value}`),
-      { type: "warning" }
-    );
-  } catch {
-    return;
+    if (
+      (action === "approve" || action === "resubmit") &&
+      !(await fieldForm.value?.validate())
+    ) {
+      detailTab.value = "form";
+      return;
+    }
+    if (action !== "transfer") {
+      const label = t(`workflow.actions.${action}`);
+      try {
+        await ElMessageBox.confirm(
+          t("workflow.actionConfirm", { action: label }),
+          label,
+          { type: "warning" }
+        );
+      } catch {
+        return;
+      }
+    }
+    if (document.value && permittedActions.value.includes(action))
+      await executeAction(action, targetUserId);
+  } finally {
+    activeAction.value = undefined;
   }
+}
+async function executeAction(action: Action, targetUserId?: string) {
   await run(async (signal, key) => {
     const current = document.value!.instance;
     const base = {
@@ -256,29 +373,30 @@ async function submit() {
     };
     const requestConfig = (body: unknown) => ({
       signal,
-      headers: { "Idempotency-Key": key({ action: action.value, body }) }
+      headers: { "Idempotency-Key": key({ action, body }) }
     });
     try {
-      if (action.value === "approve") {
+      if (action === "approve") {
         const body = { ...taskBody, values: patch.value };
         await api.workflowTaskApprove({ body }, requestConfig(body));
-      } else if (action.value === "reject")
+      } else if (action === "reject")
         await api.workflowTaskReject(
           { body: taskBody },
           requestConfig(taskBody)
         );
-      else if (action.value === "transfer") {
-        const body = { ...taskBody, targetUserId: target.value };
+      else if (action === "transfer" && targetUserId) {
+        const body = { ...taskBody, targetUserId };
         await api.workflowTaskTransfer({ body }, requestConfig(body));
-      } else if (action.value === "withdraw")
+      } else if (action === "withdraw")
         await api.workflowInstanceWithdraw({ body: base }, requestConfig(base));
-      else if (action.value === "urge")
+      else if (action === "urge")
         await api.workflowInstanceUrge({ body: base }, requestConfig(base));
-      else {
+      else if (action === "resubmit") {
         const body = { ...base, values: patch.value };
         await api.workflowInstanceResubmit({ body }, requestConfig(body));
       }
       ElMessage.success(t("workflow.actionDone"));
+      if (action !== "urge") void workflowCounts.refreshPending();
       emit("changed");
       emit("close");
     } catch (e) {
@@ -291,7 +409,7 @@ async function submit() {
   });
 }
 async function close(done?: () => void) {
-  if (busy.value || uploading.value) return;
+  if (busy.value || uploading.value || activeAction.value) return;
   if (
     Object.keys(patch.value).length ||
     comment.value ||
@@ -330,18 +448,44 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <el-dialog
+  <el-drawer
+    class="workflow-document-drawer"
+    body-class="workflow-document-body"
     :model-value="true"
-    :title="t('workflow.applicationDetail')"
-    width="min(1320px,96vw)"
-    top="3vh"
+    size="min(960px, 100vw)"
+    direction="rtl"
     append-to-body
     :close-on-click-modal="false"
     :before-close="close"
   >
+    <template #header="{ titleId, titleClass }">
+      <div class="document-header">
+        <h3 :id="titleId" :class="titleClass">
+          {{
+            document?.form.name ||
+            document?.instance.name ||
+            t("workflow.applicationDetail")
+          }}
+        </h3>
+        <template v-if="document">
+          <el-tag
+            :type="
+              document.instance.status === 'returned' ? 'danger' : 'primary'
+            "
+            >{{
+              t(`workflow.instanceStatus.${document.instance.status}`)
+            }}</el-tag
+          >
+          <el-tag type="info" effect="plain">
+            {{ t("workflow.round") }} {{ document.instance.round }}
+          </el-tag>
+        </template>
+      </div>
+    </template>
     <el-skeleton v-if="!document && busy" :rows="6" animated />
     <el-alert
       v-if="error"
+      class="document-feedback"
       :title="t(error)"
       type="error"
       :closable="false"
@@ -350,18 +494,13 @@ onBeforeUnmount(() => {
         <li v-for="(issue, i) in issues" :key="i">{{ issue }}</li>
       </ul></el-alert
     >
-    <div v-if="document" class="application-detail">
-      <header class="document-header">
-        <h3>{{ document.instance.name }}</h3>
-        <el-tag>{{
-          t(`workflow.instanceStatus.${document.instance.status}`)
-        }}</el-tag
-        ><el-tag effect="plain">v{{ document.instance.revision }}</el-tag
-        ><span>{{ t("workflow.round") }} {{ document.instance.round }}</span>
-      </header>
-      <div class="document-layout">
-        <main>
-          <h4>{{ document.form.name }}</h4>
+    <el-tabs v-if="document" v-model="detailTab" class="document-tabs">
+      <el-tab-pane :label="t('workflow.formValues')" name="form">
+        <section
+          class="document-form-pane"
+          tabindex="0"
+          :aria-label="t('workflow.formValues')"
+        >
           <el-alert
             v-if="previewError"
             :title="t(previewError)"
@@ -377,83 +516,9 @@ onBeforeUnmount(() => {
             :disabled="busy || (!canAct && !canResubmit)"
             @update:model-value="change"
           />
-          <section
-            v-if="
-              canAct ||
-              canResubmit ||
-              (own &&
-                ['running', 'returned'].includes(
-                  document.instance.status ?? ''
-                ))
-            "
-            class="action-form"
-          >
-            <el-form label-position="top" :disabled="busy"
-              ><el-form-item :label="t('workflow.action')"
-                ><el-select v-model="action"
-                  ><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskApprove')
-                      )
-                    "
-                    value="approve"
-                    :label="t('workflow.actions.approve')" /><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskReject')
-                      )
-                    "
-                    value="reject"
-                    :label="t('workflow.actions.reject')" /><el-option
-                    v-if="
-                      canAct &&
-                      user.permissions.includes(
-                        permission('workflowTaskTransfer')
-                      )
-                    "
-                    value="transfer"
-                    :label="t('workflow.actions.transfer')" /><el-option
-                    v-if="
-                      canResubmit &&
-                      user.permissions.includes(
-                        permission('workflowInstanceResubmit')
-                      )
-                    "
-                    value="resubmit"
-                    :label="t('workflow.actions.resubmit')" /><el-option
-                    v-if="
-                      own &&
-                      ['running', 'returned'].includes(
-                        document.instance.status ?? ''
-                      ) &&
-                      user.permissions.includes(
-                        permission('workflowInstanceWithdraw')
-                      )
-                    "
-                    value="withdraw"
-                    :label="t('workflow.actions.withdraw')" /><el-option
-                    v-if="
-                      own &&
-                      document.instance.status === 'running' &&
-                      user.permissions.includes(
-                        permission('workflowInstanceUrge')
-                      )
-                    "
-                    value="urge"
-                    :label="t('workflow.actions.urge')" /></el-select
-              ></el-form-item>
-              <el-form-item
-                v-if="action === 'transfer'"
-                :label="t('workflow.transferTarget')"
-                required
-                ><ResourceSelect
-                  v-model="target"
-                  kind="users"
-                  :disabled="busy" /></el-form-item
-              ><el-form-item :label="t('workflow.comment')"
+          <section v-if="permittedActions.length" class="action-form">
+            <el-form label-position="top" :disabled="busy">
+              <el-form-item :label="t('workflow.comment')"
                 ><el-input
                   v-model="comment"
                   type="textarea"
@@ -482,68 +547,128 @@ onBeforeUnmount(() => {
                 ></el-form-item
               >
             </el-form>
-            <el-button
-              type="primary"
-              :loading="busy"
-              :disabled="
-                uploading > 0 ||
-                previewing ||
-                Boolean(previewError) ||
-                !user.permissions.includes(
-                  permission(
-                    action === 'approve'
-                      ? 'workflowTaskApprove'
-                      : action === 'reject'
-                        ? 'workflowTaskReject'
-                        : action === 'transfer'
-                          ? 'workflowTaskTransfer'
-                          : action === 'withdraw'
-                            ? 'workflowInstanceWithdraw'
-                            : action === 'urge'
-                              ? 'workflowInstanceUrge'
-                              : 'workflowInstanceResubmit'
-                  )
-                )
-              "
-              @click="submit"
-              >{{ t(`workflow.actions.${action}`) }}</el-button
-            >
           </section>
-        </main>
-        <aside>
-          <h4>{{ t("workflow.progressTitle") }}</h4>
-          <ProgressTree :nodes="document.progress" />
-        </aside>
-      </div>
-      <section class="approval-records">
-        <h4>{{ t("workflow.records") }}</h4>
-        <CrudPage
-          ref="records"
-          :port="recordPort"
-          page-key="workflow:record"
-          :fill="false"
-          ><template #cell-attachmentIds="{ row, value }"
-            ><el-space wrap
-              ><el-button
-                v-for="(id, i) in Array.isArray(value) ? value : []"
-                :key="id"
-                link
-                type="primary"
-                :disabled="busy"
-                @click="download(String(row.id), String(id), i)"
-                >{{ t("workflow.attachment") }} {{ i + 1 }}</el-button
-              ></el-space
-            ></template
-          ></CrudPage
+        </section>
+      </el-tab-pane>
+      <el-tab-pane :label="t('workflow.progressTitle')" name="progress" lazy>
+        <section
+          class="document-flow"
+          :aria-label="t('workflow.progressTitle')"
         >
-      </section>
-    </div>
-  </el-dialog>
+          <div v-if="currentNodes.length" class="current-nodes">
+            <strong>{{ t("workflow.currentNodes") }}</strong>
+            <el-tag v-for="node in currentNodes" :key="node.id" size="small">
+              {{ node.name }}
+            </el-tag>
+          </div>
+          <WorkflowCanvas
+            :progress="document.progress"
+            readonly
+            show-status
+            embedded
+          />
+        </section>
+      </el-tab-pane>
+      <el-tab-pane :label="t('workflow.records')" name="records" lazy>
+        <section
+          class="approval-records"
+          tabindex="0"
+          :aria-label="t('workflow.records')"
+        >
+          <CrudPage
+            ref="records"
+            class="approval-record-list"
+            :port="recordPort"
+            page-key="workflow:record"
+            :fill="false"
+          >
+            <template #cell-action="{ row, value, text }">
+              <span class="record-detail-text">{{
+                (value === "transfer" && transferDescription(row)) || text
+              }}</span>
+            </template>
+            <template #cell-nodeId="{ value }">{{
+              nodeNames.get(String(value)) ?? value ?? "—"
+            }}</template>
+            <template #cell-comment="{ value }"
+              ><span class="record-detail-text">{{
+                value || "—"
+              }}</span></template
+            >
+            <template #cell-attachmentIds="{ row, value }">
+              <el-space wrap>
+                <el-button
+                  v-for="(id, i) in Array.isArray(value) ? value : []"
+                  :key="id"
+                  link
+                  type="primary"
+                  :disabled="busy"
+                  @click="download(String(row.id), String(id), i)"
+                  >{{ t("workflow.attachment") }} {{ i + 1 }}</el-button
+                >
+              </el-space>
+            </template>
+          </CrudPage>
+        </section>
+      </el-tab-pane>
+    </el-tabs>
+    <template v-if="permittedActions.length" #footer>
+      <div class="document-actions">
+        <template v-for="action in permittedActions" :key="action">
+          <MemberPicker
+            v-if="action === 'transfer'"
+            class="document-transfer"
+            :source="workflowMemberDirectory"
+            :disabled="actionsDisabled || Boolean(activeAction)"
+            :confirm-label="t('workflow.actions.transfer')"
+            required
+            show-avatars
+            @update:model-value="transfer"
+          >
+            <template #trigger="{ open, disabled }">
+              <el-button
+                :disabled="disabled"
+                :loading="busy && activeAction === 'transfer'"
+                aria-haspopup="dialog"
+                @click="open"
+                >{{ t("workflow.actions.transfer") }}</el-button
+              >
+            </template>
+          </MemberPicker>
+          <el-button
+            v-else
+            :type="actionStyles[action]"
+            :loading="busy && activeAction === action"
+            :disabled="actionsDisabled || Boolean(activeAction)"
+            @click="submit(action)"
+            >{{ t(`workflow.actions.${action}`) }}</el-button
+          >
+        </template>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 <style scoped>
-.application-detail {
-  display: grid;
-  gap: 20px;
+:global(.workflow-document-drawer .el-drawer__header) {
+  margin-block-end: 0;
+}
+
+:global(.workflow-document-drawer .el-drawer__footer) {
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+:global(.workflow-document-body.el-drawer__body) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding-block-start: 4px;
+  overflow: hidden;
+}
+
+.document-feedback {
+  max-height: 30%;
+  overflow: auto;
 }
 
 .document-header {
@@ -556,32 +681,79 @@ onBeforeUnmount(() => {
 .document-header h3 {
   margin: 0;
   font-size: 18px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
-.document-header > span {
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
-}
-
-.document-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 28px;
-}
-
-.document-layout > main,
-.document-layout > aside {
+.document-tabs,
+.document-flow {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
-.document-layout > aside {
-  padding-left: 20px;
-  border-left: 1px solid var(--el-border-color-lighter);
+.document-tabs :deep(.el-tabs__content) {
+  flex: 1;
+  min-height: 0;
 }
 
-h4 {
-  margin: 8px 0 20px;
-  font-size: 15px;
+.document-tabs :deep(.el-tab-pane),
+.document-flow,
+.document-form-pane {
+  height: 100%;
+}
+
+.document-form-pane {
+  padding: 4px 2px 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.document-actions :deep(.el-button) {
+  margin-inline-start: 0;
+}
+
+.document-actions .document-transfer {
+  width: auto;
+}
+
+.approval-records,
+.approval-record-list {
+  height: 100%;
+}
+
+.approval-records :deep(.crud-table-bounded) {
+  flex: 1;
+  height: auto;
+}
+
+.document-flow :deep(.workflow-canvas) {
+  flex: 1;
+  height: auto;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--el-border-radius-base);
+}
+
+.current-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-block-end: 12px;
+}
+
+.record-detail-text {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .action-form {
@@ -589,25 +761,8 @@ h4 {
   border-top: 1px solid var(--el-border-color-lighter);
 }
 
-.approval-records {
-  padding-top: 20px;
-  border-top: 1px solid var(--el-border-color-lighter);
-}
-
 .hint {
   font-size: 12px;
   color: var(--el-text-color-secondary);
-}
-
-@media (width<=850px) {
-  .document-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .document-layout > aside {
-    padding: 20px 0 0;
-    border-top: 1px solid var(--el-border-color-lighter);
-    border-left: 0;
-  }
 }
 </style>

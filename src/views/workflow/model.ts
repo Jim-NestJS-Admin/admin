@@ -13,10 +13,20 @@ export type Condition =
   | S["WorkflowConditionValue"];
 export type Definition = S["WorkflowDefinitionRow"];
 export type Document = S["WorkflowDocumentResult"];
+export function pendingNodes(
+  nodes: Document["progress"]
+): Document["progress"] {
+  return nodes.flatMap(node => [
+    ...(node.type === "approve" && node.status === "pending" ? [node] : []),
+    ...pendingNodes(node.branches?.flatMap(branch => branch.nodes) ?? [])
+  ]);
+}
 export type Task = S["WorkflowTaskRow"];
 export type Field = S["FormFieldDto"];
 export const uid = () => `n_${crypto.randomUUID().replaceAll("-", "")}`;
-export function allNodes(nodes: Node[]): Node[] {
+export function allNodes<T extends { branches?: { nodes: T[] }[] }>(
+  nodes: T[]
+): T[] {
   return nodes.flatMap(node => [
     node,
     ...allNodes(node.branches?.flatMap(b => b.nodes) ?? [])
@@ -25,7 +35,6 @@ export function allNodes(nodes: Node[]): Node[] {
 export function newNode(type: Node["type"], name: string): Node {
   const node: Node = { id: uid(), name, type };
   if (type === "approve" || type === "copy") {
-    node.actor = { type: "applicant" };
     if (type === "approve")
       Object.assign(node, {
         empty: "stop",
@@ -58,6 +67,32 @@ export function newNode(type: Node["type"], name: string): Node {
       }
     ];
   return node;
+}
+export function parallelApproverBlocks(nodes: Node[], selectedId: string) {
+  const blocked: Record<string, string> = {};
+  for (const group of allNodes(nodes)) {
+    if (group.type !== "parallel" || !group.branches) continue;
+    const current = group.branches.find(branch =>
+      allNodes(branch.nodes).some(node => node.id === selectedId)
+    );
+    if (!current) continue;
+    for (const branch of group.branches) {
+      if (branch === current) continue;
+      for (const node of allNodes(branch.nodes))
+        if (node.type === "approve" && node.actor?.type === "users")
+          for (const id of node.actor.ids ?? []) blocked[id] = branch.name;
+    }
+  }
+  return blocked;
+}
+export function addWorkflowBranch(node: Node, name: string, field: string) {
+  const branches = node.branches;
+  if (!branches || branches.length >= 10) return;
+  const branch: Branch = { id: uid(), name, nodes: [] };
+  if (node.type === "condition") {
+    branch.condition = { source: "field", field, operator: "eq", value: "" };
+    branches.splice(branches.length - 1, 0, branch);
+  } else branches.push(branch);
 }
 export function text(value: unknown) {
   return value == null || value === ""

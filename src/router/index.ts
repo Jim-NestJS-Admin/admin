@@ -21,6 +21,7 @@ import { usePermissionStoreHook } from "@/store/modules/permission";
 import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import { routerArrays } from "@/layout/types";
 import { onSessionReset } from "@/platform/lifecycle";
+import { OPERATION_PERMISSIONS } from "@/api/constants";
 const modules = import.meta.glob(
   ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
   { eager: true }
@@ -100,6 +101,11 @@ router.beforeEach(async to => {
       loaded = true;
       return to.fullPath;
     }
+    if (
+      to.name === "NotificationCenter" &&
+      !user.permissions.includes(OPERATION_PERMISSIONS.notifyMessagePage[0])
+    )
+      return "/access-denied";
     document.title =
       transformI18n(to.meta.title) +
       " | " +

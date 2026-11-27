@@ -666,6 +666,19 @@ export function createApiClient(
         config
       );
     },
+    formDefinitionCurrentPage(
+      input: OperationInput<"formDefinitionCurrentPage"> & {
+        body: OperationBody<"formDefinitionCurrentPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionCurrentPage">>(
+        "post",
+        interpolate("/admin/form/definition/current-page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     formDefinitionInfo(
       input: OperationInput<"formDefinitionInfo"> & {
         body: OperationBody<"formDefinitionInfo">;
@@ -725,6 +738,19 @@ export function createApiClient(
       return transport.request<OperationResponse<"formDefinitionSchema">>(
         "get",
         interpolate("/admin/form/definition/schema", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    formDefinitionSetArchived(
+      input: OperationInput<"formDefinitionSetArchived"> & {
+        body: OperationBody<"formDefinitionSetArchived">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"formDefinitionSetArchived">>(
+        "post",
+        interpolate("/admin/form/definition/set-archived", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );
@@ -2757,6 +2783,19 @@ export function createApiClient(
         config
       );
     },
+    systemRoleGrantablePermissions(
+      input: OperationInput<"systemRoleGrantablePermissions"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"systemRoleGrantablePermissions">
+      >(
+        "get",
+        interpolate("/admin/system/permission/grantable", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemPermissionList(
       input: OperationInput<"systemPermissionList"> = {},
       config: PureHttpRequestConfig = {}
@@ -3419,6 +3458,45 @@ export function createApiClient(
         config
       );
     },
+    workflowInstanceDraftInfo(
+      input: OperationInput<"workflowInstanceDraftInfo"> & {
+        body: OperationBody<"workflowInstanceDraftInfo">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftInfo">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-info", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceDraftPage(
+      input: OperationInput<"workflowInstanceDraftPage"> & {
+        body: OperationBody<"workflowInstanceDraftPage">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftPage">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-page", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceDraftSave(
+      input: OperationInput<"workflowInstanceDraftSave"> & {
+        body: OperationBody<"workflowInstanceDraftSave">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<OperationResponse<"workflowInstanceDraftSave">>(
+        "post",
+        interpolate("/admin/workflow/instance/draft-save", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     workflowInstanceInfo(
       input: OperationInput<"workflowInstanceInfo"> & {
         body: OperationBody<"workflowInstanceInfo">;
@@ -3491,6 +3569,21 @@ export function createApiClient(
       return transport.request<OperationResponse<"workflowInstanceStart">>(
         "post",
         interpolate("/admin/workflow/instance/start", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
+    workflowInstanceStartApplication(
+      input: OperationInput<"workflowInstanceStartApplication"> & {
+        body: OperationBody<"workflowInstanceStartApplication">;
+      },
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"workflowInstanceStartApplication">
+      >(
+        "post",
+        interpolate("/admin/workflow/instance/start-application", input.path),
         { params: input.query, headers: input.headers, data: input.body },
         config
       );

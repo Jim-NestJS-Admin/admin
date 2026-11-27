@@ -5,8 +5,10 @@ import { menuType } from "@/layout/types";
 import { ReText } from "@/components/ReText";
 import { useNav } from "@/layout/hooks/useNav";
 import { transformI18n } from "@/plugins/i18n";
+import { useRouter } from "vue-router";
 import SidebarLinkItem from "./SidebarLinkItem.vue";
 import SidebarExtraIcon from "./SidebarExtraIcon.vue";
+import SidebarCountBadge from "./SidebarCountBadge.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import {
   type PropType,
@@ -23,7 +25,8 @@ import ArrowLeft from "~icons/ep/arrow-left-bold";
 import ArrowRight from "~icons/ep/arrow-right-bold";
 
 const attrs = useAttrs();
-const { layout, isCollapse, tooltipEffect, getDivStyle } = useNav();
+const router = useRouter();
+const { layout, isCollapse, tooltipEffect } = useNav();
 
 const props = defineProps({
   item: {
@@ -36,7 +39,9 @@ const props = defineProps({
   basePath: {
     type: String,
     default: ""
-  }
+  },
+  pendingByPath: Object as PropType<Record<string, number>>,
+  openGroup: Function as PropType<(path: string) => void>
 });
 
 const getNoDropdownStyle = computed((): CSSProperties => {
@@ -117,6 +122,72 @@ function resolvePath(routePath) {
     return posix.resolve(props.basePath, routePath);
   }
 }
+
+type PendingEntry = { path: string; count: number; groups: string[] };
+
+function collectPending(
+  menu: menuType,
+  path: string,
+  groups: string[],
+  entries: Map<string, PendingEntry>
+) {
+  if (menu.children?.length) {
+    const [child] = menu.children;
+    const ancestors =
+      menu.children.length === 1 && !child.meta?.showParent && !child.children
+        ? groups
+        : [...groups, path];
+    for (const child of menu.children)
+      collectPending(
+        child,
+        posix.resolve(path, child.path ?? ""),
+        ancestors,
+        entries
+      );
+    return;
+  }
+  const count = props.pendingByPath?.[path] ?? 0;
+  if (count > 0 && !entries.has(path))
+    entries.set(path, { path, count, groups });
+}
+
+const pendingEntries = computed(() => {
+  const entries = new Map<string, PendingEntry>();
+  collectPending(
+    props.item,
+    props.basePath || props.item.path || "",
+    [],
+    entries
+  );
+  return [...entries.values()];
+});
+const pendingCount = computed(() =>
+  pendingEntries.value.reduce((sum, entry) => sum + entry.count, 0)
+);
+function pendingLocation(path: string) {
+  return path === "/workflow/instance"
+    ? { path, query: { pending: "1" } }
+    : { path };
+}
+
+function activatePending() {
+  const [first, ...other] = pendingEntries.value;
+  if (!first) return;
+  if (!other.length) {
+    const group = first.groups.at(-1);
+    if (group) props.openGroup?.(group);
+    void router.push(pendingLocation(first.path));
+    return;
+  }
+  // 先打开待办入口共享的最深分组，分叉后让各分组继续显示自己的汇总。
+  const common = [...first.groups]
+    .reverse()
+    .find(path => other.every(entry => entry.groups.includes(path)));
+  if (common) props.openGroup?.(common);
+}
+const compactBadge = computed(
+  () => isCollapse.value && !props.isNest && layout.value !== "horizontal"
+);
 </script>
 
 <template>
@@ -164,18 +235,30 @@ function resolvePath(routePath) {
         {{ transformI18n(onlyOneChild.meta.title) }}
       </el-text>
 
+      <SidebarCountBadge
+        v-if="compactBadge"
+        :count="pendingCount"
+        class="sidebar-count-compact"
+        @activate="activatePending"
+      />
+
       <template #title>
-        <div :style="getDivStyle">
+        <div class="sidebar-title-row">
           <ReText
             :tippyProps="{
               offset: [0, -10],
               theme: tooltipEffect
             }"
-            class="w-full! text-inherit!"
+            class="sidebar-menu-label text-inherit!"
           >
             {{ transformI18n(onlyOneChild.meta.title) }}
           </ReText>
           <SidebarExtraIcon :extraIcon="onlyOneChild.meta.extraIcon" />
+          <SidebarCountBadge
+            v-if="!compactBadge"
+            :count="pendingCount"
+            @activate="activatePending"
+          />
         </div>
       </template>
     </el-menu-item>
@@ -183,6 +266,7 @@ function resolvePath(routePath) {
   <el-sub-menu
     v-else
     ref="subMenu"
+    class="sidebar-menu-group"
     teleported
     :index="resolvePath(item.path)"
     v-bind="expandCloseIcon"
@@ -195,26 +279,48 @@ function resolvePath(routePath) {
       >
         <component :is="useRenderIcon(item.meta && toRaw(item.meta.icon))" />
       </div>
-      <ReText
-        v-if="
-          layout === 'mix' && toRaw(item.meta.icon)
-            ? !isCollapse || item?.pathList?.length !== 2
-            : !(
-                layout === 'vertical' &&
-                isCollapse &&
-                toRaw(item.meta.icon) &&
-                item.parentId === null
-              )
-        "
-        :tippyProps="{
-          offset: [0, -10],
-          theme: tooltipEffect
+      <div
+        class="sidebar-title-row"
+        :class="{
+          'sidebar-title-row-with-arrow': pendingCount > 0 && !compactBadge
         }"
-        :class="textClass"
       >
-        {{ transformI18n(item.meta.title) }}
-      </ReText>
-      <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
+        <ReText
+          v-if="
+            layout === 'mix' && toRaw(item.meta.icon)
+              ? !isCollapse || item?.pathList?.length !== 2
+              : !(
+                  layout === 'vertical' &&
+                  isCollapse &&
+                  toRaw(item.meta.icon) &&
+                  item.parentId === null
+                )
+          "
+          :tippyProps="{
+            offset: [0, -10],
+            theme: tooltipEffect
+          }"
+          class="sidebar-menu-label"
+          :class="textClass"
+        >
+          {{ transformI18n(item.meta.title) }}
+        </ReText>
+        <SidebarExtraIcon v-if="!isCollapse" :extraIcon="item.meta.extraIcon" />
+        <SidebarCountBadge
+          v-if="!compactBadge"
+          :count="pendingCount"
+          group
+          class="sidebar-count-group"
+          @activate="activatePending"
+        />
+      </div>
+      <SidebarCountBadge
+        v-if="compactBadge"
+        :count="pendingCount"
+        group
+        class="sidebar-count-compact sidebar-count-group"
+        @activate="activatePending"
+      />
     </template>
 
     <sidebar-item
@@ -223,7 +329,40 @@ function resolvePath(routePath) {
       :is-nest="true"
       :item="child"
       :base-path="resolvePath(child.path)"
+      :pending-by-path="pendingByPath"
+      :open-group="openGroup"
       class="nest-menu"
     />
   </el-sub-menu>
 </template>
+
+<style scoped>
+.sidebar-title-row {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.sidebar-menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-title-row-with-arrow {
+  margin-inline-end: 16px;
+}
+
+.sidebar-count-compact {
+  position: absolute;
+  inset-block: 4px auto;
+  inset-inline-end: 4px;
+  height: auto;
+  margin: 0;
+}
+
+.sidebar-menu-group.is-opened
+  > :deep(.el-sub-menu__title .sidebar-count-group) {
+  display: none;
+}
+</style>

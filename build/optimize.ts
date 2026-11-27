@@ -16,6 +16,16 @@ const include = [
   "vue-tippy",
   "pinyin-pro",
   "sortablejs",
+  "@form-create/element-ui",
+  // 设计器走 Vue 源码转换，其中的 CommonJS 依赖需要单独预构建。
+  "@form-create/designer > codemirror/lib/codemirror",
+  "@form-create/designer > codemirror/mode/javascript/javascript",
+  "@form-create/designer > codemirror/addon/hint/show-hint",
+  "@form-create/designer > codemirror/addon/hint/javascript-hint",
+  "@form-create/designer > codemirror/addon/hint/anyword-hint",
+  "@form-create/designer > codemirror/addon/display/placeholder",
+  "@form-create/designer > js-beautify",
+  "mldong-flow-designer-dingtalk/packages/flow-designer/src/locales/index",
   "@vueuse/core",
   "@pureadmin/utils",
   "responsive-storage"

@@ -26,6 +26,8 @@ const props = defineProps<{
   fields: Field[];
   definitionId?: string;
   submit?: boolean;
+  embedded?: boolean;
+  initialValues?: Record<string, unknown>;
 }>();
 const emit = defineEmits<{
   submitted: [record: components["schemas"]["FormSubmissionRow"]];
@@ -52,14 +54,14 @@ watch(
   () => props.designer,
   () => {
     request?.abort();
-    values.value = {};
+    values.value = copy(props.initialValues ?? {});
     issues.value = [];
     error.value = "";
     valid.value = false;
     busy.value = false;
     lastEffects = "";
     rules.value = copy(
-      previewRules(props.designer, props.fields, {}).rules
+      previewRules(props.designer, props.fields, values.value).rules
     ) as FcRule[];
   },
   { immediate: true }
@@ -165,10 +167,25 @@ async function validate() {
   }
 }
 onBeforeUnmount(() => request?.abort());
+async function applicationValues(validateFields: boolean) {
+  if (
+    validateFields &&
+    formApi.value &&
+    !(await formApi.value.validate().catch(() => false))
+  ) {
+    error.value = "autoCodes.correctFields";
+    return;
+  }
+  error.value = "";
+  const effective = previewRules(props.designer, props.fields, values.value);
+  return cleanPreviewValues(effective.fields, values.value);
+}
+defineExpose({ applicationValues });
 </script>
 <template>
   <section class="form-preview">
     <el-alert
+      v-if="!embedded"
       :title="
         t(
           submit
@@ -207,7 +224,7 @@ onBeforeUnmount(() => request?.abort());
         :option="options"
       />
     </div>
-    <div v-if="definitionId" class="preview-actions">
+    <div v-if="definitionId && !embedded" class="preview-actions">
       <el-button
         v-perm="
           permission(submit ? 'formSubmissionAdd' : 'formDefinitionValidate')

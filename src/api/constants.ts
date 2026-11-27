@@ -231,11 +231,13 @@ export const OPERATION_PERMISSIONS = {
   fileAssetSchema: ["file:asset:page"],
   fileAssetUpload: ["file:asset:upload"],
   formDefinitionAdd: ["form:definition:add"],
+  formDefinitionCurrentPage: ["form:definition:page"],
   formDefinitionInfo: ["form:definition:info"],
   formDefinitionInspect: ["form:definition:info"],
   formDefinitionPage: ["form:definition:page"],
   formDefinitionRevise: ["form:definition:update"],
   formDefinitionSchema: ["form:definition:page"],
+  formDefinitionSetArchived: ["form:definition:update"],
   formDefinitionValidate: ["form:definition:validate"],
   formSubmissionAdd: ["form:submission:add"],
   formSubmissionInfo: ["form:submission:info"],
@@ -404,6 +406,7 @@ export const OPERATION_PERMISSIONS = {
   systemRoleFieldSave: ["system:role-field:update"],
   systemRoleFieldSchema: ["system:role-field:page"],
   systemRoleFieldUpdate: ["system:role-field:update"],
+  systemRoleGrantablePermissions: ["system:role:page"],
   systemRoleInfo: ["system:role:info"],
   systemRolePage: ["system:role:page"],
   systemRoleSchema: ["system:role:page"],
@@ -444,12 +447,16 @@ export const OPERATION_PERMISSIONS = {
   workflowDirectoryPage: ["workflow:directory:page"],
   workflowInstanceAttachment: ["workflow:instance:info"],
   workflowInstanceDocument: ["workflow:instance:info"],
+  workflowInstanceDraftInfo: ["workflow:instance:add"],
+  workflowInstanceDraftPage: ["workflow:instance:add"],
+  workflowInstanceDraftSave: ["workflow:instance:add"],
   workflowInstanceInfo: ["workflow:instance:info"],
   workflowInstancePage: ["workflow:instance:page"],
   workflowInstancePreview: ["workflow:instance:info"],
   workflowInstanceResubmit: ["workflow:instance:resubmit"],
   workflowInstanceSchema: ["workflow:instance:page"],
   workflowInstanceStart: ["workflow:instance:add"],
+  workflowInstanceStartApplication: ["workflow:instance:add"],
   workflowInstanceUrge: ["workflow:instance:urge"],
   workflowInstanceWithdraw: ["workflow:instance:withdraw"],
   workflowRecordInfo: ["workflow:record:info"],
@@ -735,6 +742,19 @@ export const ENUMS = {
   ],
   "components.schemas.FileAssetPageSort.properties.order": ["asc", "desc"],
   "components.schemas.FileAssetRow.properties._fieldState.additionalProperties":
+    ["readonly", "masked", "hidden"],
+  "components.schemas.FormDefinitionCurrentPageSort.properties.field": [
+    "id",
+    "createdAt",
+    "updatedAt",
+    "code",
+    "revision"
+  ],
+  "components.schemas.FormDefinitionCurrentPageSort.properties.order": [
+    "asc",
+    "desc"
+  ],
+  "components.schemas.FormDefinitionCurrentRow.properties._fieldState.additionalProperties":
     ["readonly", "masked", "hidden"],
   "components.schemas.FormDefinitionPageSort.properties.field": [
     "id",
@@ -1460,6 +1480,19 @@ export const ENUMS = {
     "copy",
     "condition",
     "parallel"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.actorType": [
+    "users",
+    "roles",
+    "department_leader",
+    "supervisor",
+    "self_select",
+    "applicant"
+  ],
+  "components.schemas.WorkflowProgressNode.properties.mode": [
+    "all",
+    "any",
+    "sequential"
   ],
   "components.schemas.WorkflowProgressNode.properties.status": [
     "waiting",

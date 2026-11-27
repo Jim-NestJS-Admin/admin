@@ -10,6 +10,11 @@ overrides:
   minimatch@>=9.0.0 <9.0.9: 9.0.9
   brace-expansion@>=2.0.0 <2.1.8: 2.1.8
 
+patchedDependencies:
+  mldong-flow-designer-dingtalk@3.2.8:
+    hash: 4444c226c7b321bbb3cf3d6dddfe4f11d37d83fbb0de417a8f4b0faf0872021a
+    path: patches/mldong-flow-designer-dingtalk@3.2.8.patch
+
 importers:
 
   .:
@@ -59,6 +64,9 @@ importers:
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
+      mldong-flow-designer-dingtalk:
+        specifier: 3.2.8
+        version: 3.2.8(patch_hash=4444c226c7b321bbb3cf3d6dddfe4f11d37d83fbb0de417a8f4b0faf0872021a)(vue@3.5.44(typescript@5.9.3))
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -2938,6 +2946,11 @@ packages:
 
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+
+  mldong-flow-designer-dingtalk@3.2.8:
+    resolution: {integrity: sha512-tpz4mHpFa/dtUOUKCgZymz6AbRDkWYm3Abij12N9u6j8RVqp+evCbHB2lzIPsSbQS9haOO4ltUbTjDbY6nxlxQ==}
+    peerDependencies:
+      vue: ^3.4.0
 
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
@@ -6687,6 +6700,10 @@ snapshots:
   minipass@7.1.2: {}
 
   mitt@3.0.1: {}
+
+  mldong-flow-designer-dingtalk@3.2.8(patch_hash=4444c226c7b321bbb3cf3d6dddfe4f11d37d83fbb0de417a8f4b0faf0872021a)(vue@3.5.44(typescript@5.9.3)):
+    dependencies:
+      vue: 3.5.44(typescript@5.9.3)
 
   mlly@1.8.0:
     dependencies:

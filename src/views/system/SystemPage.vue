@@ -14,6 +14,7 @@ import CrudPage from "@/components/Crud/CrudPage.vue";
 import MenuIcon from "@/components/ReIcon/src/MenuIcon.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import MenuIconPicker from "./MenuIconPicker.vue";
+import RolePermissionTree from "./RolePermissionTree.vue";
 import SearchIcon from "~icons/ri/search-line";
 import AddIcon from "~icons/ri/add-circle-line";
 import KeyIcon from "~icons/ri/key-2-line";
@@ -23,7 +24,7 @@ import { scopePort } from "@/platform/system/scoped-port.mjs";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import type { CrudCell, CrudRecord, CrudPort } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
-import { PERMISSIONS, ENUMS } from "@/api/constants";
+import { ENUMS } from "@/api/constants";
 import {
   resources,
   permission,
@@ -33,6 +34,7 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import { failureView } from "@/platform/failure-view.mjs";
+import { issuesFrom } from "@/views/form/model";
 
 const props = withDefaults(
   defineProps<{
@@ -61,6 +63,8 @@ const port = computed<CrudPort>(() => {
 type Option = {
   id: string;
   label: string;
+  nickname?: string;
+  username?: string;
   disabled?: boolean;
   version?: number;
   parentId?: string | null;
@@ -107,7 +111,9 @@ const treeNodes = computed(() => {
 watch(treeSearch, value => treeRef.value?.filter(value));
 const dialog = ref<"create" | "reset" | "">("");
 const busy = ref(false),
-  error = ref("");
+  error = ref(""),
+  usernameError = ref("");
+const usernamePattern = /^[a-z][a-z0-9_.-]{2,63}$/;
 const form = reactive<OperationBody<"systemUserCreate">>({
   username: "",
   nickname: "",
@@ -119,9 +125,6 @@ const reset = reactive({ id: "", password: "" });
 let reloadList: (() => Promise<void>) | undefined;
 const requests = new Set<AbortController>();
 const can = (code: string) => !!code && user.permissions.includes(code);
-const permissionOptions = computed(() =>
-  PERMISSIONS.filter(code => user.permissions.includes(code))
-);
 const scopeOptions =
   ENUMS["components.schemas.SystemRoleAddData.properties.dataScope"];
 const menuTypes = ENUMS["components.schemas.SystemMenuAddData.properties.type"];
@@ -142,6 +145,10 @@ const options = (rows: CrudRecord[], fields: string[]): Option[] =>
                 .map(field => row[field])
                 .filter(value => typeof value === "string" && value)
                 .join(" · ") || row.id,
+            nickname:
+              typeof row.nickname === "string" ? row.nickname : undefined,
+            username:
+              typeof row.username === "string" ? row.username : undefined,
             disabled: row.enabled === false,
             version: typeof row.version === "number" ? row.version : undefined,
             parentId: typeof row.parentId === "string" ? row.parentId : null
@@ -246,6 +253,7 @@ onMounted(loadOptions);
 function openDialog(mode: "create" | "reset", reload: () => Promise<void>) {
   reloadList = reload;
   error.value = "";
+  usernameError.value = "";
   dialog.value = mode;
   Object.assign(form, {
     username: "",
@@ -259,11 +267,16 @@ function openDialog(mode: "create" | "reset", reload: () => Promise<void>) {
 }
 async function submit() {
   if (busy.value) return;
+  error.value = "";
+  usernameError.value = "";
+  if (dialog.value === "create" && !usernamePattern.test(form.username)) {
+    usernameError.value = t("system.usernameFormat");
+    return;
+  }
   const controller = new AbortController();
   requests.add(controller);
   const epoch = user.epoch;
   busy.value = true;
-  error.value = "";
   try {
     if (dialog.value === "create")
       await api.systemUserCreate(
@@ -302,6 +315,21 @@ async function submit() {
     await loadOptions();
   } catch (reason) {
     if (!controller.signal.aborted && epoch === user.epoch) {
+      const account =
+        dialog.value === "create"
+          ? issuesFrom(reason).find(
+              issue =>
+                issue.field === "username" || issue.field === "data.username"
+            )
+          : undefined;
+      if (account?.messages.length) {
+        usernameError.value = account.messages.some(message =>
+          message.includes("must match")
+        )
+          ? t("system.usernameFormat")
+          : account.messages.join("；");
+        return;
+      }
       const view = failureView(
         reason instanceof RequestFailure ? reason.failure : null
       );
@@ -322,6 +350,9 @@ function selection(field: string): Option[] {
   if (field === "parentId" && props.resource === "menu") return menus.value;
   return orgs.value;
 }
+const userOptionsById = computed(
+  () => new Map(users.value.map(option => [option.id, option]))
+);
 const referenceFields = [
   "parentId",
   "defaultOrgId",
@@ -379,6 +410,22 @@ function cell(row: CrudRecord, field: string): CrudCell {
       "
       :cell="cell"
     >
+      <template v-if="resource === 'org'" #cell-leaderId="{ row, text }">
+        <span
+          v-if="
+            typeof row.leaderId === 'string' &&
+            defaultCell(row, 'leaderId').state === 'visible' &&
+            userOptionsById.has(row.leaderId)
+          "
+          class="leader-identity"
+        >
+          <span>{{ userOptionsById.get(row.leaderId)?.nickname || "—" }}</span>
+          <span class="leader-account">{{
+            userOptionsById.get(row.leaderId)?.username || "—"
+          }}</span>
+        </span>
+        <template v-else>{{ text }}</template>
+      </template>
       <template v-if="resource === 'menu'" #cell-scope="{ value, text }">
         <el-tag
           v-if="value === 'platform' || value === 'tenant'"
@@ -530,25 +577,21 @@ function cell(row: CrudRecord, field: string): CrudCell {
             :value="option.id"
             :label="option.label"
             :disabled="option.disabled"
-          />
+          >
+            <span v-if="field === 'leaderId'" class="leader-identity">
+              <span>{{ option.nickname || "—" }}</span>
+              <span class="leader-account">{{ option.username || "—" }}</span>
+            </span>
+            <template v-else>{{ option.label }}</template>
+          </el-option>
         </el-select>
       </template>
       <template #form-permissions="{ values, disabled }">
-        <el-select
+        <RolePermissionTree
           :model-value="(values.permissions ?? []) as string[]"
-          multiple
-          filterable
           :disabled="disabled"
-          :aria-label="t('system.permissions')"
           @update:model-value="values.permissions = $event"
-        >
-          <el-option
-            v-for="code in permissionOptions"
-            :key="code"
-            :value="code"
-            :label="code"
-          />
-        </el-select>
+        />
       </template>
       <template #form-customOrgIds="{ values, disabled }">
         <el-select
@@ -650,12 +693,16 @@ function cell(row: CrudRecord, field: string): CrudCell {
         @submit.prevent="submit"
       >
         <template v-if="dialog === 'create'">
-          <el-form-item :label="t('admin.account')" required
+          <el-form-item
+            :label="t('admin.account')"
+            :error="usernameError"
+            required
             ><el-input
               v-model="form.username"
               maxlength="64"
               autocomplete="off"
               :disabled="busy"
+              @update:model-value="usernameError = ''"
           /></el-form-item>
           <el-form-item :label="t('system.name')" required
             ><el-input v-model="form.nickname" maxlength="100" :disabled="busy"
@@ -723,6 +770,16 @@ function cell(row: CrudRecord, field: string): CrudCell {
   flex-direction: column;
   gap: 8px;
   min-height: 0;
+}
+
+.leader-identity {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.leader-account {
+  color: var(--el-text-color-secondary);
 }
 
 .side {

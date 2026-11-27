@@ -1,179 +1,326 @@
 <script setup lang="ts">
 import { ref, watch, computed, defineAsyncComponent } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import { api } from "@/api/client";
 import type { components } from "@/api/schema";
-import { permission } from "@/platform/system/resources";
+import { useFillHeight } from "@/components/Crud/useFillHeight";
 import ResourceSelect from "./ResourceSelect.vue";
-import { useRequestScope } from "./model";
+import WorkflowCanvas from "./WorkflowCanvas.vue";
+import { copy, useRequestScope } from "./model";
+
 const FormPreview = defineAsyncComponent(
   () => import("../form/FormPreview.vue")
 );
-const emit = defineEmits<{ close: []; started: [id: string] }>();
+type Schema = components["schemas"];
 const { t } = useI18n();
-const { busy, error, run } = useRequestScope();
-const definitionId = ref(""),
-  submissionId = ref(""),
-  mode = ref<"new" | "existing">("new"),
-  selections = ref<Record<string, string[]>>({});
-const definition = ref<components["schemas"]["WorkflowAvailableRow"]>();
+const route = useRoute();
+const router = useRouter();
+const { busy, error, run, reset } = useRequestScope();
+const graphRequest = useRequestScope();
+const page = ref<HTMLElement>();
+const height = useFillHeight(page, 320);
+const definition = ref<Schema["WorkflowAvailableRow"]>();
+const draft = ref<Schema["ApplicationDraftRow"]>();
+const initialValues = ref<Record<string, unknown>>({});
+const selections = ref<Record<string, string[]>>({});
+const preview = ref<InstanceType<typeof FormPreview>>();
 const canStart = computed(() =>
-  Boolean(
-    definition.value &&
-      submissionId.value &&
-      definition.value.selections.every(n => selections.value[n.id]?.length)
-  )
+  definition.value?.selections.every(node => selections.value[node.id]?.length)
 );
-watch(definitionId, async id => {
-  definition.value = undefined;
-  submissionId.value = "";
-  selections.value = {};
-  mode.value = "new";
-  if (id)
-    await run(async signal => {
-      const row = (
-        await api.workflowDefinitionAvailable(
-          { body: { id, keyword: "", page: 1, size: 1 } },
-          { signal }
-        )
-      ).data.list[0];
-      if (!row?.form) throw Error(t("workflow.unavailableChoice"));
-      definition.value = row;
-    });
-});
-async function start() {
-  if (!canStart.value) return;
-  await run(async (signal, key) => {
-    const body = {
-      definitionId: definitionId.value,
-      submissionId: submissionId.value,
-      selections: selections.value
-    };
-    const r = await api.workflowInstanceStart(
-      { body },
-      { signal, headers: { "Idempotency-Key": key(body) } }
-    );
-    ElMessage.success(t("workflow.started"));
-    emit("started", r.data.id);
-  });
-}
-function submitted(record: components["schemas"]["FormSubmissionRow"]) {
-  submissionId.value = record.id;
-  mode.value = "existing";
-  ElMessage.success(t("workflow.submissionReady"));
-}
-async function close(done?: () => void) {
-  if (busy.value) return;
-  if (submissionId.value) {
-    try {
-      await ElMessageBox.confirm(
-        t("workflow.savedSubmissionHint"),
-        t("workflow.leave")
-      );
-    } catch {
+
+watch(
+  () => [route.name, route.params.id],
+  async ([name, id]) => {
+    if (
+      name === "WorkflowApplicationDraft" &&
+      draft.value?.id === id &&
+      definition.value
+    )
+      return;
+    reset();
+    graphRequest.reset();
+    definition.value = undefined;
+    draft.value = undefined;
+    initialValues.value = {};
+    selections.value = {};
+    if (typeof id !== "string" || !/^[1-9]\d{0,19}$/.test(id)) {
+      error.value = "crud.recordUnavailable";
       return;
     }
-  }
-  done?.();
-  emit("close");
+    await run(async signal => {
+      const existing =
+        name === "WorkflowApplicationDraft"
+          ? (await api.workflowInstanceDraftInfo({ body: { id } }, { signal }))
+              .data
+          : undefined;
+      const { data } = await api.workflowDefinitionAvailable(
+        {
+          body: {
+            id: existing?.definitionId ?? id,
+            keyword: "",
+            page: 1,
+            size: 1,
+            selections: existing?.selections
+          }
+        },
+        { signal }
+      );
+      if (signal.aborted) return;
+      const row = data.list[0];
+      if (!row?.form?.fields || !row.form.designer)
+        throw Error(t("workflow.unavailableChoice"));
+      draft.value = existing;
+      initialValues.value = existing?.values ?? {};
+      selections.value = existing?.selections ?? {};
+      definition.value = row;
+    });
+  },
+  { immediate: true }
+);
+
+function back() {
+  void router.push({
+    path: "/workflow/instance",
+    query: route.name === "WorkflowApplicationDraft" ? { drafts: "1" } : {}
+  });
+}
+
+function updateSelection(id: string, value: string[]) {
+  selections.value[id] = value;
+  const current = definition.value;
+  if (!current) return;
+  graphRequest.reset();
+  void graphRequest.run(async signal => {
+    const { data } = await api.workflowDefinitionAvailable(
+      {
+        body: {
+          id: current.id,
+          keyword: "",
+          page: 1,
+          size: 1,
+          selections: Object.fromEntries(
+            Object.entries(selections.value).filter(([, users]) => users.length)
+          )
+        }
+      },
+      { signal }
+    );
+    if (!signal.aborted && definition.value === current)
+      current.progress = data.list[0]?.progress;
+  });
+}
+
+async function submit(action: "draft" | "start") {
+  if (
+    busy.value ||
+    !definition.value ||
+    !preview.value ||
+    (action === "start" && !canStart.value)
+  )
+    return;
+  await run(async (signal, key) => {
+    const values = await preview.value?.applicationValues(action === "start");
+    if (!values || signal.aborted || !definition.value) return;
+    const body = {
+      definitionId: definition.value.id,
+      values,
+      selections: copy(
+        Object.fromEntries(
+          Object.entries(selections.value).filter(([, users]) => users.length)
+        )
+      ),
+      ...(draft.value
+        ? { draftId: draft.value.id, version: draft.value.version }
+        : {})
+    };
+    const config = {
+      signal,
+      headers: { "Idempotency-Key": key({ action, body }) }
+    };
+    if (action === "draft") {
+      const { data } = await api.workflowInstanceDraftSave({ body }, config);
+      if (signal.aborted) return;
+      draft.value = data;
+      ElMessage.success(t("workflow.applicationDraftSaved"));
+      await router.replace({
+        name: "WorkflowApplicationDraft",
+        params: { id: data.id }
+      });
+    } else {
+      const { data } = await api.workflowInstanceStartApplication(
+        { body },
+        config
+      );
+      if (signal.aborted) return;
+      ElMessage.success(t("workflow.started"));
+      await router.replace({
+        path: "/workflow/instance",
+        query: { instanceId: data.id, mine: "1" }
+      });
+    }
+  });
 }
 </script>
+
 <template>
-  <el-dialog
-    :model-value="true"
-    :title="t('workflow.startApplication')"
-    width="min(980px,96vw)"
-    top="4vh"
-    append-to-body
-    :close-on-click-modal="false"
-    :before-close="close"
+  <section
+    ref="page"
+    class="application-editor"
+    :style="{ height: `${height}px` }"
   >
-    <div class="start-application">
-      <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
-      <el-steps :active="submissionId ? 2 : definition ? 1 : 0" simple
-        ><el-step :title="t('workflow.selectWorkflow')" /><el-step
-          :title="t('workflow.fillApplication')" /><el-step
-          :title="t('workflow.startApplication')"
-      /></el-steps>
-      <el-form label-position="top" :disabled="busy"
-        ><el-form-item :label="t('workflow.selectWorkflow')" required
-          ><ResourceSelect
-            v-model="definitionId"
-            kind="workflows"
-            published
-            :disabled="busy" /></el-form-item
-        ><el-form-item
-          v-for="node in definition?.selections ?? []"
-          :key="node.id"
-          :label="node.name"
-          required
-          ><ResourceSelect
-            :model-value="selections[node.id] ?? []"
-            kind="users"
-            multiple
-            :disabled="busy"
-            @update:model-value="
-              selections[node.id] = $event as string[]
-            " /></el-form-item
-      ></el-form>
-      <template v-if="definition?.form"
-        ><el-radio-group v-model="mode" :disabled="busy"
-          ><el-radio-button
-            value="new"
-            :label="t('workflow.fillNew')" /><el-radio-button
-            value="existing"
-            :label="t('workflow.useSubmission')"
-        /></el-radio-group>
-        <FormPreview
-          v-if="mode === 'new'"
-          :key="definitionId"
-          :definition-id="definition.formDefinitionId"
-          :fields="definition.form.fields!"
-          :designer="definition.form.designer!"
-          submit
-          @submitted="submitted"
-        />
-        <el-form v-else label-position="top"
-          ><el-form-item :label="t('workflow.mySubmission')" required
-            ><ResourceSelect
-              v-model="submissionId"
-              kind="submissions"
+    <el-page-header @back="back">
+      <template #content>{{
+        definition?.name || t("workflow.startApplication")
+      }}</template>
+    </el-page-header>
+    <el-alert v-if="error" :title="t(error)" type="error" :closable="false" />
+    <el-skeleton v-if="busy && !definition" :rows="4" animated />
+    <template v-if="definition?.form?.fields && definition.form.designer">
+      <div class="application-layout">
+        <section
+          class="application-form"
+          :aria-label="t('workflow.fillApplication')"
+        >
+          <div class="application-fields" tabindex="0" :inert="busy">
+            <FormPreview
+              ref="preview"
+              :key="definition.id"
               :definition-id="definition.formDefinitionId"
-              :disabled="busy" /></el-form-item
-        ></el-form>
-      </template>
-      <p class="hint">{{ t("workflow.startHint") }}</p>
-    </div>
-    <template #footer
-      ><el-button :disabled="busy" @click="close()">{{
-        t("crud.cancel")
-      }}</el-button
-      ><el-button
-        v-perm="permission('workflowInstanceStart')"
-        type="primary"
-        :loading="busy"
-        :disabled="!canStart"
-        @click="start"
-        >{{ t("workflow.startApplication") }}</el-button
-      ></template
-    >
-  </el-dialog>
+              :fields="definition.form.fields"
+              :designer="definition.form.designer"
+              :initial-values="initialValues"
+              embedded
+            />
+            <el-form label-position="top" :disabled="busy">
+              <el-form-item
+                v-for="node in definition.selections"
+                :key="node.id"
+                :label="node.name"
+                required
+              >
+                <ResourceSelect
+                  :model-value="selections[node.id] ?? []"
+                  kind="users"
+                  multiple
+                  show-avatars
+                  :disabled="busy"
+                  @update:model-value="
+                    updateSelection(node.id, $event as string[])
+                  "
+                />
+              </el-form-item>
+            </el-form>
+          </div>
+          <el-space wrap class="application-actions">
+            <el-button :disabled="busy" @click="submit('draft')">{{
+              t("workflow.saveApplicationDraft")
+            }}</el-button>
+            <el-button
+              type="primary"
+              :loading="busy"
+              :disabled="!canStart"
+              @click="submit('start')"
+            >
+              {{ t("workflow.startApplication") }}
+            </el-button>
+          </el-space>
+        </section>
+        <aside
+          class="application-diagram"
+          :aria-label="t('workflow.approvalFlow')"
+        >
+          <h2>{{ t("workflow.approvalFlow") }}</h2>
+          <el-alert
+            v-if="graphRequest.error.value"
+            :title="t(graphRequest.error.value)"
+            type="error"
+            :closable="false"
+          />
+          <WorkflowCanvas
+            v-if="definition.progress"
+            v-loading="graphRequest.busy.value"
+            :progress="definition.progress"
+            readonly
+            embedded
+          />
+        </aside>
+      </div>
+    </template>
+  </section>
 </template>
+
 <style scoped>
-.start-application {
+.application-editor {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--el-bg-color);
+  border-radius: var(--el-border-radius-base);
+}
+
+.application-editor :deep(.el-page-header) {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.application-layout {
   display: grid;
-  gap: 20px;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  min-height: 0;
+}
+
+.application-form,
+.application-diagram {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
-.hint {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--el-text-color-secondary);
+.application-fields {
+  flex: 1;
+  min-height: 0;
+  padding: 20px;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
-.start-application :deep(.form-preview) {
+.application-fields :deep(.form-preview) {
   max-width: none;
+}
+
+.application-actions {
+  padding: 12px 20px;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.application-diagram {
+  border-inline-start: 1px solid var(--el-border-color-lighter);
+}
+
+.application-diagram h2 {
+  padding: 12px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.application-diagram :deep(.workflow-canvas) {
+  flex: 1;
+}
+
+@media (width <= 850px) {
+  .application-layout {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 0.8fr);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .application-diagram {
+    border-inline-start: 0;
+    border-top: 1px solid var(--el-border-color-lighter);
+  }
 }
 </style>

@@ -8,6 +8,7 @@ import { ref, nextTick, computed, onMounted } from "vue";
 import { storageLocal, isAllEmpty } from "@pureadmin/utils";
 import { useTranslationLang } from "../../hooks/useTranslationLang";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
 import LaySidebarItem from "../lay-sidebar/components/SidebarItem.vue";
 import LaySidebarFullScreen from "../lay-sidebar/components/SidebarFullScreen.vue";
 
@@ -16,7 +17,11 @@ import LogoutCircleRLine from "~icons/ri/logout-circle-r-line";
 import Setting from "~icons/ri/settings-3-line";
 import Check from "~icons/ep/check";
 
-const menuRef = ref();
+const menuRef = ref<{ open(index: string): void; handleResize(): void }>();
+const counts = useWorkflowCounts();
+function openGroup(path: string) {
+  menuRef.value?.open(path);
+}
 const showLogo = ref(
   storageLocal().getItem<StorageConfigs>(
     `${responsiveStorageNameSpace()}configure`
@@ -74,6 +79,8 @@ onMounted(() => {
         :key="route.path"
         :item="route"
         :base-path="route.path"
+        :pending-by-path="counts.pendingByPath"
+        :open-group="openGroup"
       />
     </el-menu>
     <div class="horizontal-header-right">

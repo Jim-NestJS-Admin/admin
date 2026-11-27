@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeUnmount, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { generatedCrud } from "@/platform/generated-crud";
 import { permission } from "@/platform/system/resources";
@@ -8,8 +8,10 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { onSessionReset } from "@/platform/lifecycle";
 import type { CrudPort, CrudRecord } from "@/components/Crud/types";
 import CrudPage from "@/components/Crud/CrudPage.vue";
-import StartApplication from "./StartApplication.vue";
+import { useFillHeight } from "@/components/Crud/useFillHeight";
 import WorkflowDocument from "./WorkflowDocument.vue";
+import ApplicationCatalog from "./ApplicationCatalog.vue";
+import ApplicationDrafts from "./ApplicationDrafts.vue";
 defineOptions({ name: "WorkflowWorkbenchPage" });
 const { t } = useI18n();
 const user = useUserStoreHook();
@@ -18,24 +20,69 @@ const tab = ref(
       ? "pending"
       : "mine"
   ),
-  start = ref(false),
   detail = ref<{ instanceId: string; taskId?: string }>();
 const list = ref<InstanceType<typeof CrudPage>>();
+const page = ref<HTMLElement>();
+const height = useFillHeight(page);
+const catalogOpen = ref(false);
+const canApply = computed(() =>
+  user.permissions.includes(permission("workflowInstanceStart"))
+);
 const route = useRoute();
+const router = useRouter();
 watch(
-  () => route.query.instanceId,
-  value => {
+  () => [
+    route.query.instanceId,
+    route.query.taskId,
+    route.query.mine,
+    route.query.drafts,
+    route.query.apply,
+    route.query.pending
+  ],
+  ([value, taskId, mine, drafts, apply, pending]) => {
     if (typeof value === "string" && /^[1-9]\d{0,19}$/.test(value))
       detail.value = {
         instanceId: value,
-        ...(typeof route.query.taskId === "string" &&
-        /^[1-9]\d{0,19}$/.test(route.query.taskId)
-          ? { taskId: route.query.taskId }
+        ...(typeof taskId === "string" && /^[1-9]\d{0,19}$/.test(taskId)
+          ? { taskId }
           : {})
       };
+    if (
+      mine === "1" &&
+      user.permissions.includes(permission("workflowInstancePage"))
+    )
+      tab.value = "mine";
+    if (drafts === "1" && canApply.value) tab.value = "drafts";
+    if (apply === "1" && canApply.value) catalogOpen.value = true;
+    if (
+      pending === "1" &&
+      user.permissions.includes(permission("workflowTaskPage"))
+    ) {
+      tab.value = "pending";
+      const query = { ...route.query };
+      delete query.pending;
+      void router.replace({ query });
+    }
   },
   { immediate: true }
 );
+function closeCatalog() {
+  catalogOpen.value = false;
+  if (route.path === "/workflow/instance" && route.query.apply === "1") {
+    const query = { ...route.query };
+    delete query.apply;
+    void router.replace({ query });
+  }
+}
+function closeDocument() {
+  detail.value = undefined;
+  if (route.query.instanceId) {
+    const query = { ...route.query };
+    delete query.instanceId;
+    delete query.taskId;
+    void router.replace({ query });
+  }
+}
 const port = computed<CrudPort>(() => {
   const resource = tab.value === "mine" ? "workflowInstance" : "workflowTask";
   const g = generatedCrud(resource);
@@ -83,48 +130,62 @@ function open(row: CrudRecord) {
     ...(tab.value !== "mine" ? { taskId: String(row.id) } : {})
   };
 }
-function started(id: string) {
-  start.value = false;
-  tab.value = "mine";
-  detail.value = { instanceId: id };
-  void list.value?.refresh();
-}
 const stop = onSessionReset(() => {
-  start.value = false;
   detail.value = undefined;
+  catalogOpen.value = false;
 });
 onBeforeUnmount(stop);
 </script>
 <template>
-  <div class="workflow-workbench">
-    <el-tabs v-model="tab"
-      ><el-tab-pane
-        v-if="user.permissions.includes(permission('workflowTaskPage'))"
-        :label="t('workflow.tabs.pending')"
-        name="pending" /><el-tab-pane
-        v-if="user.permissions.includes(permission('workflowTaskPage'))"
-        :label="t('workflow.tabs.processed')"
-        name="processed" /><el-tab-pane
-        v-if="user.permissions.includes(permission('workflowInstancePage'))"
-        :label="t('workflow.tabs.mine')"
-        name="mine" /><el-tab-pane
-        v-if="user.permissions.includes(permission('workflowTaskPage'))"
-        :label="t('workflow.tabs.copy')"
-        name="copy" /></el-tabs
-    ><CrudPage
-      ref="list"
+  <div ref="page" class="workflow-workbench" :style="{ height: `${height}px` }">
+    <header class="workbench-header">
+      <el-tabs v-model="tab"
+        ><el-tab-pane
+          v-if="user.permissions.includes(permission('workflowTaskPage'))"
+          :label="t('workflow.tabs.pending')"
+          name="pending"
+        /><el-tab-pane
+          v-if="user.permissions.includes(permission('workflowTaskPage'))"
+          :label="t('workflow.tabs.processed')"
+          name="processed"
+        /><el-tab-pane
+          v-if="user.permissions.includes(permission('workflowInstancePage'))"
+          :label="t('workflow.tabs.mine')"
+          name="mine"
+        /><el-tab-pane
+          v-if="user.permissions.includes(permission('workflowTaskPage'))"
+          :label="t('workflow.tabs.copy')"
+          name="copy"
+        />
+        <el-tab-pane
+          v-if="canApply"
+          :label="t('workflow.applicationDrafts')"
+          name="drafts"
+        />
+      </el-tabs>
+    </header>
+    <ApplicationDrafts v-if="tab === 'drafts'" class="workbench-body">
+      <template v-if="canApply" #toolbar>
+        <el-button type="primary" @click="catalogOpen = true"
+          >+ {{ t("workflow.startApplication") }}</el-button
+        >
+      </template>
+    </ApplicationDrafts>
+    <CrudPage
+      v-else
       :key="tab"
+      ref="list"
+      class="workbench-body"
       :port="port"
       :page-key="tab === 'mine' ? 'workflow:instance' : 'workflow:task'"
       :row-actions-width="150"
-      ><template #toolbar
-        ><el-button
-          v-perm="permission('workflowInstanceStart')"
-          type="primary"
-          @click="start = true"
+    >
+      <template v-if="canApply" #toolbar>
+        <el-button type="primary" @click="catalogOpen = true"
           >+ {{ t("workflow.startApplication") }}</el-button
-        ></template
-      ><template #cell-revision="{ value }"
+        >
+      </template>
+      <template #cell-revision="{ value }"
         ><el-tag size="small">v{{ value }}</el-tag></template
       ><template #row-actions="{ row, disabled }"
         ><el-button
@@ -142,26 +203,43 @@ onBeforeUnmount(stop);
           }}</el-button
         ></template
       ></CrudPage
-    ><StartApplication
-      v-if="start"
-      @close="start = false"
-      @started="started"
-    /><WorkflowDocument
+    >
+    <ApplicationCatalog v-if="catalogOpen" @close="closeCatalog" />
+    <WorkflowDocument
       v-if="detail"
       :instance-id="detail.instanceId"
       :task-id="detail.taskId"
-      @close="detail = undefined"
+      @close="closeDocument"
       @changed="list?.refresh()"
     />
   </div>
 </template>
 <style scoped>
 .workflow-workbench {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
+  background: var(--el-bg-color);
+  border-radius: var(--el-border-radius-base);
 }
 
-.workflow-workbench :deep(.el-tabs__header) {
-  margin-bottom: 12px;
+.workbench-header {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.workbench-header :deep(.el-tabs__header) {
+  margin: 0;
+}
+
+.workbench-header :deep(.el-tabs__nav-wrap::after) {
+  background: transparent;
+}
+
+.workbench-body {
+  flex: 1;
+  min-height: 0;
 }
 </style>

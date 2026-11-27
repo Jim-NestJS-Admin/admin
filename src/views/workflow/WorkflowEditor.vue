@@ -1,23 +1,28 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from "vue-router";
+import { onSessionReset } from "@/platform/lifecycle";
 import { useI18n } from "vue-i18n";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { api } from "@/api/client";
+import type { components } from "@/api/schema";
 import { permission } from "@/platform/system/resources";
 import { issuesFrom } from "../form/model";
 import {
   allNodes,
   copy,
   newNode,
+  parallelApproverBlocks,
   useRequestScope,
   type Definition,
   type Designer,
   type Field,
   type Node
 } from "./model";
-import NodeList from "./NodeList.vue";
+import WorkflowCanvas from "./WorkflowCanvas.vue";
 import NodeSettings from "./NodeSettings.vue";
 import ResourceSelect from "./ResourceSelect.vue";
+import { useWorkflowPublish } from "./useWorkflowPublish";
 const props = defineProps<{
   record: Definition | null;
   mode: "create" | "revise" | "view";
@@ -25,9 +30,11 @@ const props = defineProps<{
 const emit = defineEmits<{ saved: []; close: [] }>();
 const { t } = useI18n();
 const { busy, error, run } = useRequestScope();
+const publishVersion = useWorkflowPublish(run);
 const form = ref({
   name: props.record?.name ?? "",
   description: props.record?.description ?? "",
+  category: props.record?.category ?? "",
   formDefinitionId: props.record?.formDefinitionId ?? ""
 });
 const designer = ref<Designer>(
@@ -38,25 +45,72 @@ const designer = ref<Designer>(
     }
   )
 );
-const fields = ref<Field[]>([]),
+const boundForm = ref<components["schemas"]["FormDefinitionRow"]>(),
+  formState = ref<"loading" | "ready" | "unavailable" | "error">("unavailable"),
+  formLoadAttempt = ref(0),
+  nodeTab = ref<"approval" | "fields">("approval"),
   selectedId = ref(""),
+  panel = ref<"workflow" | "node" | "">(""),
   valid = ref(false),
   issues = ref<string[]>([]);
 const readonly = computed(() => props.mode === "view");
+const fields = computed<Field[]>(() => boundForm.value?.fields ?? []);
+const formLabel = computed(() => {
+  const record = boundForm.value;
+  return [record?.name, record?.revision && `v${record.revision}`]
+    .filter(Boolean)
+    .join(" · ");
+});
 const selected = computed(() =>
-  allNodes(designer.value.nodes).find(n => n.id === selectedId.value)
+  allNodes(designer.value.nodes).find(
+    node =>
+      node.id === selectedId.value ||
+      node.branches?.some(branch => branch.id === selectedId.value)
+  )
 );
-const initial = JSON.stringify({ form: form.value, designer: designer.value });
+const drawerOpen = computed({
+  get: () => panel.value !== "",
+  set: (open: boolean) => {
+    if (!open) {
+      panel.value = "";
+      selectedId.value = "";
+    }
+  }
+});
+function openNode(id: string) {
+  nodeTab.value = "approval";
+  selectedId.value = id;
+  panel.value = "node";
+}
+function bindFormForNode() {
+  nodeTab.value = "fields";
+  panel.value = "workflow";
+}
+const snapshot = () =>
+  JSON.stringify({ form: form.value, designer: designer.value });
+const initial = snapshot();
+let canLeave = false;
+const stop = onSessionReset(() => (canLeave = true));
+onBeforeUnmount(stop);
 watch(
-  () => form.value.formDefinitionId,
-  async id => {
-    fields.value = [];
+  () => [form.value.formDefinitionId, formLoadAttempt.value] as const,
+  async ([id], _, onCleanup) => {
+    boundForm.value = undefined;
+    formState.value = id ? "loading" : "unavailable";
     if (!id) return;
-    await run(async signal => {
-      fields.value = (
-        await api.formDefinitionInfo({ body: { id } }, { signal })
-      ).data.fields;
-    });
+    const request = new AbortController();
+    onCleanup(() => request.abort());
+    try {
+      const { data } = await api.formDefinitionInfo(
+        { body: { id } },
+        { signal: request.signal }
+      );
+      if (request.signal.aborted) return;
+      boundForm.value = data;
+      formState.value = Array.isArray(data.fields) ? "ready" : "unavailable";
+    } catch {
+      if (!request.signal.aborted) formState.value = "error";
+    }
   },
   { immediate: true }
 );
@@ -97,14 +151,26 @@ function validateLocal() {
   for (const node of nodes) {
     if (!node.name.trim()) issues.value.push(t("workflow.needNodeName"));
     if (
-      node.actor &&
-      ["users", "roles"].includes(node.actor.type) &&
-      !node.actor.ids?.length
+      (node.type === "approve" || node.type === "copy") &&
+      (!node.actor ||
+        (["users", "roles"].includes(node.actor.type) &&
+          !node.actor.ids?.length))
     )
       issues.value.push(`${node.name}：${t("workflow.needPeople")}`);
+    if (node.type === "approve" && node.actor?.type === "users") {
+      const blocked = parallelApproverBlocks(designer.value.nodes, node.id);
+      for (const branch of new Set(
+        node.actor.ids?.map(id => blocked[id]).filter(Boolean)
+      ))
+        issues.value.push(
+          `${node.name}：${t("workflow.memberInBranch", { name: branch })}`
+        );
+    }
     for (const b of node.branches ?? [])
       if (!b.name.trim()) issues.value.push(t("workflow.needBranchName"));
   }
+  if (!form.value.name.trim() || !form.value.formDefinitionId)
+    panel.value = "workflow";
   return !issues.value.length;
 }
 async function inspect() {
@@ -168,6 +234,7 @@ async function save() {
         );
       else await api.workflowDefinitionAdd({ body: { data } }, config);
       ElMessage.success(t("workflow.savedDraft"));
+      canLeave = true;
       emit("saved");
     } catch (e) {
       issues.value = issuesFrom(e).map(i => i.messages.join("；"));
@@ -177,64 +244,83 @@ async function save() {
 }
 async function publish() {
   if (!props.record) return;
+  const { id, version } = props.record;
+  if (await publishVersion({ id, version })) emit("saved");
+}
+async function confirmLeave() {
+  if (canLeave || readonly.value) return true;
+  if (busy.value) return false;
+  if (initial === snapshot()) return true;
   try {
     await ElMessageBox.confirm(
-      t("workflow.publishConfirm"),
-      t("workflow.publish"),
+      t("workflow.discardConfirm"),
+      t("workflow.leave"),
       { type: "warning" }
     );
+    return true;
   } catch {
-    return;
+    return false;
   }
-  await run(async (signal, key) => {
-    const body = { id: props.record!.id, version: props.record!.version };
-    await api.workflowDefinitionPublish(
-      { body },
-      { signal, headers: { "Idempotency-Key": key(body) } }
-    );
-    ElMessage.success(t("workflow.published"));
-    emit("saved");
-  });
 }
-async function close(done?: () => void) {
-  if (busy.value) return;
-  if (
-    !readonly.value &&
-    initial !== JSON.stringify({ form: form.value, designer: designer.value })
-  ) {
-    try {
-      await ElMessageBox.confirm(
-        t("workflow.discardConfirm"),
-        t("workflow.leave"),
-        { type: "warning" }
-      );
-    } catch {
-      return;
-    }
-  }
-  done?.();
-  emit("close");
-}
+onBeforeRouteLeave(confirmLeave);
+onBeforeRouteUpdate(confirmLeave);
 </script>
 <template>
-  <el-dialog
-    :model-value="true"
-    width="min(1440px,96vw)"
-    top="3vh"
-    append-to-body
-    destroy-on-close
-    :close-on-click-modal="false"
-    :before-close="close"
-    :title="
-      t(
-        readonly
-          ? 'workflow.viewDefinition'
-          : mode === 'revise'
-            ? 'workflow.revise'
-            : 'workflow.create'
-      )
-    "
-  >
+  <section class="workflow-designer-page">
+    <header class="workflow-designer-page__header">
+      <el-page-header @back="emit('close')">
+        <template #content>
+          {{
+            t(
+              readonly
+                ? "workflow.viewDefinition"
+                : mode === "revise"
+                  ? "workflow.revise"
+                  : "workflow.create"
+            )
+          }}
+        </template>
+      </el-page-header>
+      <div class="workflow-designer-page__actions">
+        <el-space wrap
+          ><el-button :disabled="busy" @click="panel = 'workflow'">{{
+            t("workflow.definitionDetails")
+          }}</el-button
+          ><el-button
+            v-if="!readonly"
+            :disabled="busy"
+            @click="emit('close')"
+            >{{ t("crud.cancel") }}</el-button
+          ><el-button
+            v-if="!readonly"
+            v-perm="permission('workflowDefinitionInspect')"
+            :loading="busy"
+            @click="inspect"
+            >{{ t("workflow.inspect") }}</el-button
+          ><el-button
+            v-if="!readonly"
+            v-perm="
+              permission(
+                mode === 'revise'
+                  ? 'workflowDefinitionRevise'
+                  : 'workflowDefinitionAdd'
+              )
+            "
+            type="primary"
+            :loading="busy"
+            @click="save"
+            >{{ t("workflow.saveDraft") }}</el-button
+          ><el-button
+            v-if="readonly && record?.status === 'draft'"
+            v-perm="permission('workflowDefinitionPublish')"
+            type="primary"
+            :loading="busy"
+            @click="publish"
+            >{{ t("workflow.publish") }}</el-button
+          ></el-space
+        >
+      </div>
+    </header>
     <div v-loading="busy" class="workflow-editor">
       <el-space v-if="record" wrap
         ><el-tag>{{ record.name }}</el-tag
@@ -257,177 +343,109 @@ async function close(done?: () => void) {
         type="success"
         :closable="false"
       />
-      <el-form
-        label-position="top"
-        :disabled="readonly || busy"
-        class="definition-meta"
-      >
-        <el-form-item
-          :label="t('workflow.name')"
-          required
-          :error="
-            !form.name.trim() && issues.length
-              ? t('workflow.needName')
-              : undefined
-          "
-          ><el-input v-model="form.name" maxlength="100" show-word-limit
-        /></el-form-item>
-        <el-form-item :label="t('workflow.formVersion')" required
-          ><ResourceSelect
-            :model-value="form.formDefinitionId"
-            kind="forms"
-            :disabled="readonly || busy"
-            @update:model-value="form.formDefinitionId = String($event)"
-        /></el-form-item>
-        <el-form-item :label="t('workflow.description')" class="description"
-          ><el-input
-            v-model="form.description"
-            type="textarea"
-            maxlength="500"
-            show-word-limit
-            :rows="2"
-        /></el-form-item>
-      </el-form>
-      <p class="hint">{{ t("workflow.immutableHint") }}</p>
-      <div class="designer-layout">
-        <div class="designer-canvas">
-          <div class="endpoint">{{ t("workflow.startApplicant") }}</div>
-          <NodeList
-            v-model="designer.nodes"
-            :readonly="readonly || busy"
-            :selected-id="selectedId"
-            @select="selectedId = $event"
-          />
-          <div class="endpoint">{{ t("workflow.end") }}</div>
-        </div>
-        <aside class="designer-settings">
-          <h3>{{ t("workflow.nodeSettings") }}</h3>
-          <NodeSettings
-            v-if="selected"
-            :model-value="selected"
-            :fields="fields"
-            :readonly="readonly || busy"
-            @update:model-value="setNode"
-          /><el-empty
-            v-else
-            :description="t('workflow.selectNode')"
-            :image-size="64"
-          />
-        </aside>
-      </div>
+      <WorkflowCanvas
+        v-model:nodes="designer.nodes"
+        :readonly="readonly || busy"
+        :active-id="selected?.id ?? ''"
+        :first-field="fields[0]?.field ?? ''"
+        @select="openNode"
+        @details="panel = 'workflow'"
+      />
     </div>
-    <template #footer
-      ><el-space wrap
-        ><el-button v-if="!readonly" :disabled="busy" @click="close()">{{
-          t("crud.cancel")
-        }}</el-button
-        ><el-button
-          v-if="!readonly"
-          v-perm="permission('workflowDefinitionInspect')"
-          :loading="busy"
-          @click="inspect"
-          >{{ t("workflow.inspect") }}</el-button
-        ><el-button
-          v-if="!readonly"
-          v-perm="
-            permission(
-              mode === 'revise'
-                ? 'workflowDefinitionRevise'
-                : 'workflowDefinitionAdd'
-            )
-          "
-          type="primary"
-          :loading="busy"
-          @click="save"
-          >{{ t("workflow.saveDraft") }}</el-button
-        ><el-button
-          v-if="readonly && record?.status === 'draft'"
-          v-perm="permission('workflowDefinitionPublish')"
-          type="primary"
-          :loading="busy"
-          @click="publish"
-          >{{ t("workflow.publish") }}</el-button
-        ></el-space
-      ></template
+    <el-drawer
+      v-model="drawerOpen"
+      :title="
+        panel === 'workflow'
+          ? t('workflow.definitionDetails')
+          : selected?.name || t('workflow.nodeSettings')
+      "
+      size="min(600px, 100vw)"
+      append-to-body
     >
-  </el-dialog>
+      <template v-if="panel === 'workflow'">
+        <el-form label-position="top" :disabled="readonly || busy">
+          <el-form-item
+            :label="t('workflow.name')"
+            required
+            :error="
+              !form.name.trim() && issues.length
+                ? t('workflow.needName')
+                : undefined
+            "
+            ><el-input v-model="form.name" maxlength="100" show-word-limit
+          /></el-form-item>
+          <el-form-item :label="t('workflow.formVersion')" required
+            ><ResourceSelect
+              :model-value="form.formDefinitionId"
+              kind="forms"
+              :disabled="readonly || busy"
+              @update:model-value="form.formDefinitionId = String($event)"
+          /></el-form-item>
+          <el-form-item :label="t('workflow.applicationCategory')">
+            <el-input v-model="form.category" maxlength="50" />
+          </el-form-item>
+          <el-form-item :label="t('workflow.description')"
+            ><el-input
+              v-model="form.description"
+              type="textarea"
+              maxlength="500"
+              show-word-limit
+              :rows="2"
+          /></el-form-item>
+        </el-form>
+        <p class="hint">{{ t("workflow.immutableHint") }}</p>
+        <el-button
+          v-if="selected && nodeTab === 'fields'"
+          @click="panel = 'node'"
+        >
+          {{ t("workflow.returnToFieldPermissions") }}
+        </el-button>
+      </template>
+      <NodeSettings
+        v-else-if="selected"
+        :key="selected.id"
+        :model-value="selected"
+        :fields="fields"
+        :form-definition-id="form.formDefinitionId"
+        :form-label="formLabel"
+        :form-state="formState"
+        :initial-tab="nodeTab"
+        :blocked-members="parallelApproverBlocks(designer.nodes, selected.id)"
+        :readonly="readonly || busy"
+        @update:model-value="setNode"
+        @bind-form="bindFormForNode"
+        @retry-form="formLoadAttempt++"
+      />
+    </el-drawer>
+  </section>
 </template>
 <style scoped>
-.workflow-editor {
-  display: grid;
-  gap: 16px;
+.workflow-designer-page {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 6px;
+}
+
+.workflow-designer-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.workflow-editor > .el-alert,
+.workflow-editor > .el-space {
+  margin: 12px 16px;
 }
 
 .hint {
   font-size: 13px;
   line-height: 1.6;
   color: var(--el-text-color-secondary);
-}
-
-.definition-meta {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 24px;
-}
-
-.description {
-  grid-column: 1/-1;
-}
-
-.designer-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  min-height: 480px;
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: 6px;
-}
-
-.designer-canvas {
-  max-height: 65vh;
-  padding: 24px;
-  overflow: auto;
-  background: var(--el-fill-color-lighter);
-}
-
-.endpoint {
-  max-width: 220px;
-  padding: 12px;
-  margin: 10px auto;
-  text-align: center;
-  background: var(--el-bg-color);
-  border: 1px solid var(--el-border-color);
-  border-radius: 24px;
-}
-
-.designer-settings {
-  max-height: 65vh;
-  padding: 20px;
-  overflow: auto;
-  border-left: 1px solid var(--el-border-color-lighter);
-}
-
-.designer-settings h3 {
-  margin: 0 0 20px;
-  font-size: 15px;
-}
-
-@media (width<=900px) {
-  .designer-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .designer-settings {
-    max-height: none;
-    border-top: 1px solid var(--el-border-color-lighter);
-    border-left: 0;
-  }
-
-  .designer-canvas {
-    max-height: 45vh;
-  }
-
-  .definition-meta {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

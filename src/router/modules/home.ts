@@ -21,6 +21,48 @@ export default {
         title: $t("menus.pureHome"),
         showLink: VITE_HIDE_HOME === "true" ? false : true
       }
+    },
+    {
+      path: "/notify/message",
+      name: "NotificationCenter",
+      component: () => import("@/views/notify/message.vue"),
+      meta: { title: $t("notifications.inbox"), showLink: false }
+    },
+    {
+      path: "/workflow/definition/new",
+      name: "WorkflowCreate",
+      component: () => import("@/views/workflow/design.vue"),
+      meta: { title: $t("workflow.create"), showLink: false }
+    },
+    {
+      path: "/workflow/definition/:id/revise",
+      name: "WorkflowRevise",
+      component: () => import("@/views/workflow/design.vue"),
+      meta: { title: $t("workflow.revise"), showLink: false }
+    },
+    {
+      path: "/workflow/definition/:id/view",
+      name: "WorkflowView",
+      component: () => import("@/views/workflow/design.vue"),
+      meta: { title: $t("workflow.viewDefinition"), showLink: false }
+    },
+    {
+      path: "/workflow/apply",
+      name: "WorkflowApplicationCatalog",
+      redirect: "/workflow/instance?apply=1",
+      meta: { title: $t("workflow.startApplication"), showLink: false }
+    },
+    {
+      path: "/workflow/apply/new/:id",
+      name: "WorkflowApplicationNew",
+      component: () => import("@/views/workflow/StartApplication.vue"),
+      meta: { title: $t("workflow.startApplication"), showLink: false }
+    },
+    {
+      path: "/workflow/apply/draft/:id",
+      name: "WorkflowApplicationDraft",
+      component: () => import("@/views/workflow/StartApplication.vue"),
+      meta: { title: $t("workflow.applicationDraft"), showLink: false }
     }
   ]
 } satisfies RouteConfigsTable;

@@ -188,6 +188,7 @@ crud:
   editOf: "编辑{name}"
 
 system:
+  usernameFormat: 账号须以小写字母开头，长度为 3–64 位，仅可使用小写字母、数字、下划线、点和连字符。
   roleAssignments: 角色分配
   supervisors: 上级关系
   dictionaryItems: 字典项
@@ -214,6 +215,9 @@ system:
   saved: 保存成功
   lookupFailed: 关联选项加载失败，请检查权限后重试
   permissions: 权限码
+  permissionTreeLoading: 正在加载可授予权限
+  permissionTreePlaceholder: 按名称或权限码搜索
+  permissionTreeUnavailable: 此角色保留了当前不可授予的权限。可从已选项中移除后再保存。
   organizations: 组织
   globalScope: 全局作用范围
   dataScope: 数据范围
@@ -647,7 +651,16 @@ forms:
   saveRevision: 保存新版本
   saved: 表单版本已保存
   immutableHint: 每次保存新版本，历史版本与已提交数据保持不变。
-  versionListHint: 每条记录都是一个保留的表单版本
+  versionHistory: 版本历史
+  archiveStatus: 归档状态
+  retainedVersions: 未归档
+  archivedVersions: 已归档
+  viewArchived: 查看
+  archiveVersion: 归档版本
+  restoreVersion: 恢复版本
+  archiveConfirm: 确定归档「{name}」v{revision}？归档后可以恢复。
+  archivedSuccess: 版本已归档
+  restoredSuccess: 版本已恢复
   searchHint: 搜索名称或编码
   empty: 暂无表单，点击“新建表单”开始设计
   revision: 版本
@@ -876,6 +889,27 @@ autoCodes:
     digits: 纯数字
 
 workflow:
+  approvalFlow: 审批流程
+  currentNodes: 当前审批节点
+  cardDepartmentLeader: 部门负责人
+  cardDepartmentLeaderLevel: 第 {level} 级部门负责人
+  cardSupervisor: 直属上级
+  cardSupervisorLevel: 第 {level} 级上级
+  noResolvedMembers: 未找到办理人
+  applicationItems: 审批事项
+  applicationCategory: 事项分组
+  applicationDraft: 申请草稿
+  applicationDrafts: 我的草稿
+  applicationDraftSaved: 草稿已保存
+  saveApplicationDraft: 保存草稿
+  continueApplication: 继续填写
+  draftUpdated: 上次保存
+  searchApplication: 搜索事项
+  uncategorized: 未分组
+  memberInBranch: 已在「{name}」分支选为审批人
+  removeBranchConfirm: 删除分支「{name}」及其节点？
+  definitionDetails: "流程设置"
+  submitApplication: "提交申请"
   create: "新建流程"
   viewDefinition: "流程定义详情"
   viewDesign: "查看设计"
@@ -890,6 +924,14 @@ workflow:
   formVersion: "绑定表单版本"
   immutableHint: "每次保存创建新版本；已发布版本和进行中的审批保持不变。首次创建前，请在“编码规则”的用途配置中绑定“流程定义编码”。"
   nodeSettings: "节点配置"
+  approvalSettings: "审批设置"
+  formFieldPermissions: "表单字段权限"
+  advancedSettings: "高级设置"
+  boundForm: "已绑定主表单：{form}"
+  noBoundForm: "请先在流程设置中绑定主表单，再配置字段权限。"
+  boundFormUnavailable: "当前账号无法查看已绑定表单的字段清单。"
+  boundFormLoadError: "无法加载已绑定表单，请重试。"
+  returnToFieldPermissions: "返回节点字段权限"
   selectNode: "点击左侧节点配置审批人、条件和权限"
   startApplicant: "发起人"
   end: "流程结束"
@@ -898,11 +940,14 @@ workflow:
   people: "选择成员或角色"
   level: "第几级"
   emptyPolicy: "没有可用审批人时"
+  emptyPolicyHint: "进入此节点时，如果选人规则找不到可用审批人，按这里的设置处理。"
   approvalMode: "多人审批方式"
   skipRepeated: "相邻节点重复审批人自动通过"
+  skipRepeatedHint: "当前审批人已在实际经过的所有直接前置审批节点同意时，系统自动完成该人的待办。"
   timeout: "启用超时处理"
   timeoutMinutes: "超时分钟数"
   timeoutAction: "超时动作"
+  timeoutHint: "从待办创建开始计时。到期仍待办时，按所选动作提醒或转交上级。"
   remind: "提醒当前审批人"
   transferSupervisor: "自动转交上级；无上级时提醒"
   fieldPermissions: "节点字段权限"
@@ -962,6 +1007,8 @@ workflow:
   uploadAttachment: "上传附件"
   attachmentHint: "最多10个，沿用文件模块的类型与大小限制；取消办理不会自动删除已上传文件。"
   transferTarget: "转交给"
+  transferRecord: "{from} 转交给了 {to}"
+  systemActor: "系统"
   needTarget: "请选择转交接收人"
   actionConfirm: "确认执行“{action}”？"
   actionDone: "操作已完成"
@@ -1019,14 +1066,14 @@ workflow:
   instanceStatus:
     running: "审批中"
     approved: "已通过"
-    returned: "已退回"
+    returned: "已驳回"
     withdrawn: "已撤回"
   progress:
     waiting: "未进入"
-    pending: "处理中"
+    pending: "待审批"
     approved: "已通过"
     cancelled: "已取消"
-    returned: "已退回"
+    returned: "已驳回"
     copied: "已抄送"
     taken: "已选路"
 
@@ -1056,6 +1103,24 @@ memberPicker:
   cancel: "取消"
   confirm: "确定"
 notifications:
+  inbox: 站内信中心
+  all: 全部
+  unreadStatus: 未读
+  viewMore: 查看更多
+  markRead: 标为已读
+  markPreviewRead: 将当前列表中的消息标为已读
+  event:
+    taskCreated: 新审批待办
+    taskReminder: 审批催办
+    taskCancelled: 审批待办已失效
+    taskCopied: 审批抄送
+    instanceApproved: 审批通过
+    instanceReturned: 审批退回
+    instanceWithdrawn: 申请撤回
+    mcpExempt: 免确认操作通知
+    other: 其他通知
+  unread: "{count} 条未读消息"
+  pending: "{count} 条审批待办"
   queued: 已加入同步队列，请在同步记录查看结果
   logs: 同步记录
   open: 查看消息

@@ -7,6 +7,8 @@ import { useI18n } from "vue-i18n";
 import { useLayout } from "./hooks/useLayout";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useSettingStoreHook } from "@/store/modules/settings";
+import { useWorkflowCounts } from "@/store/modules/workflow-counts";
+import { useEventListener, useIntervalFn } from "@vueuse/core";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
 import {
   h,
@@ -39,6 +41,12 @@ const { layout } = useLayout();
 const isMobile = deviceDetection();
 const pureSetting = useSettingStoreHook();
 const { $storage } = useGlobal<GlobalPropertiesApi>();
+const workflowCounts = useWorkflowCounts();
+onMounted(workflowCounts.refresh);
+useIntervalFn(() => {
+  if (!document.hidden) workflowCounts.refresh();
+}, 15000);
+useEventListener(window, "focus", workflowCounts.refresh);
 
 const set: setType = reactive({
   sidebar: computed(() => {
