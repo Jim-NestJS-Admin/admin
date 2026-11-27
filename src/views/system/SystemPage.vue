@@ -14,6 +14,7 @@ import CrudPage from "@/components/Crud/CrudPage.vue";
 import MenuIcon from "@/components/ReIcon/src/MenuIcon.vue";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import MenuIconPicker from "./MenuIconPicker.vue";
+import RolePermissionTree from "./RolePermissionTree.vue";
 import SearchIcon from "~icons/ri/search-line";
 import AddIcon from "~icons/ri/add-circle-line";
 import KeyIcon from "~icons/ri/key-2-line";
@@ -23,7 +24,7 @@ import { scopePort } from "@/platform/system/scoped-port.mjs";
 import { defaultCell } from "@/components/Crud/model.mjs";
 import type { CrudCell, CrudRecord, CrudPort } from "@/components/Crud/types";
 import { api, type OperationBody } from "@/api/client";
-import { PERMISSIONS, ENUMS } from "@/api/constants";
+import { ENUMS } from "@/api/constants";
 import {
   resources,
   permission,
@@ -62,6 +63,8 @@ const port = computed<CrudPort>(() => {
 type Option = {
   id: string;
   label: string;
+  nickname?: string;
+  username?: string;
   disabled?: boolean;
   version?: number;
   parentId?: string | null;
@@ -122,9 +125,6 @@ const reset = reactive({ id: "", password: "" });
 let reloadList: (() => Promise<void>) | undefined;
 const requests = new Set<AbortController>();
 const can = (code: string) => !!code && user.permissions.includes(code);
-const permissionOptions = computed(() =>
-  PERMISSIONS.filter(code => user.permissions.includes(code))
-);
 const scopeOptions =
   ENUMS["components.schemas.SystemRoleAddData.properties.dataScope"];
 const menuTypes = ENUMS["components.schemas.SystemMenuAddData.properties.type"];
@@ -145,6 +145,10 @@ const options = (rows: CrudRecord[], fields: string[]): Option[] =>
                 .map(field => row[field])
                 .filter(value => typeof value === "string" && value)
                 .join(" · ") || row.id,
+            nickname:
+              typeof row.nickname === "string" ? row.nickname : undefined,
+            username:
+              typeof row.username === "string" ? row.username : undefined,
             disabled: row.enabled === false,
             version: typeof row.version === "number" ? row.version : undefined,
             parentId: typeof row.parentId === "string" ? row.parentId : null
@@ -346,6 +350,9 @@ function selection(field: string): Option[] {
   if (field === "parentId" && props.resource === "menu") return menus.value;
   return orgs.value;
 }
+const userOptionsById = computed(
+  () => new Map(users.value.map(option => [option.id, option]))
+);
 const referenceFields = [
   "parentId",
   "defaultOrgId",
@@ -403,6 +410,22 @@ function cell(row: CrudRecord, field: string): CrudCell {
       "
       :cell="cell"
     >
+      <template v-if="resource === 'org'" #cell-leaderId="{ row, text }">
+        <span
+          v-if="
+            typeof row.leaderId === 'string' &&
+            defaultCell(row, 'leaderId').state === 'visible' &&
+            userOptionsById.has(row.leaderId)
+          "
+          class="leader-identity"
+        >
+          <span>{{ userOptionsById.get(row.leaderId)?.nickname || "—" }}</span>
+          <span class="leader-account">{{
+            userOptionsById.get(row.leaderId)?.username || "—"
+          }}</span>
+        </span>
+        <template v-else>{{ text }}</template>
+      </template>
       <template v-if="resource === 'menu'" #cell-scope="{ value, text }">
         <el-tag
           v-if="value === 'platform' || value === 'tenant'"
@@ -554,25 +577,21 @@ function cell(row: CrudRecord, field: string): CrudCell {
             :value="option.id"
             :label="option.label"
             :disabled="option.disabled"
-          />
+          >
+            <span v-if="field === 'leaderId'" class="leader-identity">
+              <span>{{ option.nickname || "—" }}</span>
+              <span class="leader-account">{{ option.username || "—" }}</span>
+            </span>
+            <template v-else>{{ option.label }}</template>
+          </el-option>
         </el-select>
       </template>
       <template #form-permissions="{ values, disabled }">
-        <el-select
+        <RolePermissionTree
           :model-value="(values.permissions ?? []) as string[]"
-          multiple
-          filterable
           :disabled="disabled"
-          :aria-label="t('system.permissions')"
           @update:model-value="values.permissions = $event"
-        >
-          <el-option
-            v-for="code in permissionOptions"
-            :key="code"
-            :value="code"
-            :label="code"
-          />
-        </el-select>
+        />
       </template>
       <template #form-customOrgIds="{ values, disabled }">
         <el-select
@@ -751,6 +770,16 @@ function cell(row: CrudRecord, field: string): CrudCell {
   flex-direction: column;
   gap: 8px;
   min-height: 0;
+}
+
+.leader-identity {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.leader-account {
+  color: var(--el-text-color-secondary);
 }
 
 .side {

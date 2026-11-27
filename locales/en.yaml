@@ -215,6 +215,9 @@ system:
   saved: Saved
   lookupFailed: Could not load related options. Check your permissions and retry.
   permissions: Permissions
+  permissionTreeLoading: Loading grantable permissions
+  permissionTreePlaceholder: Search by name or permission code
+  permissionTreeUnavailable: This role contains permissions you cannot grant. Remove them from the selection before saving.
   organizations: Organizations
   globalScope: Global scope
   dataScope: Data scope

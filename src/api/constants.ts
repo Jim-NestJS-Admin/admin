@@ -406,6 +406,7 @@ export const OPERATION_PERMISSIONS = {
   systemRoleFieldSave: ["system:role-field:update"],
   systemRoleFieldSchema: ["system:role-field:page"],
   systemRoleFieldUpdate: ["system:role-field:update"],
+  systemRoleGrantablePermissions: ["system:role:page"],
   systemRoleInfo: ["system:role:info"],
   systemRolePage: ["system:role:page"],
   systemRoleSchema: ["system:role:page"],

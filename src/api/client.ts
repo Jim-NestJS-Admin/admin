@@ -2783,6 +2783,19 @@ export function createApiClient(
         config
       );
     },
+    systemRoleGrantablePermissions(
+      input: OperationInput<"systemRoleGrantablePermissions"> = {},
+      config: PureHttpRequestConfig = {}
+    ) {
+      return transport.request<
+        OperationResponse<"systemRoleGrantablePermissions">
+      >(
+        "get",
+        interpolate("/admin/system/permission/grantable", input.path),
+        { params: input.query, headers: input.headers, data: input.body },
+        config
+      );
+    },
     systemPermissionList(
       input: OperationInput<"systemPermissionList"> = {},
       config: PureHttpRequestConfig = {}

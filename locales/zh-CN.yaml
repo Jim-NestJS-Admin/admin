@@ -215,6 +215,9 @@ system:
   saved: 保存成功
   lookupFailed: 关联选项加载失败，请检查权限后重试
   permissions: 权限码
+  permissionTreeLoading: 正在加载可授予权限
+  permissionTreePlaceholder: 按名称或权限码搜索
+  permissionTreeUnavailable: 此角色保留了当前不可授予的权限。可从已选项中移除后再保存。
   organizations: 组织
   globalScope: 全局作用范围
   dataScope: 数据范围

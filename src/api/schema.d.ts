@@ -3704,6 +3704,23 @@ export type paths = {
     patch?: never;
     trace?: never;
   };
+  "/admin/system/permission/grantable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** 当前组织下可授予角色的权限及菜单分组 */
+    get: operations["systemRoleGrantablePermissions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/system/permission/list": {
     parameters: {
       query?: never;
@@ -6268,6 +6285,14 @@ export type components = {
       revision: number;
       /** @enum {boolean} */
       valid: true;
+    };
+    GrantablePermissionItem: {
+      code: string;
+      groups: string[];
+      label: string;
+    };
+    GrantablePermissionList: {
+      list: components["schemas"]["GrantablePermissionItem"][];
     };
     HistoryBody: {
       page?: number;
@@ -19836,6 +19861,31 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ApiErrorBody"];
+        };
+      };
+    };
+  };
+  systemRoleGrantablePermissions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @enum {integer} */
+            code: 1000;
+            data: components["schemas"]["GrantablePermissionList"];
+            /** @example ok */
+            message: string;
+          };
         };
       };
     };
