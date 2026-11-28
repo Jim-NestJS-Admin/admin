@@ -10513,7 +10513,7 @@ export type components = {
       keyword: string;
       /** @enum {string} */
       kind: "users" | "roles" | "orgs";
-      /** @description 按成员的组织角色归属筛选，仅用于成员目录 */
+      /** @description 按成员的默认组织或有效的组织角色归属筛选，仅用于成员目录 */
       orgId?: string;
       /** @default 1 */
       page: number;

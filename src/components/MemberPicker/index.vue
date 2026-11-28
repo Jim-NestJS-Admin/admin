@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
-import type { ElTree } from "element-plus";
+import { useMediaQuery } from "@vueuse/core";
+import { ElDialog, ElDrawer, type ElTree } from "element-plus";
 import { onSessionReset } from "@/platform/lifecycle";
 import { RequestFailure } from "@/utils/http";
 import type {
@@ -28,8 +29,15 @@ const emit = defineEmits<{ "update:modelValue": [value: string | string[]] }>();
 const { t } = useI18n();
 type Choice = MemberChoice & { unavailable?: boolean };
 type TreeNode = MemberOrganization & { children: TreeNode[] };
+type MobilePanel = "members" | "organizations" | "selected";
 const opened = ref(false),
   organizations = ref<MemberOrganization[]>([]);
+const narrow = useMediaQuery("(max-width: 760px)");
+const openInDrawer = ref(false);
+const mobilePanel = ref<MobilePanel>("members");
+const departmentButton = ref<HTMLElement>();
+const selectedButton = ref<HTMLElement>();
+const panelBackButton = ref<HTMLElement>();
 const rows = ref<MemberChoice[]>([]),
   selected = ref<Choice[]>([]),
   draft = ref<Choice[]>([]);
@@ -85,6 +93,27 @@ const currentOrg = computed(
   () =>
     organizations.value.find(org => org.id === orgId.value)?.label ??
     t("memberPicker.allMembers")
+);
+const departmentPath = computed(() => {
+  const labels: string[] = [];
+  const visited = new Set<string>();
+  const byId = new Map(organizations.value.map(org => [org.id, org]));
+  let current = byId.get(orgId.value);
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id);
+    labels.unshift(current.label);
+    current = current.parentId ? byId.get(current.parentId) : undefined;
+  }
+  return labels.join(" / ") || currentOrg.value;
+});
+const pickerTitle = computed(() =>
+  t(
+    openInDrawer.value && mobilePanel.value === "organizations"
+      ? "memberPicker.chooseOrg"
+      : openInDrawer.value && mobilePanel.value === "selected"
+        ? "memberPicker.selected"
+        : "memberPicker.title"
+  )
 );
 const allChecked = computed(
   () =>
@@ -221,6 +250,8 @@ async function open() {
   draft.value = selected.value.map(item => ({ ...item }));
   page.value = 1;
   includeChildren.value = true;
+  openInDrawer.value = narrow.value;
+  mobilePanel.value = "members";
   opened.value = true;
   void loadOrganizations();
   void loadMembers();
@@ -240,6 +271,36 @@ function chooseOrg(value: string) {
   orgId.value = value;
   tree.value?.setCurrentKey(value || undefined);
   filterMembers();
+  if (openInDrawer.value) void returnToMembers();
+}
+async function showPanel(panel: Exclude<MobilePanel, "members">) {
+  mobilePanel.value = panel;
+  await nextTick();
+  panelBackButton.value?.focus();
+}
+async function returnToMembers() {
+  const from = mobilePanel.value;
+  mobilePanel.value = "members";
+  await nextTick();
+  if (from === "organizations") departmentButton.value?.focus();
+  else selectedButton.value?.focus();
+}
+function handlePanelEscape(event: KeyboardEvent) {
+  if (!openInDrawer.value || mobilePanel.value === "members") return;
+  event.stopPropagation();
+  event.preventDefault();
+  void returnToMembers();
+}
+function isPicked(id: string) {
+  return draft.value.some(item => item.id === id);
+}
+function isPickDisabled(id: string) {
+  return (
+    busy.value ||
+    (!isPicked(id) &&
+      (Boolean(props.blockedMembers?.[id]) ||
+        (props.multiple && draft.value.length >= maximum.value)))
+  );
 }
 function toggle(member: MemberChoice, checked: boolean) {
   if (!checked) draft.value = draft.value.filter(item => item.id !== member.id);
@@ -346,35 +407,61 @@ onBeforeUnmount(() => {
         t("memberPicker.retry")
       }}</el-button></small
     >
-    <el-dialog
+    <component
+      :is="openInDrawer ? ElDrawer : ElDialog"
       :model-value="opened"
-      :title="t('memberPicker.title')"
-      width="min(920px, 96vw)"
-      top="7vh"
+      :title="pickerTitle"
+      v-bind="
+        openInDrawer
+          ? {
+              direction: 'rtl',
+              size: '100%',
+              bodyClass: 'member-picker-drawer-body',
+              closeOnPressEscape: mobilePanel === 'members'
+            }
+          : { width: 'min(920px, 96vw)', top: '7vh' }
+      "
       append-to-body
       :close-on-click-modal="false"
       destroy-on-close
       @update:model-value="!$event && close()"
     >
-      <div class="member-layout">
+      <div
+        class="member-layout"
+        :class="{ 'member-layout-mobile': openInDrawer }"
+        @keydown.esc="handlePanelEscape"
+      >
+        <button
+          v-if="openInDrawer && mobilePanel !== 'members'"
+          ref="panelBackButton"
+          type="button"
+          class="member-panel-button member-panel-back"
+          @click="returnToMembers"
+        >
+          <span aria-hidden="true">‹</span>
+          {{ t("memberPicker.backToMembers") }}
+        </button>
         <aside
+          v-show="!openInDrawer || mobilePanel === 'organizations'"
           v-loading="orgBusy"
           class="member-organizations"
           :aria-label="t('memberPicker.organizations')"
         >
-          <el-input
-            v-model="orgKeyword"
-            :placeholder="t('memberPicker.searchOrg')"
-            :aria-label="t('memberPicker.searchOrg')"
-            clearable
-          />
-          <el-button
-            class="member-all"
-            :type="!orgId ? 'primary' : 'default'"
-            plain
-            @click="chooseOrg('')"
-            >{{ t("memberPicker.allMembers") }}</el-button
-          >
+          <div class="member-search member-org-search">
+            <el-input
+              v-model="orgKeyword"
+              :placeholder="t('memberPicker.searchOrg')"
+              :aria-label="t('memberPicker.searchOrg')"
+              clearable
+            />
+            <el-button
+              class="member-all"
+              :type="!orgId ? 'primary' : 'default'"
+              plain
+              @click="chooseOrg('')"
+              >{{ t("memberPicker.allMembers") }}</el-button
+            >
+          </div>
           <div v-if="orgError" class="member-error" role="alert">
             {{ orgError }}
             <el-button link @click="loadOrganizations">{{
@@ -408,7 +495,24 @@ onBeforeUnmount(() => {
             </el-tree>
           </el-scrollbar>
         </aside>
-        <section class="member-results" :aria-label="t('memberPicker.members')">
+        <section
+          v-show="!openInDrawer || mobilePanel === 'members'"
+          class="member-results"
+          :aria-label="t('memberPicker.members')"
+        >
+          <button
+            v-if="openInDrawer"
+            ref="departmentButton"
+            type="button"
+            class="member-panel-button member-department"
+            @click="showPanel('organizations')"
+          >
+            <span>{{ t("memberPicker.department") }}</span>
+            <span class="member-org-name" :title="departmentPath">{{
+              departmentPath
+            }}</span>
+            <span aria-hidden="true">›</span>
+          </button>
           <div class="member-search">
             <el-input
               v-model="keyword"
@@ -418,14 +522,16 @@ onBeforeUnmount(() => {
               @input="search"
               @keyup.enter="filterMembers"
             />
-            <el-button @click="filterMembers">{{
+            <el-button v-if="!openInDrawer" @click="filterMembers">{{
               t("memberPicker.search")
             }}</el-button>
           </div>
-          <div class="member-scope">
-            <span class="member-org-name" :title="currentOrg">{{
-              currentOrg
-            }}</span
+          <div v-if="!openInDrawer || orgId" class="member-scope">
+            <span
+              v-if="!openInDrawer"
+              class="member-org-name"
+              :title="currentOrg"
+              >{{ currentOrg }}</span
             ><el-checkbox
               v-model="includeChildren"
               :disabled="!orgId"
@@ -439,8 +545,49 @@ onBeforeUnmount(() => {
               t("memberPicker.retry")
             }}</el-button>
           </div>
+          <el-checkbox
+            v-if="openInDrawer && multiple && rows.length"
+            class="member-page-choice"
+            :model-value="allChecked"
+            :indeterminate="partlyChecked"
+            :disabled="busy || !selectableRows.length"
+            @change="togglePage(Boolean($event))"
+          >
+            {{ t("memberPicker.selectPage") }}
+          </el-checkbox>
           <div v-loading="busy" class="member-table" :aria-busy="busy">
+            <el-scrollbar v-if="openInDrawer" class="member-list">
+              <el-checkbox
+                v-for="row in rows"
+                :key="row.id"
+                class="member-list-choice"
+                :model-value="isPicked(row.id)"
+                :disabled="isPickDisabled(row.id)"
+                @change="toggle(row, Boolean($event))"
+              >
+                <span class="member-identity">
+                  <el-avatar v-if="showAvatars" :size="24" :src="row.avatar">{{
+                    Array.from(row.label)[0]
+                  }}</el-avatar>
+                  <span>
+                    {{ row.label }}
+                    <small v-if="blockedMembers?.[row.id]">{{
+                      t("workflow.memberInBranch", {
+                        name: blockedMembers[row.id]
+                      })
+                    }}</small>
+                  </span>
+                </span>
+              </el-checkbox>
+              <p
+                v-if="!busy && !error && !rows.length"
+                class="member-muted member-empty"
+              >
+                {{ t("memberPicker.noMembers") }}
+              </p>
+            </el-scrollbar>
             <el-table
+              v-else
               :data="rows"
               row-key="id"
               height="100%"
@@ -458,15 +605,8 @@ onBeforeUnmount(() => {
                 /></template>
                 <template #default="{ row }"
                   ><el-checkbox
-                    :model-value="draft.some(item => item.id === row.id)"
-                    :disabled="
-                      busy ||
-                      (Boolean(blockedMembers?.[row.id]) &&
-                        !draft.some(item => item.id === row.id)) ||
-                      (multiple &&
-                        draft.length >= maximum &&
-                        !draft.some(item => item.id === row.id))
-                    "
+                    :model-value="isPicked(row.id)"
+                    :disabled="isPickDisabled(row.id)"
                     :aria-label="
                       t('memberPicker.selectMember', { name: row.label })
                     "
@@ -498,11 +638,14 @@ onBeforeUnmount(() => {
             </el-table>
           </div>
           <el-pagination
+            v-if="!openInDrawer || total > size"
             class="member-pagination"
             :current-page="page"
             :page-size="size"
             :total="total"
-            layout="total, prev, pager, next"
+            :layout="
+              openInDrawer ? 'prev, pager, next' : 'total, prev, pager, next'
+            "
             small
             :pager-count="5"
             :disabled="busy"
@@ -512,8 +655,67 @@ onBeforeUnmount(() => {
             "
           />
         </section>
+        <section
+          v-if="openInDrawer && mobilePanel === 'selected'"
+          class="member-selected-mobile"
+          :aria-label="t('memberPicker.selected')"
+        >
+          <div class="member-selected-heading">
+            <span>{{
+              t("memberPicker.selectedCount", {
+                count: draft.length,
+                limit: maximum
+              })
+            }}</span>
+            <el-button link :disabled="!draft.length" @click="draft = []">{{
+              t("memberPicker.clear")
+            }}</el-button>
+          </div>
+          <el-scrollbar class="member-list">
+            <div
+              v-for="member in draft"
+              :key="member.id"
+              class="member-selected-row"
+            >
+              <span
+                class="member-identity"
+                :class="{
+                  'member-error':
+                    member.unavailable || blockedMembers?.[member.id]
+                }"
+              >
+                <el-avatar v-if="showAvatars" :size="24" :src="member.avatar">{{
+                  Array.from(member.label)[0]
+                }}</el-avatar>
+                <span>
+                  {{ member.label }}
+                  <small v-if="blockedMembers?.[member.id]">{{
+                    t("workflow.memberInBranch", {
+                      name: blockedMembers[member.id]
+                    })
+                  }}</small>
+                </span>
+              </span>
+              <el-button
+                link
+                :aria-label="
+                  t('memberPicker.removeMember', { name: member.label })
+                "
+                @click="toggle(member, false)"
+                >{{ t("memberPicker.remove") }}</el-button
+              >
+            </div>
+            <p v-if="!draft.length" class="member-muted member-empty">
+              {{ t("memberPicker.noneSelected") }}
+            </p>
+          </el-scrollbar>
+        </section>
       </div>
-      <section class="member-selected" :aria-label="t('memberPicker.selected')">
+      <section
+        v-if="!openInDrawer"
+        class="member-selected"
+        :aria-label="t('memberPicker.selected')"
+      >
         <div class="member-selected-heading">
           <span>{{
             t("memberPicker.selectedCount", {
@@ -555,21 +757,54 @@ onBeforeUnmount(() => {
           t("memberPicker.invalidSelection")
         }}</small>
       </section>
-      <template #footer
-        ><el-button @click="close">{{ t("memberPicker.cancel") }}</el-button
-        ><el-button
-          type="primary"
-          :disabled="
-            invalid ||
-            Boolean(selectionError) ||
-            disabled ||
-            (required && !draft.length)
-          "
-          @click="confirm"
-          >{{ confirmLabel || t("memberPicker.confirm") }}</el-button
-        ></template
-      >
-    </el-dialog>
+      <template #footer>
+        <div
+          :class="{ 'member-drawer-footer': openInDrawer }"
+          @keydown.esc="handlePanelEscape"
+        >
+          <small
+            v-if="openInDrawer && invalid"
+            class="member-error"
+            role="alert"
+            >{{ t("memberPicker.invalidSelection") }}</small
+          >
+          <div :class="{ 'member-drawer-actions': openInDrawer }">
+            <button
+              v-if="openInDrawer"
+              ref="selectedButton"
+              type="button"
+              class="member-panel-button member-count-button"
+              :disabled="mobilePanel === 'selected'"
+              @click="showPanel('selected')"
+            >
+              <span aria-live="polite">{{
+                t("memberPicker.selectedShort", { count: draft.length })
+              }}</span>
+              <span v-if="mobilePanel !== 'selected'" aria-hidden="true"
+                >›</span
+              >
+            </button>
+            <div :class="{ 'member-confirm-actions': openInDrawer }">
+              <el-button @click="close">{{
+                t("memberPicker.cancel")
+              }}</el-button>
+              <el-button
+                type="primary"
+                :disabled="
+                  invalid ||
+                  Boolean(selectionError) ||
+                  disabled ||
+                  (required && !draft.length)
+                "
+                @click="confirm"
+              >
+                {{ confirmLabel || t("memberPicker.confirm") }}
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </component>
   </div>
 </template>
 
@@ -658,6 +893,11 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
+.member-org-search {
+  flex-direction: column;
+  gap: 12px;
+}
+
 .member-scope,
 .member-selected-heading {
   display: flex;
@@ -699,44 +939,185 @@ onBeforeUnmount(() => {
   color: var(--el-color-danger);
 }
 
-@media (width <= 640px) {
-  .member-layout {
-    grid-template-columns: 150px minmax(0, 1fr);
-    height: 42dvh;
-    min-height: 280px;
-  }
-
-  .member-organizations,
-  .member-results {
-    padding: 8px;
-  }
-
-  .member-scope {
-    flex-wrap: wrap;
-    gap: 0;
-    padding: 4px 0;
-  }
-
-  .member-pagination {
-    justify-content: center;
-  }
-
-  .member-pagination :deep(.el-pagination__total) {
-    display: none;
-  }
+:global(.el-drawer__body.member-picker-drawer-body) {
+  display: flex;
+  min-height: 0;
+  padding-block: 0;
+  overflow: hidden;
 }
 
-@media (width <= 420px) {
-  .member-layout {
-    grid-template-columns: 115px minmax(0, 1fr);
-  }
+.member-layout-mobile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  border: 0;
+}
 
-  .member-search {
-    flex-wrap: wrap;
-  }
+.member-layout-mobile .member-organizations,
+.member-layout-mobile .member-results,
+.member-selected-mobile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+}
 
-  .member-search .el-button {
-    display: none;
-  }
+.member-layout-mobile .member-tree-scroll :deep(.el-tree-node__content) {
+  height: 44px;
+}
+
+.member-panel-button {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--el-color-primary);
+  text-align: start;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--el-border-radius-base);
+}
+
+.member-panel-back {
+  align-self: flex-start;
+  padding-inline: 0 12px;
+}
+
+.member-department {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  color: var(--el-text-color-regular);
+  border: 1px solid var(--el-border-color);
+}
+
+.member-department .member-org-name {
+  flex: 1;
+  color: var(--el-text-color-primary);
+}
+
+.member-layout-mobile .member-search :deep(.el-input__wrapper) {
+  min-height: 44px;
+}
+
+.member-layout-mobile .member-search :deep(.el-input__inner) {
+  font-size: 16px;
+}
+
+.member-layout-mobile .member-org-search {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.member-layout-mobile .member-org-search :deep(.el-input) {
+  min-width: 0;
+}
+
+.member-layout-mobile .member-all {
+  flex-shrink: 0;
+  width: auto;
+  min-height: 44px;
+}
+
+.member-layout-mobile .member-scope {
+  justify-content: flex-start;
+  min-height: 36px;
+}
+
+.member-page-choice {
+  flex-shrink: 0;
+}
+
+.member-list {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.member-list-choice,
+.member-selected-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  min-height: 44px;
+  padding-block: 4px;
+  margin: 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.member-list-choice :deep(.el-checkbox__label),
+.member-selected-row .member-identity {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.member-list-choice .member-identity small,
+.member-selected-row .member-identity small {
+  display: block;
+}
+
+.member-list-choice :deep(.el-avatar),
+.member-selected-row :deep(.el-avatar) {
+  flex-shrink: 0;
+}
+
+.member-selected-row {
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.member-selected-row :deep(.el-button) {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+
+.member-layout-mobile .member-pagination {
+  justify-content: center;
+}
+
+.member-empty {
+  margin-block: 12px;
+}
+
+.member-drawer-footer {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.member-drawer-actions,
+.member-confirm-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.member-drawer-actions {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.member-count-button {
+  padding-inline: 0 8px;
+}
+
+.member-count-button:disabled {
+  color: var(--el-text-color-regular);
+  cursor: default;
+}
+
+.member-confirm-actions :deep(.el-button) {
+  min-height: 44px;
+  margin: 0;
 }
 </style>
