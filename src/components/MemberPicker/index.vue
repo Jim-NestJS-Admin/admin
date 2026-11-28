@@ -447,19 +447,21 @@ onBeforeUnmount(() => {
           class="member-organizations"
           :aria-label="t('memberPicker.organizations')"
         >
-          <el-input
-            v-model="orgKeyword"
-            :placeholder="t('memberPicker.searchOrg')"
-            :aria-label="t('memberPicker.searchOrg')"
-            clearable
-          />
-          <el-button
-            class="member-all"
-            :type="!orgId ? 'primary' : 'default'"
-            plain
-            @click="chooseOrg('')"
-            >{{ t("memberPicker.allMembers") }}</el-button
-          >
+          <div class="member-search member-org-search">
+            <el-input
+              v-model="orgKeyword"
+              :placeholder="t('memberPicker.searchOrg')"
+              :aria-label="t('memberPicker.searchOrg')"
+              clearable
+            />
+            <el-button
+              class="member-all"
+              :type="!orgId ? 'primary' : 'default'"
+              plain
+              @click="chooseOrg('')"
+              >{{ t("memberPicker.allMembers") }}</el-button
+            >
+          </div>
           <div v-if="orgError" class="member-error" role="alert">
             {{ orgError }}
             <el-button link @click="loadOrganizations">{{
@@ -891,6 +893,11 @@ onBeforeUnmount(() => {
   gap: 8px;
 }
 
+.member-org-search {
+  flex-direction: column;
+  gap: 12px;
+}
+
 .member-scope,
 .member-selected-heading {
   display: flex;
@@ -988,6 +995,7 @@ onBeforeUnmount(() => {
 }
 
 .member-department {
+  margin-top: 8px;
   margin-bottom: 8px;
   color: var(--el-text-color-regular);
   border: 1px solid var(--el-border-color);
@@ -1004,6 +1012,21 @@ onBeforeUnmount(() => {
 
 .member-layout-mobile .member-search :deep(.el-input__inner) {
   font-size: 16px;
+}
+
+.member-layout-mobile .member-org-search {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.member-layout-mobile .member-org-search :deep(.el-input) {
+  min-width: 0;
+}
+
+.member-layout-mobile .member-all {
+  flex-shrink: 0;
+  width: auto;
+  min-height: 44px;
 }
 
 .member-layout-mobile .member-scope {
